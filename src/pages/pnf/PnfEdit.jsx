@@ -5,16 +5,11 @@ import { InputLabel } from "../../components/InputLabel";
 import { Create } from "../../components/Link";
 import { FORM_LABELS } from "../../constants/formLabels";
 import * as Yup from "yup";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Api from "../../services/Api";
+import { useEffect, useState } from "react";
 
 
-const initialValues = {
-  codigo: "",
-  nombre: "",
-  abreviado: "",
-  abreviado_coord: "",
-};
 // Validando campos
 const validationSchema = Yup.object({
   nombre: Yup.string().required("Este campo es obligatorio"),
@@ -29,27 +24,47 @@ const validationSchema = Yup.object({
     .required("Este campo es obligatorio"), // Campo requerido
 });
 
-export function PnfCreate() {
-
+function PnfEdit() {
+  const {id} = useParams();
   const navegation = useNavigate()
+  const [pnf, setPnf] = useState();
+
   // Funcion para enviar datos al backend
   const onSubmit = async (values) => {
-    await Api.post(`/pnf`, values).then((response) => {
+    await Api.put(`/pnf/${id}`, values).then((response) => {
       console.log(response)
       navegation("/pnf", { state: { message: response.data.message } });
     })
   };
 
   const formik = useFormik({
-    initialValues,
+    enableReinitialize: true,
+    // Cargando los datos en los campos
+    initialValues: {
+      codigo: pnf?.codigo || '',
+      nombre: pnf?.nombre || '',
+      abreviado: pnf?.abreviado || '',
+      abreviado_coord: pnf?.abreviado_coord || ''
+    },
     validationSchema,
     onSubmit,
   });
 
+  useEffect(() => {
+    // Trayendo los datos del registro
+    const getPnf = async () => {
+      const response = await Api.get(`pnf/${id}`)
+      setPnf(response.data);
+    }
+
+    getPnf();
+
+  }, [id]);
+
   return (
     <form onSubmit={formik.handleSubmit}>
       <ContainerIput
-        title="NUEVO PNF"
+        title="EDITAR PNF"
         link={
           <Create path="/pnf" text="Volver" style="btn btn-secondary mb-4" />
         }
@@ -62,6 +77,7 @@ export function PnfCreate() {
               name="codigo"
               placeholder="INGRESE CÓDIGO"
               formik={formik}
+              
             />
             {/* Input para nombre de PNF */}
             <InputLabel
@@ -93,16 +109,10 @@ export function PnfCreate() {
         buttom={
           <>
             <Buttom
-              text="Guardar"
-              title="Guardar"
+              text="Editar"
+              title="Editar"
               type="submit"
               style="btn-success"
-            />
-            <Buttom
-              text="Cancelar"
-              title="Cancelar"
-              type="reset"
-              style="btn-danger ms-1"
             />
           </>
         }
@@ -110,3 +120,5 @@ export function PnfCreate() {
     </form>
   );
 }
+
+export default PnfEdit;

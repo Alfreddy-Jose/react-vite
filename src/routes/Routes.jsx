@@ -18,6 +18,7 @@ import Aulas from "../pages/espacios/Aulas";
 import AulasCreate from "../pages/espacios/AulasCreate";
 import Laboratorios from "../pages/espacios/Laboratorios";
 import LaboratoriosCreate from "../pages/espacios/LaboratorioCreate";
+import PnfEdit from "../pages/pnf/PnfEdit";
 
 export function AppRoutes() {
   return (
@@ -33,6 +34,7 @@ export function AppRoutes() {
         {/* Rutas de PNF */}
         <Route path="/pnf" element={<Pnf />} />
         <Route path="/pnf/create" element={<PnfCreate />} />
+        <Route path="/pnf/:id/edit" element={<PnfEdit />} />
 
         {/* Rutas de Sede */}
         <Route path="/sede" element={<Sede />} />

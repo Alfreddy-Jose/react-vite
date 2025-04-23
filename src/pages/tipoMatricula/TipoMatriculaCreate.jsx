@@ -5,24 +5,31 @@ import { InputLabel } from "../../components/InputLabel";
 import { Create } from "../../components/Link";
 import { FORM_LABELS } from "../../constants/formLabels";
 import * as Yup from "yup";
+import { useNavigate } from "react-router-dom";
+import Api from "../../services/Api";
 // Inicializando los campos
 const initialValues = {
-  name_tipo_matricula: "",
-  tipo_matricula: "",
+  nombre: "",
+  tipo: "",
 };
 // Validando los campos
 const validationSchema = Yup.object({
-  name_tipo_matricula: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
-  tipo_matricula: Yup.string()
+  nombre: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
+  tipo: Yup.string()
     .matches(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "Solo letras permitidas") //Solo letras
     .required("Este campo es obligatorio"), // Campo obligatorio
 });
 
 export function TipoMatriculaCreate() {
+  const navegation = useNavigate()
   // Funcion para enviar datos al backend
-  const onSubmit = (values) => {
-    console.log(values);
+  const onSubmit = async (values) => {
+    await Api.post(`/matricula`, values).then((response) => {
+      console.log(response)
+      navegation("/tipo_matricula", { state: { message: response.data.message } });
+    })
   };
+
 
   const formik = useFormik({
     initialValues,
@@ -47,7 +54,7 @@ export function TipoMatriculaCreate() {
             <InputLabel
               label={FORM_LABELS.TIPO_MATRICULA.NAME}
               type="text"
-              name="name_tipo_matricula"
+              name="nombre"
               placeholder="INGRESE UN NOMBRE"
               onBlur={formik.handleBlur}
               value={formik.values.codigo}
@@ -57,7 +64,7 @@ export function TipoMatriculaCreate() {
             <InputLabel
               label={FORM_LABELS.TIPO_MATRICULA.TYPE}
               type="text"
-              name="tipo_matricula"
+              name="tipo"
               placeholder="TIPO"
               formik={formik}
             />

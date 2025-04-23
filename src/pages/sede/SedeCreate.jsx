@@ -5,9 +5,11 @@ import { FORM_LABELS } from "../../constants/formLabels";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Create } from "../../components/Link";
+import Api from "../../services/Api";
+import { useNavigate } from "react-router-dom";
 
 const initialValues = {
-  numero_sede: "",
+  nro_sede: "",
   nombre_sede: "",
   nombre_abreviado: "",
   direccion: "",
@@ -15,20 +17,33 @@ const initialValues = {
 };
 // Validando campos
 const validationSchema = Yup.object({
-  numero_sede: Yup.string().required("Este campo es obligatorio").matches(/^[0-9]*$/, 'Solo números permitidos'),
-  nombre_sede: Yup.string().required("Este campo es obligatorio"),
+  nro_sede: Yup.string()
+    .required("Este campo es obligatorio") // Campo obligatorio
+    .matches(/^[0-9]*$/, "Solo números permitidos"), // Solo Permitir Números
+  nombre_sede: Yup.string()
+    .required("Este campo es obligatorio")
+    .matches(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "Solo letras permitidas"), // Permite Solo Letras
   nombre_abreviado: Yup.string()
     .min(3, "Minimo 3 caracteres")
-    .required("Este campo es obligatorio"),
+    .required("Este campo es obligatorio")
+    .matches(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "Solo letras permitidas"),
   direccion: Yup.string().required("Este campo es obligatorio"),
-  municipio_sede: Yup.string().required("Este campo es obligatorio"),
+  municipio: Yup.string()
+    .required("Este campo es obligatorio")
+    .matches(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "Solo letras permitidas"),
 });
 
 export function SedeCreate() {
+
+  const navegation = useNavigate()
   // Funcion para enviar datos al backend
-  const onSubmit = (values) => {
-    console.log(values);
+  const onSubmit = async (values) => {
+    await Api.post(`/sede`, values).then((response) => {
+      console.log(response)
+      navegation("/sede", { state: { message: response.data.message } });
+    })
   };
+
 
   const formik = useFormik({
     initialValues,
@@ -50,9 +65,9 @@ export function SedeCreate() {
             <>
               {/* Input para numero de SEDE */}
               <InputLabel
-                label={FORM_LABELS.PNF.SEDE_NUMBER}
+                label={FORM_LABELS.SEDE.SEDE_NUMBER}
                 type="text"
-                name="numero_sede"
+                name="nro_sede"
                 placeholder="NÚMERO DE SEDE"
                 onBlur={formik.handleBlur}
                 value={formik.values.codigo}
@@ -92,7 +107,7 @@ export function SedeCreate() {
               <InputLabel
                 label={FORM_LABELS.SEDE.MUNICIPIO}
                 type="text"
-                name="municipio_sede"
+                name="municipio"
                 placeholder="MUNICIPIO"
                 onBlur={formik.handleBlur}
                 value={formik.values.codigo}

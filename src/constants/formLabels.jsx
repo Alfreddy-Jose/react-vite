@@ -11,11 +11,11 @@ export const FORM_LABELS = {
         NAME_ABRE: "NOMBRE ABREVIADO",
         ABREVIADO: "ABREVIADO",
         COORDINACION: "ABREVIADO COORDINACIÓN",
-        SEDE_NUMBER: "NRO_SEDE"
     },
     SEDE: {
         ADDRE: "DIRECCIÓN",
-        MUNICIPIO: "MUNICIPIO"
+        MUNICIPIO: "MUNICIPIO",
+        SEDE_NUMBER: "NÚMERO SEDE"
     },
     LAPSO_ACADEMICO: {
         NAME: "NOMBRE LAPSO",
