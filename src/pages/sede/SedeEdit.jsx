@@ -6,15 +6,10 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Create } from "../../components/Link";
 import Api from "../../services/Api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 
-const initialValues = {
-  nro_sede: "",
-  nombre_sede: "",
-  nombre_abreviado: "",
-  direccion: "",
-  municipio_sede: "",
-};
+
 // Validando campos
 const validationSchema = Yup.object({
   nro_sede: Yup.string()
@@ -33,31 +28,48 @@ const validationSchema = Yup.object({
     .matches(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "Solo letras permitidas"),
 });
 
-export function SedeCreate() {
+export function SedeEdit() {
+  const {id} = useParams();
+  const navegation = useNavigate();
+  const [sede, setSede] = useState();
 
-  const navegation = useNavigate()
   // Funcion para enviar datos al backend
   const onSubmit = async (values) => {
-    await Api.post(`/sede`, values).then((response) => {
-      console.log(response)
-      navegation("/sede", { state: { message: response.data.message } }); 
-    })
+    await Api.put(`/sede/${id}`, values).then((response) => {
+      navegation("/sede", { state: { message: response.data.message } });
+    });
   };
 
-
   const formik = useFormik({
-    initialValues,
+    enableReinitialize: true,
+    // Cargando los datos en los campos
+    initialValues: {
+      nro_sede: sede?.nro_sede || '',
+      nombre_sede: sede?.nombre_sede || '',
+      nombre_abreviado: sede?.nombre_abreviado || '',
+      direccion: sede?.direccion || '',
+      municipio: sede?.municipio || ''
+    },
     validationSchema,
     onSubmit,
   });
 
-  console.log(formik.errors);
+  useEffect(() => {
+    // Trayendo los datos del registro
+    const getSede = async () => {
+      const response = await Api.get(`sede/${id}`)
+      setSede(response.data);
+    }
+
+    getSede();
+
+  }, [id]);
 
   return (
     <form onSubmit={formik.handleSubmit}>
       <>
         <ContainerIput
-          title="NUEVA SEDE"
+          title="EDITAR SEDE"
           link={
             <Create path="/sede" text="Volver" style="btn btn-secondary mb-4" />
           }
@@ -118,8 +130,8 @@ export function SedeCreate() {
           buttom={
             <>
               <Buttom
-                text="Guardar"
-                title="Guardar"
+                text="Editar"
+                title="Editar"
                 type="submit"
                 style="btn-success"
               />

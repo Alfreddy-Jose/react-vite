@@ -1,4 +1,3 @@
-
 export function InputLabel({
   type,
   name,
@@ -10,14 +9,14 @@ export function InputLabel({
     <div className="col-sm-6 col-xl-4">
       <label className="mt-4">{label}</label>
       <input
-        className={ `form-control ${formik.touched[name] && formik.errors[name] ? "border-danger" : ""}`}
-        // className={formik.touched[name] && formik.errors[name]}
+        className={`form-control ${formik.touched[name] && formik.errors[name] ? "border-danger" : ""}`}
         type={type}
         name={name}
         placeholder={placeholder}
         onChange={(e) => {
-          formik.handleChange(e);
-          formik.setFieldTouched(e.target.name, true, false);
+          const upperCaseValue = e.target.value.toUpperCase(); // Convertir a mayúsculas
+          formik.setFieldValue(name, upperCaseValue); // Actualizar el valor en Formik
+          formik.setFieldTouched(name, true, false); // Marcar el campo como tocado
         }}
         onBlur={formik.handleBlur}
         value={formik.values[name]}
@@ -25,6 +24,6 @@ export function InputLabel({
       {formik.touched[name] && formik.errors[name] ? (
         <div className="text-danger">{formik.errors[name]}</div>
       ) : null}
-    </div>  
+    </div>
   );
 }

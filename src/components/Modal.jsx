@@ -1,4 +1,4 @@
-function Modal({ id, titleModal, children }) {
+export function Modal({ id, titleModal, children }) {
   return (
     <>
       {/* Button trigger modal  */}
@@ -33,10 +33,7 @@ function Modal({ id, titleModal, children }) {
                 className="btn btn-secondary"
                 data-bs-dismiss="modal"
               >
-                Close
-              </button>
-              <button type="button" className="btn btn-primary">
-                Save changes
+                Cerrar
               </button>
             </div>
           </div>
@@ -45,5 +42,19 @@ function Modal({ id, titleModal, children }) {
     </>
   );
 }
+
+export function ButtomModal({ id }) {
+  return (
+    <button
+      type="button"
+      className="btn btn-info"
+      data-bs-toggle="modal"
+      data-bs-target={`#${id}`}
+    >
+      <i className="fa-regular fa-circle-question"></i>
+    </button>
+  );
+}
+
 
 export default Modal;

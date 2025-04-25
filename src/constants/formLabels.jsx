@@ -36,5 +36,11 @@ export const FORM_LABELS = {
         NUMBER: "NÚMERO DE AULA",
         ETAPA: "ETAPA",
         CODIGO: "CÓDIGO"
+    },
+    UNIVERSIDAD: {
+        RIF: "RIF",
+        NAME: "NOMBRE",
+        NAME_ABRE: "NOMBRE ABREVIADO",
+        ADRRE: "DIRRECIÓN"
     }
 };

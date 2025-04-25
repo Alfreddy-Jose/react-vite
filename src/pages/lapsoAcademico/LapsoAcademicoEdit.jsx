@@ -5,14 +5,10 @@ import { InputLabel } from "../../components/InputLabel";
 import { Create } from "../../components/Link";
 import { FORM_LABELS } from "../../constants/formLabels";
 import * as Yup from "yup";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Api from "../../services/Api";
+import { useEffect, useState } from "react";
 
-const initialValues = {
-  nombre_lapso: "",
-  ano: "",
-  tipo_lapso: "",
-}; 
 
 const validationSchema = Yup.object({
   nombre_lapso: Yup.string()
@@ -32,27 +28,46 @@ const validationSchema = Yup.object({
     .required("Este campo es obligatorio"),
 });
 
-export function LapsoAcademicoCreate() {
-  const navegation = useNavigate()
+export function LapsoAcademicoEdit() {
+
+  const {id} = useParams();
+  const navegation = useNavigate();
+  const [lapso, setLapso] = useState();
 
   // Funcion para enviar datos al backend
   const onSubmit = async (values) => {
-    await Api.post(`/lapso`, values).then((response) => {
-      console.log(response)
+    await Api.put(`/lapso/${id}`, values).then((response) => {
       navegation("/lapso_academico", { state: { message: response.data.message } });
-    })
+    });
   };
 
   const formik = useFormik({
-    initialValues,
+    enableReinitialize: true,
+    // Cargando los datos en los campos
+    initialValues: {
+      nombre_lapso: lapso?.nombre_lapso || '',
+      ano: lapso?.ano || '',
+      tipo_lapso: lapso?.tipo_lapso || ''
+    },
     validationSchema,
     onSubmit,
   });
 
+  useEffect(() => {
+    // Trayendo los datos del registro
+      const getLapso = async () => {
+      const response = await Api.get(`lapso/${id}`)
+      setLapso(response.data);
+    }
+
+    getLapso();
+
+  }, [id]);
+
   return (
     <form onSubmit={formik.handleSubmit}>
       <ContainerIput
-        title="NUEVO LAPSO ACADEMICO"
+        title="EDITAR LAPSO ACADEMICO"
         link={
           <Create
             path="/lapso_academico"
@@ -92,8 +107,8 @@ export function LapsoAcademicoCreate() {
         buttom={
           <>
             <Buttom
-              text="Guardar"
-              title="Guardar"
+              text="Editar"
+              title="Editar"
               type="submit"
               style="btn-success"
             />

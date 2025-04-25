@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { ContainerTable } from "../../components/ContainerTable";
 import { Create } from "../../components/Link";
 import Api from "../../services/Api";
-import DataTable from "react-data-table-component";
+import Acciones from "../../components/Acciones";
+import { Tabla } from "../../components/Tabla";
 
 const columns = [
   { name: "ID",
@@ -21,6 +22,12 @@ const columns = [
     name: "ROL",
     selector: row => row.roles.join(', '),
     sortable: true,
+  },
+  {
+    name: "ACCIONES",
+    cell: (row) =>(
+      <Acciones url={`/usuario/${row.id}/edit`} />
+    )
   }
 ]
 
@@ -46,10 +53,9 @@ export function Usuario() {
         // Boton para crear nuevos registros
         link={<Create path="/usuarios/create" />}
         // Tabla
-        tabla={<DataTable
+        tabla={<Tabla
             columns={columns}
             data={usuarios}
-            pagination
           />}
       />
     </>

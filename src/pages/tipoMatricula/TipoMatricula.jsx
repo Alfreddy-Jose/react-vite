@@ -1,10 +1,35 @@
 import { useEffect, useState } from "react";
 import { ContainerTable } from "../../components/ContainerTable";
 import { Create } from "../../components/Link";
-import Prueba from "../../components/TablaPrue";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import Api from "../../services/Api";
 import Alerta from "../../components/Alert";
+import { Tabla } from "../../components/Tabla";
+import Acciones from "../../components/Acciones";
+
+
+
+const columns = [
+  {
+    name: "ID",
+    selector: (row) => row.id,
+    sortable: true,
+  },
+  {
+    name: "NOMBRE",
+    selector: (row) => row.nombre,
+    sortable: true,
+  },
+  {
+    name: "TIPO",
+    selector: (row) => row.tipo,
+  },
+  {
+    name: "ACCIONES",
+    cell: (row) => <Acciones url={`/tipo_matricula/${row.id}/edit`} />,
+  },
+];
+
 
 export function TipoMatricula() {
 
@@ -13,10 +38,10 @@ export function TipoMatricula() {
 
   useEffect(() => {
 
-    // Mostrar la lista de PNF
+    // Mostrar la lista de Matricula
     getAllMatriculas();
 
-    // Motrar Alerta al registrar unm nuevo tipop de matricula
+    // Motrar Alerta al registrar unm nuevo tipo de matricula
     if (location.state?.message) {
       Alerta(location.state.message);
     }
@@ -40,19 +65,8 @@ export function TipoMatricula() {
         // Boton para crear nuevos registros
         link={<Create path="/tipo_matricula/create" />}
         // Tabla
-        tabla={<Prueba c1="ID" c2="NOMBRE" c3="TIPO" c4="ACCIONES">
-            { matricula.map((matricula) => (
-              <tr key={matricula.id}>
-                <td>{ matricula.id }</td>
-                <td>{ matricula.nombre }</td>
-                <td>{ matricula.tipo }</td>
-                <td>
-                  <Link to={`/tipo_matricula/${matricula.id}/edit`} className="btn btn-primary" >Editar</Link>
-                  <button className="btn btn-danger">Eliminar</button>
-                </td>
-              </tr>
-            )) }
-        </Prueba>}
+        tabla={<Tabla data={matricula} columns={columns}>
+        </Tabla>}
       />
     </>
   );

@@ -5,7 +5,8 @@ import { Tabla } from "../../components/Tabla";
 import { useLocation } from "react-router-dom";
 import Alerta from "../../components/Alert";
 import Api from "../../services/Api";
-import DataTable from "react-data-table-component";
+import Acciones from "../../components/Acciones";
+import Modal, { ButtomModal } from "../../components/Modal";
 
 const columns = [
   {
@@ -23,36 +24,42 @@ const columns = [
     sortable: true,
   },
   {
-    name: "ABREVIADO",
-    selector: (row) => row.nombre_abreviado,
-    sortable: true,
+    name: "+INFO",
+    cell: (row) => (
+      <div>
+        <ButtomModal id={row.id} />
+
+        <Modal titleModal={`+INFO ${row.nombre_abreviado}`} id={row.id}>
+          <p>
+            <b>NÚMERO SEDE: </b> {row.nro_sede}
+          </p>
+          <p>
+            <b>NOMBRE: </b> {row.nombre_sede}
+          </p>
+          <p>
+            <b>ABREVIADO: </b> {row.nombre_abreviado}
+          </p>
+          <p>
+            <b>DIRECCIÓN: </b> {row.direccion}
+          </p>
+          <p>
+            <b>MUNICIPIO: </b> {row.municipio}
+          </p>
+        </Modal>
+      </div>
+    ),
   },
   {
-    name: "DIRECCIÓN",
-    selector: (row) => row.direccion,
-    sortable: true,
-  },
-  {
-    name: "MUNICIPIO",
-    selector: (row) => row.municipio,
-    sortable: true,
+    name: "ACCIONES",
+    cell: (row) => <Acciones url={`/sede/${row.id}/edit`} />,
   },
 ];
 
-const paginacionObciones = {
-  rowsPerPageText: "Filas por Páginas",
-  rangeSeparatorText: "de",
-  selectAllRowsItem: true,
-  selectAllRowsItemText: "Todos",
-};
-
 export function Sede() {
-
   const [sedes, setSedes] = useState([]);
   const location = useLocation();
 
   useEffect(() => {
-
     // Mostrar la lista de PNF
     getAllSedes();
 
@@ -63,30 +70,21 @@ export function Sede() {
 
     // Limpiar el estado de navegacion para no mostrar el mensaje nuevamente
     window.history.replaceState({}, "");
-
   }, [location.state]);
 
+  // Recibiendo datos de la Api
   const getAllSedes = async () => {
     const response = await Api.get(`/sedes`);
     setSedes(response.data);
   };
 
-
-
-    return (
-      <>
-        <ContainerTable 
-          link={<Create path="/sede/create" />}
-          title="SEDES"
-          tabla={<DataTable
-            className="table-responsive"
-            columns={columns}
-            data={sedes}
-            pagination
-            paginationComponentOptions={paginacionObciones}
-            fixedHeader
-            />}
-        />
-      </>
-    );
-  }
+  return (
+    <>
+      <ContainerTable
+        link={<Create path="/sede/create" />}
+        title="SEDES"
+        tabla={<Tabla data={sedes} columns={columns} />}
+      />
+    </>
+  );
+}

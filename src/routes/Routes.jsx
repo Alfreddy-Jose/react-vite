@@ -19,13 +19,18 @@ import AulasCreate from "../pages/espacios/AulasCreate";
 import Laboratorios from "../pages/espacios/Laboratorios";
 import LaboratoriosCreate from "../pages/espacios/LaboratorioCreate";
 import PnfEdit from "../pages/pnf/PnfEdit";
+import Roles from "../pages/roles/Roles";
+import { TipoMatriculaEdit } from "../pages/tipoMatricula/MatriculaEdit";
+import { Universidad } from "../pages/universidad/Universidad";
+import { SedeEdit } from "../pages/sede/SedeEdit";
+import { LapsoAcademicoEdit } from "../pages/lapsoAcademico/LapsoAcademicoEdit";
 
 export function AppRoutes() {
   return (
     <>
       <Routes>
-        <Route index path="/" element={<Login />} />
-        <Route path="/panel" element={<Panel />} />
+        <Route index path="/panel" element={<Panel />} />
+        <Route path="/login" element={<Login />} />
 
         {/* Rutas de Usuario */}
         <Route path="/usuarios" element={<Usuario />} />
@@ -39,6 +44,7 @@ export function AppRoutes() {
         {/* Rutas de Sede */}
         <Route path="/sede" element={<Sede />} />
         <Route path="/sede/create" element={<SedeCreate />} />
+        <Route path="/sede/:id/edit" element={<SedeEdit />} />
 
         {/* Rutas de Lapso Academico */}
         <Route path="/lapso_academico" element={<LapsoAcademico />} />
@@ -46,6 +52,7 @@ export function AppRoutes() {
           path="/lapso_academico/create"
           element={<LapsoAcademicoCreate />}
         />
+        <Route path="/lapso_academico/:id/edit" element={<LapsoAcademicoEdit />} />
 
         {/* Rutas de Tipo de matricula */}
         <Route path="/tipo_matricula" element={<TipoMatricula />} />
@@ -53,6 +60,8 @@ export function AppRoutes() {
           path="/tipo_matricula/create"
           element={<TipoMatriculaCreate />}
         />
+        <Route path="/tipo_matricula/:id/edit" element={<TipoMatriculaEdit />} />
+
         {/* Rutas de Secciones*/}
         <Route path="/secciones" element={<Secciones />} />
         {/* <Route path="/secciones/create" element={<SeccionesCreate />} /> */}
@@ -66,6 +75,13 @@ export function AppRoutes() {
         <Route path="/aula/create" element={<AulasCreate />} />
         <Route path="/laboratorio" element={<Laboratorios />} />
         <Route path="/laboratorio/create" element={<LaboratoriosCreate />} />
+
+        {/* Rutas para los Roles */}
+        <Route path="/roles" element={<Roles />} />
+
+        {/* Rutas para la Universidad */}
+        <Route path="/universidad" element={<Universidad />} />
+
       </Routes>
     </>
   );
