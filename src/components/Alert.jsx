@@ -1,4 +1,5 @@
 import Swal from "sweetalert2";
+import Api from "../services/Api";
 
 export function Alerta(mensaje) {
   let message = mensaje;

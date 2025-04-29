@@ -4,7 +4,7 @@ import { Create } from "../../components/Link";
 import { Tabla } from "../../components/Tabla";
 import { useLocation } from "react-router-dom";
 import Alerta from "../../components/Alert";
-import Api from "../../services/Api";
+import { GetAll } from "../../services/Api";
 import Acciones from "../../components/Acciones";
 import Modal, { ButtomModal } from "../../components/Modal";
 
@@ -51,17 +51,24 @@ const columns = [
   },
   {
     name: "ACCIONES",
-    cell: (row) => <Acciones url={`/sede/${row.id}/edit`} />,
+    cell: (row) => (
+      <Acciones
+        url={`/sede/${row.id}/edit`}
+        urlDelete={`/sede/${row.id}`}
+        navegar="/sede"
+      />
+    ),
   },
 ];
 
 export function Sede() {
   const [sedes, setSedes] = useState([]);
+  const [loading, setLoading] = useState(true);
   const location = useLocation();
 
   useEffect(() => {
     // Mostrar la lista de PNF
-    getAllSedes();
+    GetAll(setSedes, setLoading, "/sedes");
 
     // Motrar Alerta al registrar un nuevo PNF
     if (location.state?.message) {
@@ -72,17 +79,12 @@ export function Sede() {
     window.history.replaceState({}, "");
   }, [location.state]);
 
-  // Recibiendo datos de la Api
-  const getAllSedes = async () => {
-    const response = await Api.get(`/sedes`);
-    setSedes(response.data);
-  };
-
   return (
     <>
       <ContainerTable
-        link={<Create path="/sede/create" />}
         title="SEDES"
+        link={<Create path="/sede/create" />}
+        isLoading={loading}
         tabla={<Tabla data={sedes} columns={columns} />}
       />
     </>

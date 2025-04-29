@@ -37,6 +37,13 @@ export const FORM_LABELS = {
         ETAPA: "ETAPA",
         CODIGO: "CÓDIGO"
     },
+    LABORATORIO: {
+        NAME: "NOMBRE DE LABORATORIO",
+        ABREVIADO: "ABREVIADO LABORATORIO",
+        ETAPA: "ETAPA",
+        CODIGO: "CÓDIGO",
+        EQUIPOS: "EQUIPOS",
+    },
     UNIVERSIDAD: {
         RIF: "RIF",
         NAME: "NOMBRE",

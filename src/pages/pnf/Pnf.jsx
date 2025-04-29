@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ContainerTable } from "../../components/ContainerTable";
 import { Create } from "../../components/Link";
-import Api from "../../services/Api";
+import { GetAll } from "../../services/Api";
 import { useLocation } from "react-router-dom";
 import Alerta from "../../components/Alert";
 import { Modal, ButtomModal } from "../../components/Modal";
@@ -50,17 +50,24 @@ const columns = [
   },
   {
     name: "ACCIONES",
-    cell: (row) => <Acciones url={`/pnf/${row.id}/edit`} id={row.id} />,
+    cell: (row) => (
+      <Acciones
+        url={`/pnf/${row.id}/edit`}
+        urlDelete={`/pnf/${row.id}`}
+        navegar="/pnf"
+      />
+    ),
   },
 ];
 
 export function Pnf() {
   const [pnf, setPnf] = useState([]);
+  const [loading, setLoading] = useState(true);
   const location = useLocation();
 
   useEffect(() => {
     // Mostrar la lista de PNF
-    getAllPnf();
+    GetAll(setPnf, setLoading, "/pnf");
 
     // Motrar Alerta al registrar un nuevo PNF
     if (location.state?.message) {
@@ -71,11 +78,6 @@ export function Pnf() {
     window.history.replaceState({}, "");
   }, [location.state]);
 
-  const getAllPnf = async () => {
-    const response = await Api.get(`/pnf`);
-    setPnf(response.data);
-  };
-
   return (
     <>
       {/* Contenedor para la tablas de PNF */}
@@ -84,6 +86,7 @@ export function Pnf() {
         title="PNF"
         // Boton para crear nuevos registros
         link={<Create path="/pnf/create" />}
+        isLoading={loading}
         // Tabla
         tabla={<Tabla columns={columns} data={pnf} />}
       />

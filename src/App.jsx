@@ -10,7 +10,7 @@ import { Sidebar } from "./components/layouts/Sidebar";
 import { AppRoutes } from "./routes/Routes";
 import { Navbar } from "./components/layouts/Navbar";
 import { Footer } from "./components/layouts/Footer";
-import Content from "./components/Content";
+import Layout from "./components/Layout";
 
 export function App() {
   const [isSidebarMinimized, setIsSidebarMinimized] = useState(false);
@@ -21,13 +21,12 @@ export function App() {
 
   return (
     <Router>
-      <Content
+      <Layout
         Sidebar={<Sidebar toggleSidebar={toggleSidebar} isSidebarMinimized={isSidebarMinimized} />}
         Navbar={<Navbar />}
-        AppRoutes={<AppRoutes />}
         Footer={<Footer />}
         wrapperClass={isSidebarMinimized ? "sidebar_minimize" : ""}
-      />
+      ><AppRoutes /></Layout>
     </Router>
   );
 }

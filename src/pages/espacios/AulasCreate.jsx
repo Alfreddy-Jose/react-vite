@@ -17,16 +17,15 @@ const initialValues = {
 
 // Validaciones para cada campo
 const validationSchema = Yup.object({
-  nombre_aula: Yup.string()
-    .required("Este campo es obligatorio"), // Campo obligatorio
-    codigo_aula: Yup.string()
-    .required("Este campo es obligatorio"), // Campo obligatorio
-    etapa: Yup.string()
+  nombre_aula: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
+  codigo_aula: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
+  etapa: Yup.string()
+    .matches(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "Solo letras permitidas") // Solo letras
     .max(1, "Maximo 1 carácteres") // Máximo 1 carácter
     .required("Este campo es obligatorio"), // Campo obligatorio
-    numero_aula: Yup.string()
+  numero_aula: Yup.string()
     .matches(/^[0-:-9]*$/, "Formato incorrecto") // Solo números
-    .required("Este campo es obligatorio") // Campo obligatorio
+    .required("Este campo es obligatorio"), // Campo obligatorio
 });
 
 export default function AulasCreate() {
@@ -47,11 +46,7 @@ export default function AulasCreate() {
         <ContainerIput
           title="NUEVA AULA"
           link={
-            <Create
-              path="/aula"
-              text="Volver"
-              style="btn btn-secondary mb-4"
-            />
+            <Create path="/aula" text="Volver" style="btn btn-secondary mb-4" />
           }
           input={
             <>

@@ -5,9 +5,8 @@ import { InputLabel } from "../../components/InputLabel";
 import { Create } from "../../components/Link";
 import { FORM_LABELS } from "../../constants/formLabels";
 import * as Yup from "yup";
+import { PostAll } from "../../services/Api";
 import { useNavigate } from "react-router-dom";
-import Api from "../../services/Api";
-
 
 const initialValues = {
   codigo: "",
@@ -30,14 +29,12 @@ const validationSchema = Yup.object({
 });
 
 export function PnfCreate() {
+  const navegation = useNavigate();
 
-  const navegation = useNavigate()
+
   // Funcion para enviar datos al backend
-  const onSubmit = async (values) => {
-    await Api.post(`/pnf`, values).then((response) => {
-      console.log(response)
-      navegation("/pnf", { state: { message: response.data.message } });
-    })
+  const onSubmit = (values) => {
+    PostAll(values, '/pnf', navegation)
   };
 
   const formik = useFormik({

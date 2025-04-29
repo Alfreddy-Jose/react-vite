@@ -2,12 +2,10 @@ import { useEffect, useState } from "react";
 import { ContainerTable } from "../../components/ContainerTable";
 import { Create } from "../../components/Link";
 import { useLocation } from "react-router-dom";
-import Api from "../../services/Api";
+import { GetAll } from "../../services/Api";
 import Alerta from "../../components/Alert";
 import { Tabla } from "../../components/Tabla";
 import Acciones from "../../components/Acciones";
-
-
 
 const columns = [
   {
@@ -26,20 +24,24 @@ const columns = [
   },
   {
     name: "ACCIONES",
-    cell: (row) => <Acciones url={`/tipo_matricula/${row.id}/edit`} />,
+    cell: (row) => (
+      <Acciones
+        url={`/tipo_matricula/${row.id}/edit`}
+        urlDelete={`/matricula/${row.id}`}
+        navegar="/tipo_matricula"
+      />
+    ),
   },
 ];
 
-
 export function TipoMatricula() {
-
+  const [loading, setLoading] = useState(true);
   const [matricula, setMatricula] = useState([]);
   const location = useLocation();
 
   useEffect(() => {
-
     // Mostrar la lista de Matricula
-    getAllMatriculas();
+    GetAll(setMatricula, setLoading, "/matriculas");
 
     // Motrar Alerta al registrar unm nuevo tipo de matricula
     if (location.state?.message) {
@@ -48,13 +50,7 @@ export function TipoMatricula() {
 
     // Limpiar el estado de navegacion para no mostrar el mensaje nuevamente
     window.history.replaceState({}, "");
-
   }, [location.state]);
-
-  const getAllMatriculas = async () => {
-    const response = await Api.get(`/matriculas`);
-    setMatricula(response.data);
-  };
 
   return (
     <>
@@ -65,8 +61,8 @@ export function TipoMatricula() {
         // Boton para crear nuevos registros
         link={<Create path="/tipo_matricula/create" />}
         // Tabla
-        tabla={<Tabla data={matricula} columns={columns}>
-        </Tabla>}
+        tabla={<Tabla data={matricula} columns={columns}></Tabla>}
+        isLoading={loading}
       />
     </>
   );

@@ -5,7 +5,7 @@ import { FORM_LABELS } from "../../constants/formLabels";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Create } from "../../components/Link";
-import Api from "../../services/Api";
+import { PostAll } from "../../services/Api";
 import { useNavigate } from "react-router-dom";
 
 const initialValues = {
@@ -34,16 +34,11 @@ const validationSchema = Yup.object({
 });
 
 export function SedeCreate() {
-
-  const navegation = useNavigate()
+  const navegation = useNavigate();
   // Funcion para enviar datos al backend
-  const onSubmit = async (values) => {
-    await Api.post(`/sede`, values).then((response) => {
-      console.log(response)
-      navegation("/sede", { state: { message: response.data.message } }); 
-    })
+  const onSubmit = (values) => {
+    PostAll(values, "/sede", navegation);
   };
-
 
   const formik = useFormik({
     initialValues,

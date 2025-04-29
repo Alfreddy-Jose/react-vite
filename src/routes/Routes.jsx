@@ -29,7 +29,7 @@ export function AppRoutes() {
   return (
     <>
       <Routes>
-        <Route index path="/panel" element={<Panel />} />
+        <Route index path="/" element={<Panel />} />
         <Route path="/login" element={<Login />} />
 
         {/* Rutas de Usuario */}

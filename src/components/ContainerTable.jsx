@@ -1,4 +1,6 @@
-export function ContainerTable({ title, link, tabla }) {
+import Spinner from "./Spinner";
+
+export function ContainerTable({ title, link, tabla, isLoading = false }) {
 
 
   return (
@@ -9,7 +11,7 @@ export function ContainerTable({ title, link, tabla }) {
           <div className="card-header">
             <div className="card-title">{`LISTA DE ${title}`}</div>
           </div>
-          {tabla}
+          { isLoading ? <Spinner /> : tabla}
         </div>
       </div>
     </div>

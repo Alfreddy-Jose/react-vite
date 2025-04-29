@@ -16,7 +16,9 @@ const initialValues = {
 
 // Validaciones para cada campo
 const validationSchema = Yup.object({
-  nombre: Yup.string().matches(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "Solo letras permitidas").required("Este campo es obligatorio"),
+  nombre: Yup.string()
+    .matches(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "Solo letras permitidas")
+    .required("Este campo es obligatorio"),
   email: Yup.string()
     .email("Correo no válido")
     .required("Este campo es obligatorio"),
@@ -97,6 +99,14 @@ export function UsuarioCreate() {
                 value={formik.values.codigo}
                 formik={formik}
               />
+              <div className="col-sm-6 col-xl-4">
+                <label className="mt-4" htmlFor="rol">ROL</label>
+                <select className="form-control" name="rol" id="rol">
+                  <option value="" selected disabled>SELECCIONE UN ROL</option>
+                  <option value="">ADMINISTRADOR</option>
+                  <option value="">SUPERVISOR</option>
+                </select>
+              </div>
             </>
           }
           buttom={

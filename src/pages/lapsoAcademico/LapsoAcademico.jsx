@@ -3,12 +3,11 @@ import { ContainerTable } from "../../components/ContainerTable";
 import { Create } from "../../components/Link";
 import { Tabla } from "../../components/Tabla";
 import { useLocation } from "react-router-dom";
-import Api from "../../services/Api";
+import { GetAll } from "../../services/Api";
 import Alerta from "../../components/Alert";
 import Acciones from "../../components/Acciones";
 
-
-const columns = [ 
+const columns = [
   {
     name: "ID",
     selector: (row) => row.id,
@@ -31,23 +30,23 @@ const columns = [
   {
     name: "ACCIONES",
     cell: (row) => (
-      <Acciones url={`/lapso_academico/${row.id}/edit`} />
-    )
-  }
+      <Acciones
+        url={`/lapso_academico/${row.id}/edit`}
+        urlDelete={`/lapso/${row.id}`}
+        navegar="/lapso_academico"
+      />
+    ),
+  },
 ];
 
-
 export function LapsoAcademico() {
-
-
-
+  const [loading, setLoading] = useState(true);
   const [lapsos, setLapsos] = useState([]);
   const location = useLocation();
 
   useEffect(() => {
-
     // Mostrar la lista de PNF
-    getAllLapsos();
+    GetAll(setLapsos, setLoading, "/lapsos");
 
     // Motrar Alerta al registrar un nuevo PNF
     if (location.state?.message) {
@@ -56,16 +55,7 @@ export function LapsoAcademico() {
 
     // Limpiar el estado de navegacion para no mostrar el mensaje nuevamente
     window.history.replaceState({}, "");
-
   }, [location.state]);
-
-  // Recibiendo datos de la Api
-  const getAllLapsos = async () => {
-    const response = await Api.get(`/lapsos`);
-    setLapsos(response.data);
-  };
-
-
 
   return (
     <>
@@ -77,6 +67,7 @@ export function LapsoAcademico() {
         link={<Create path="/lapso_academico/create" />}
         // Tabla
         tabla={<Tabla columns={columns} data={lapsos} />}
+        isLoading={loading}
       />
     </>
   );
