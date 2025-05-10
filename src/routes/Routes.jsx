@@ -24,64 +24,257 @@ import { TipoMatriculaEdit } from "../pages/tipoMatricula/MatriculaEdit";
 import { Universidad } from "../pages/universidad/Universidad";
 import { SedeEdit } from "../pages/sede/SedeEdit";
 import { LapsoAcademicoEdit } from "../pages/lapsoAcademico/LapsoAcademicoEdit";
+import Layout from "../components/Layout";
+import Persona from "../pages/persona/Persona";
+import PersonaCreate from "../pages/persona/PersonaCreate";
+import PersonaEdit from "../pages/persona/PersonaEdit";
 
 export function AppRoutes() {
   return (
     <>
       <Routes>
-        <Route index path="/" element={<Panel />} />
         <Route path="/login" element={<Login />} />
 
+        {/* Ruta del Dashboard */}
+        <Route
+          path="/"
+          element={
+            <Layout>
+              <Panel />
+            </Layout>
+          }
+        />
+
         {/* Rutas de Usuario */}
-        <Route path="/usuarios" element={<Usuario />} />
-        <Route path="/usuarios/create" element={<UsuarioCreate />} />
+        <Route
+          path="/usuarios"
+          element={
+            <Layout>
+              <Usuario />
+            </Layout>
+          }
+        />
+        <Route
+          path="/usuarios/create"
+          element={
+            <Layout>
+              <UsuarioCreate />
+            </Layout>
+          }
+        />
 
         {/* Rutas de PNF */}
-        <Route path="/pnf" element={<Pnf />} />
-        <Route path="/pnf/create" element={<PnfCreate />} />
-        <Route path="/pnf/:id/edit" element={<PnfEdit />} />
+        <Route
+          path="/pnf"
+          element={
+            <Layout>
+              <Pnf />
+            </Layout>
+          }
+        />
+        <Route
+          path="/pnf/create"
+          element={
+            <Layout>
+              <PnfCreate />
+            </Layout>
+          }
+        />
+        <Route
+          path="/pnf/:id/edit"
+          element={
+            <Layout>
+              <PnfEdit />
+            </Layout>
+          }
+        />
 
         {/* Rutas de Sede */}
-        <Route path="/sede" element={<Sede />} />
-        <Route path="/sede/create" element={<SedeCreate />} />
-        <Route path="/sede/:id/edit" element={<SedeEdit />} />
+        <Route
+          path="/sede"
+          element={
+            <Layout>
+              <Sede />
+            </Layout>
+          }
+        />
+        <Route
+          path="/sede/create"
+          element={
+            <Layout>
+              <SedeCreate />
+            </Layout>
+          }
+        />
+        <Route
+          path="/sede/:id/edit"
+          element={
+            <Layout>
+              <SedeEdit />
+            </Layout>
+          }
+        />
 
         {/* Rutas de Lapso Academico */}
-        <Route path="/lapso_academico" element={<LapsoAcademico />} />
+        <Route
+          path="/lapso_academico"
+          element={
+            <Layout>
+              <LapsoAcademico />
+            </Layout>
+          }
+        />
         <Route
           path="/lapso_academico/create"
-          element={<LapsoAcademicoCreate />}
+          element={
+            <Layout>
+              <LapsoAcademicoCreate />
+            </Layout>
+          }
         />
-        <Route path="/lapso_academico/:id/edit" element={<LapsoAcademicoEdit />} />
+        <Route
+          path="/lapso_academico/:id/edit"
+          element={
+            <Layout>
+              <LapsoAcademicoEdit />
+            </Layout>
+          }
+        />
 
         {/* Rutas de Tipo de matricula */}
-        <Route path="/tipo_matricula" element={<TipoMatricula />} />
+        <Route
+          path="/tipo_matricula"
+          element={
+            <Layout>
+              <TipoMatricula />
+            </Layout>
+          }
+        />
         <Route
           path="/tipo_matricula/create"
-          element={<TipoMatriculaCreate />}
+          element={
+            <Layout>
+              <TipoMatriculaCreate />
+            </Layout>
+          }
         />
-        <Route path="/tipo_matricula/:id/edit" element={<TipoMatriculaEdit />} />
+        <Route
+          path="/tipo_matricula/:id/edit"
+          element={
+            <Layout>
+              <TipoMatriculaEdit />
+            </Layout>
+          }
+        />
 
         {/* Rutas de Secciones*/}
-        <Route path="/secciones" element={<Secciones />} />
+        <Route
+          path="/secciones"
+          element={
+            <Layout>
+              <Secciones />
+            </Layout>
+          }
+        />
         {/* <Route path="/secciones/create" element={<SeccionesCreate />} /> */}
 
         {/* Rutas de Bloques de horas*/}
-        <Route path="/bloques" element={<Bloques />} />
-        <Route path="/bloques/create" element={<BloquesCreate />} />
+        <Route
+          path="/bloques"
+          element={
+            <Layout>
+              <Bloques />
+            </Layout>
+          }
+        />
+        <Route
+          path="/bloques/create"
+          element={
+            <Layout>
+              <BloquesCreate />
+            </Layout>
+          }
+        />
 
         {/* Rutas para los espacios*/}
-        <Route path="/aula" element={<Aulas />} />
-        <Route path="/aula/create" element={<AulasCreate />} />
-        <Route path="/laboratorio" element={<Laboratorios />} />
-        <Route path="/laboratorio/create" element={<LaboratoriosCreate />} />
+        <Route
+          path="/aula"
+          element={
+            <Layout>
+              <Aulas />
+            </Layout>
+          }
+        />
+        <Route
+          path="/aula/create"
+          element={
+            <Layout>
+              <AulasCreate />
+            </Layout>
+          }
+        />
+        <Route
+          path="/laboratorio"
+          element={
+            <Layout>
+              <Laboratorios />
+            </Layout>
+          }
+        />
+        <Route
+          path="/laboratorio/create"
+          element={
+            <Layout>
+              <LaboratoriosCreate />
+            </Layout>
+          }
+        />
 
         {/* Rutas para los Roles */}
-        <Route path="/roles" element={<Roles />} />
+        <Route
+          path="/roles"
+          element={
+            <Layout>
+              <Roles />
+            </Layout>
+          }
+        />
 
         {/* Rutas para la Universidad */}
-        <Route path="/universidad" element={<Universidad />} />
+        <Route
+          path="/universidad"
+          element={
+            <Layout>
+              <Universidad />
+            </Layout>
+          }
+        />
 
+        {/* Rutas para Personas */}
+        <Route
+          path="/persona"
+          element={
+            <Layout>
+              <Persona />
+            </Layout>
+          }
+        />
+        <Route
+          path="/persona/create"
+          element={
+            <Layout>
+              <PersonaCreate />
+            </Layout>
+          }
+        />
+        <Route
+          path="/persona/:id/edit"
+          element={
+            <Layout>
+              <PersonaEdit />
+            </Layout>
+          }
+        />
       </Routes>
     </>
   );

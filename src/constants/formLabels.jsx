@@ -49,5 +49,16 @@ export const FORM_LABELS = {
         NAME: "NOMBRE",
         NAME_ABRE: "NOMBRE ABREVIADO",
         ADRRE: "DIRRECIÓN"
+    },
+    PERSONAS: {
+        CEDULA: "CÉDULA",
+        NAME: "NOMBRE",
+        LASTNAME: "APELLIDO",
+        ADRRE: "DIRECCIÓN",
+        MUNICIPIO: "MUNICIPIO",
+        TELEFONO: "NÚMERO DE TELÉFONO",
+        EMAIL: "CORREO",
+        TYPE: "TIPO DE PERSONA",
+        GRADO: "GRADO INSTITUCIONAL"
     }
 };

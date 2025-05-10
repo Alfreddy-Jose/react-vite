@@ -8,6 +8,7 @@ import { GetAll } from "../../services/Api";
 import Acciones from "../../components/Acciones";
 import Modal, { ButtomModal } from "../../components/Modal";
 
+
 const columns = [
   {
     name: "ID",

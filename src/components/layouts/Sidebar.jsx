@@ -164,10 +164,10 @@ export function Sidebar({toggleSidebar, isSidebarMinimized}) {
               </li>
 
               <li className="nav-item">
-                <a href="#">
+                <Link to="/persona">
                   <i className="fas fa-person"></i>
                   <p>Persona</p>
-                </a>
+                </Link>
               </li>
 
               <li className="nav-item">

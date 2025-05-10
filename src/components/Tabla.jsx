@@ -19,6 +19,7 @@ export function Tabla({columns, data}) {
         paginationComponentOptions={paginacionObciones}
         fixedHeader
         fixedHeaderScrollHeight="600px"
+        noDataComponent="No hay datos disponibles"
       />
     </div>
   );

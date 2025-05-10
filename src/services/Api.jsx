@@ -8,7 +8,8 @@ export const Api = axios.create({
   headers: {
     "Content-Type": "application/json",
     //Aquí se pueden agregar más headers como token de autenticación
-  }
+  },
+  withCredentials: true, // Necesario para las cookies de Sanctum
 }) 
 
 // Traer todos los registros
@@ -23,7 +24,7 @@ export const GetAll = async (setPnf, setLoading, url) => {
   }
 };
 
-
+// Guardar Todos los registros
 export const PostAll = async (values, url, navegation) => {
       // Mostrando loader mientras se procesa
       Swal.fire({
@@ -38,5 +39,20 @@ export const PostAll = async (values, url, navegation) => {
         navegation(url, { state: { message: response.data.message } });
       });
 } 
+// Actualizando Todos los datos
+export const PutAll = async (values, url, navegation, id) => {
+        // Mostrando loader mientras se procesa
+        Swal.fire({
+          title: "Actualizando...",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+        await Api.put(`${url}/${id}`, values).then((response) => {
+          console.log(response)
+          navegation(url, { state: { message: response.data.message } });
+        })
+}
 
 export default Api;

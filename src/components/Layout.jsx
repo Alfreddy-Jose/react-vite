@@ -1,16 +1,19 @@
 import React from "react";
+import { Navbar } from "./layouts/Navbar";
+import { Sidebar } from "./layouts/Sidebar";
+import { Footer } from "./layouts/Footer";
 
-export default function Layout({ Sidebar, Navbar, Footer, wrapperClass, children }) {
+export default function Layout({ children }) {
   return (
-    <div className={`wrapper ${wrapperClass}`}> {/* Agregar clase dinámica */}
-      {Sidebar}
+    <>
+      <Sidebar />
       <div className="main-panel">
-        {Navbar}
+        <Navbar />
         <div className="container">
           <div className="page-inner">{children}</div>
         </div>
-        {Footer}
+        <Footer />
       </div>
-    </div>
+    </>
   );
 }
