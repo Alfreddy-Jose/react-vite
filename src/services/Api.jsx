@@ -1,9 +1,10 @@
 import  axios  from 'axios';
 import Swal from 'sweetalert2';
+import { AlertaError } from '../components/Alert';
 
 // Configuración basica de Axios
 export const Api = axios.create({
-  baseURL: "https://laravelapi-production-2350.up.railway.app/api", // Dirección de la Api 
+  baseURL: "http://127.0.0.1:8000/api", // Dirección de la Api 
   timeout: 5000, // tiempo máximo de espera
   headers: {
     "Content-Type": "application/json",
@@ -18,6 +19,8 @@ export const GetAll = async (setPnf, setLoading, url) => {
     const response = await Api.get(url);
     setPnf(response.data);
   } catch (error) {
+    // Manejo de errores
+    AlertaError("Error al cargar los datos");
     console.log(error);
   } finally {
     setLoading(false);
@@ -34,10 +37,16 @@ export const PostAll = async (values, url, navegation) => {
           Swal.showLoading();
         },
       });
-      await Api.post(url, values).then((response) => {
-        console.log({state:{message:response.data.message}});
-        navegation(url, { state: { message: response.data.message } });
-      });
+      try {
+        await Api.post(url, values).then((response) => {
+          console.log({state:{message:response.data.message}});
+          navegation(url, { state: { message: response.data.message } });
+        });
+      } catch (error) {
+        console.log(error);
+        AlertaError('Error al guardar los datos');
+      }
+      
 } 
 // Actualizando Todos los datos
 export const PutAll = async (values, url, navegation, id) => {
@@ -49,10 +58,17 @@ export const PutAll = async (values, url, navegation, id) => {
             Swal.showLoading();
           },
         });
-        await Api.put(`${url}/${id}`, values).then((response) => {
-          console.log(response)
+        try {
+          const response = await Api.put(`${url}/${id}`, values);
+          console.log(response);
           navegation(url, { state: { message: response.data.message } });
-        })
+        }
+        catch (error) {
+          console.log(error);
+          AlertaError('Error al actualizar los datos');
+        } finally {
+          Swal.close();
+        }
 }
 
 export default Api;

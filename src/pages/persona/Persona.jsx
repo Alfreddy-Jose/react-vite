@@ -22,7 +22,6 @@ const columns = [
     name: "NOMBRE",
     selector: (row) => row.nombre,
     sortable: true,
-    grow: 3,
   },
   {
     name: "+INFO",
@@ -31,11 +30,8 @@ const columns = [
         <ButtomModal id={row.id} />
 
         <Modal titleModal={`+INFO ${row.nombre}`} id={row.id}>
-        <p>
-            <b>ABREVIADO: </b> {row.id}
-          </p>
           <p>
-            <b>CODIGO: </b> {row.cedula_persona}
+            <b>CÉDULA: </b> {row.cedula_persona}
           </p>
           <p>
             <b>NOMBRE: </b> {row.nombre}
@@ -44,13 +40,16 @@ const columns = [
             <b>APELLIDO: </b> {row.apellido}
           </p>
           <p>
+            <b>CORREO: </b> {row.email}
+          </p>
+          <p>
             <b>DIRECCIÓN: </b> {row.direccion}
           </p>
           <p>
             <b>MUNICIPIO: </b> {row.municipio}
           </p>
           <p>
-            <b>TELEFÓNO: </b> {row.telefono}
+            <b>TELÉFONO: </b> {row.telefono}
           </p>
           <p>
             <b>TIPO PERSONA: </b> {row.tipo_persona}

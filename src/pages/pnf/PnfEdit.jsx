@@ -52,6 +52,7 @@ function PnfEdit() {
 
   useEffect(() => {
     // Trayendo los datos del registro
+    
     const getPnf = async () => {
       const response = await Api.get(`pnf/${id}`)
       setPnf(response.data);

@@ -8,6 +8,7 @@ import * as Yup from "yup";
 import { ContainerIput } from "../../components/ContainerInput";
 import { Create } from "../../components/Link";
 import { Buttom } from "../../components/Buttom";
+import Select from "../../components/Select";
 
 const initialValues = {
   cedula_persona: "",
@@ -42,8 +43,7 @@ const validationSchema = Yup.object({
     .email("Correo no válido")
     .required("Este campo es obligatorio"),
   tipo_persona: Yup.string()
-    .required("Este campo es obligatorio") // Campo requerido
-    .matches(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "Solo letras permitidas"), // solo letras permitidas
+    .required("Este campo es obligatorio"), // Campo requerido
   grado_inst: Yup.string()
     .required("Este campo es obligatorio") // Campo requerido
     .matches(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "Solo letras permitidas"), // solo letras permitidas
@@ -135,12 +135,15 @@ function PersonaCreate() {
               placeholder="CORREO"
               formik={formik}
             />
-            {/* Input para tipo de PERSONA */}
-            <InputLabel
+            {/* Select para tipo de PERSONA */}
+            <Select
               label={FORM_LABELS.PERSONAS.TYPE}
-              type="text"
               name="tipo_persona"
-              placeholder="TIPO PERSONA"
+              options={[
+                { id: "ESTUDIANTE", nombre: "ESTUDIANTE" },
+                { id: "DOCENTE", nombre: "DOCENTE" },
+                { id: "ADMINISTRATIVO", nombre: "ADMINISTRATIVO" },
+              ]}
               formik={formik}
             />
             {/* Input para grado de la PERSONA */}

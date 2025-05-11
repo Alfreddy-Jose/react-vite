@@ -20,5 +20,17 @@ export function Alerta(mensaje) {
     title: message,
   });
 }
+export function AlertaError(mensaje) {
+          Swal.fire({
+            icon: "error",
+            title: "ERROR...",
+            text: mensaje,
+            confirmButtonText: "Cerrar", // Cambia el texto del botón
+            customClass: {
+              confirmButton: "btn btn-danger", // Aplica clases personalizadas al botón
+            },
+            buttonsStyling: false, // Desactiva los estilos predeterminados de SweetAlert2
+          });
+}
 
 export default Alerta;

@@ -3,7 +3,8 @@ export function InputLabel({
   name,
   placeholder,
   label,
-  formik
+  formik,     
+  disabled = false
 }) {
   return (
     <div className="col-sm-6 col-xl-4">
@@ -12,6 +13,7 @@ export function InputLabel({
         className={`form-control ${formik.touched[name] && formik.errors[name] ? "border-danger" : ""}`}
         type={type}
         name={name}
+        disabled={disabled}
         placeholder={placeholder}
         onChange={(e) => {
           const upperCaseValue = e.target.value.toUpperCase(); // Convertir a mayúsculas
