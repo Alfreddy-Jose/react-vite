@@ -40,12 +40,12 @@ export default function Acciones({ url, urlDelete, navegar }) {
 
   return (
     <div className="d-flex justify-content-center aling-content-center">
-      <Link className="btn btn-primary" to={url}>
+      <Link className="btn traslation btn-primary" to={url}>
         <i className="far fa-edit"></i>
       </Link>
       <button
       title="Eliminar"
-      className="btn btn-danger ms-1"
+      className="btn traslation btn-danger ms-1"
       onClick={AlertDelete}
       ><i className="far fa-trash-alt"></i></button>
     </div>

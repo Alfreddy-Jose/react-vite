@@ -1,16 +1,20 @@
+import { useAuth } from "../../context/AuthContext";
+import { LogoutButton } from "../Logout";
+import logo from "../../img/logo_pnf.svg";
 
 export function Navbar() {
+  const { user } = useAuth();
+
   return (
-    <div className="main-header">
+    <div className="main-header"> 
       <div className="main-header-logo">
         {/* Logo Header */}
-        <div className="logo-header" data-background-color="white">
-          <a href="{{ route('dashboard') }}" className="logo">
+        <div className="logo-header" data-background-color="dark">
+          <a href="#" className="logo">
             <img
-              src="#"
+              src={logo}
               alt="navbar brand"
-              className="navbar-brand"
-              height="20"
+              className="navbar-brand ml-3 logo_pnfi"
             />
           </a>
           <div className="nav-toggle">
@@ -45,8 +49,8 @@ export function Navbar() {
                   <i className="fa fa-user icon-user"></i>
                 </div>
                 <span className="profile-username">
-                  <span className="op-7">Hola, </span>
-                  <span className="fw-bold">Admin</span>
+                  <span className="op-7">HOLA, </span>
+                  <span className="fw-bold">{user?.name || ''}</span>
                 </span>
               </a>
               <ul className="dropdown-menu dropdown-user animated fadeIn">
@@ -57,8 +61,8 @@ export function Navbar() {
                         <i className="fa fa-user icon-user-bottom"></i>
                       </div>
                       <div className="u-text">
-                        <h4>Admin</h4>
-                        <p className="text-muted">Admin@gmail.com</p>
+                        <h4>{user?.name || ''}</h4>
+                        <p className="text-muted">{user?.email || ''}</p>
                         <a
                           href="#"
                           className="btn btn-xs btn-secondary btn-sm"
@@ -70,18 +74,13 @@ export function Navbar() {
                   </li>
                   <li>
                     <div className="dropdown-divider"></div>
-                    <form
-                      id="logout-form"
-                      action="#"
-                    >
-                      @csrf
-                      <a
+                      <LogoutButton />
+{/*                       <a
                         className="dropdown-item"
                         href="#"
                       >
                         Finalizar Sesión
-                      </a>
-                    </form>
+                      </a> */}
                   </li>
                 </div>
               </ul>

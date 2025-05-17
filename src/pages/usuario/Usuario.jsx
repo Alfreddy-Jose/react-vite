@@ -10,11 +10,6 @@ const columns = [
   { name: "NOMBRE", selector: (row) => row.name, sortable: true },
   { name: "EMAIL", selector: (row) => row.email, sortable: true },
   {
-    name: "ROL",
-    selector: (row) => row.roles.join(", "),
-    sortable: true,
-  },
-  {
     name: "ACCIONES",
     cell: (row) => (
       <Acciones url={`/usuario/${row.id}/edit`} urlDelete={``} navegar="" />

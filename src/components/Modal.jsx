@@ -47,7 +47,7 @@ export function ButtomModal({ id }) {
   return (
     <button
       type="button"
-      className="btn btn-info"
+      className="btn btn-info traslation"
       data-bs-toggle="modal"
       data-bs-target={`#${id}`}
     >

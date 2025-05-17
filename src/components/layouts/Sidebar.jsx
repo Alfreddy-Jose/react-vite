@@ -1,9 +1,8 @@
 import React from "react";
-import { Link, useLocation} from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import logo from "../../img/logo_pnf.svg";
 
-
-export function Sidebar({toggleSidebar, isSidebarMinimized}) {
-
+export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
   const location = useLocation(); // Hook para obtener la ruta actual
   // Función para verificar si la ruta actual coincide con el enlace
   const isActive = (path) => location.pathname === path;
@@ -12,13 +11,12 @@ export function Sidebar({toggleSidebar, isSidebarMinimized}) {
     <>
       <div className="sidebar toggled" data-background-color="dark">
         <div className="sidebar-logo">
-          <div className="logo-header" data-background-color="white">
+          <div className="logo-header" data-background-color="dark">
             <a href="#" className="logo">
               <img
-                src="#"
+                src={logo}
                 alt="navbar brand"
-                className="navbar-brand"
-                height="60"
+                className="navbar-brand logo_pnfi"
               />
             </a>
             <div className="nav-toggle">
@@ -26,7 +24,9 @@ export function Sidebar({toggleSidebar, isSidebarMinimized}) {
                 className="sidenav-toggler btn btn-toggle toggle-sidebar"
                 onClick={toggleSidebar} // Llamar a la función toggleSidebar al hacer clic
               >
-                <i className={`gg-menu-${isSidebarMinimized ? "left" : "right"}`}></i>
+                <i
+                  className={`gg-menu-${isSidebarMinimized ? "left" : "right"}`}
+                ></i>
               </button>
             </div>
           </div>
@@ -48,7 +48,9 @@ export function Sidebar({toggleSidebar, isSidebarMinimized}) {
                 <h4 className="text-section">Opciones</h4>
               </li>
 
-              <li className={`nav-item ${isActive("/usuarios") ? "active" : ""}`}>
+              <li
+                className={`nav-item ${isActive("/usuarios") ? "active" : ""}`}
+              >
                 <Link to="/usuarios">
                   <i className="fas fa-users"></i>
                   <p>Usuarios</p>
@@ -118,9 +120,7 @@ export function Sidebar({toggleSidebar, isSidebarMinimized}) {
                     </li>
                     <li>
                       <a href="#">
-                        <span className="sub-item">
-                          Secciones por Trayecto
-                        </span>
+                        <span className="sub-item">Secciones por Trayecto</span>
                       </a>
                     </li>
                   </ul>
@@ -149,7 +149,9 @@ export function Sidebar({toggleSidebar, isSidebarMinimized}) {
                 </div>
               </li>
 
-              <li className={`nav-item ${isActive("/bloques") ? "active" : ""}`}>
+              <li
+                className={`nav-item ${isActive("/bloques") ? "active" : ""}`}
+              >
                 <Link to="/bloques">
                   <i className="fas fa-stopwatch"></i>
                   <p>Bloques de horas</p>
@@ -159,15 +161,45 @@ export function Sidebar({toggleSidebar, isSidebarMinimized}) {
               <li className="nav-item">
                 <a href="#">
                   <i className="fas fa-project-diagram"></i>
-                  <p>Malla del PNF</p>
+                  <p>Malla del PNF</p> 
                 </a>
               </li>
 
               <li className="nav-item">
-                <Link to="/persona">
+                <a data-bs-toggle="collapse" href="#persona">
                   <i className="fas fa-person"></i>
-                  <p>Persona</p>
-                </Link>
+                  <p>Gestion de Personas</p>
+                  <span className="caret"></span>
+                </a>
+                <div className="collapse" id="persona">
+                  <ul className="nav nav-collapse">
+                    <li>
+                      <Link to="/persona">
+                        <span className="sub-item">Crear persona</span>
+                      </Link>
+                    </li>
+                    <li>
+                    <a data-bs-toggle="collapse" href="#tipos">
+                        <span className="sub-item">Tipos</span>
+                        <span className="caret"></span>
+                    </a>
+                    <div className="collapse" id="tipos">
+                      <ul className="nav nav-collapse subnav">
+                        <li>
+                          <Link to="/coordinador">
+                            <span className="sub-item">Coodinador</span>
+                          </Link>
+                        </li>
+                        <li>
+                          <Link to="/tipo_doc">
+                            <span className="sub-item">Docente</span>
+                          </Link>
+                        </li>
+                      </ul>
+                    </div>
+                    </li>
+                  </ul>
+                </div>
               </li>
 
               <li className="nav-item">
@@ -213,7 +245,11 @@ export function Sidebar({toggleSidebar, isSidebarMinimized}) {
                 </a>
                 <div className="collapse" id="confg">
                   <ul className="nav nav-collapse">
-                    <li className={`nav-item ${isActive("/universidad") ? "active" : ""}`}>
+                    <li
+                      className={`nav-item ${
+                        isActive("/universidad") ? "active" : ""
+                      }`}
+                    >
                       <Link to="/universidad">
                         <span className="sub-item">Universidad</span>
                       </Link>

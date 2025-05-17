@@ -94,3 +94,21 @@
 .contenedor_login .btn:hover{
     background: #e8e8e8;
 }
+
+.div_checkbox{
+    color: #fff;
+    display: flex;
+    justify-content: start;
+    font-size: 16px;
+    margin: -15px 0px 15px;
+}
+
+.div_checkbox label{
+    color: #fff;
+    font-size: 16px;
+}
+
+.checkbox{
+    text-decoration: none;
+    font-weight: 600;
+}

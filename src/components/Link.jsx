@@ -8,7 +8,7 @@ export function Create({
 }) {
   return (
     <div className={position}>
-      <Link className={style} to={path}>
+      <Link className={`traslation ${style}`} to={path}>
         {text}
       </Link>
     </div>

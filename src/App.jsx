@@ -6,11 +6,14 @@ import "./styles/styles.css";
 import "./plugins/fontawesome/css/all.min.css";
 import { BrowserRouter as Router } from "react-router-dom";
 import { AppRoutes } from "./routes/Routes";
+import { AuthProvider } from "./context/AuthContext";
 
 export function App() {
   return (
     <Router>
-      <AppRoutes />
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
     </Router>
   );
 }

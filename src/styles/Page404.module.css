@@ -1,0 +1,46 @@
+.error_page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    text-align: center;
+    background-color: #f8f9fa;
+    padding: 20px;
+}
+.error_code {
+    font-size: 120px;
+    font-weight: 700;
+    color: #5d78ff;
+    margin-bottom: 10px;
+    line-height: 1;
+}
+.error_message {
+    font-size: 24px;
+    margin-bottom: 30px;
+    color: #6c757d;
+}
+.error_description {
+    max-width: 600px;
+    margin-bottom: 30px;
+    color: #6c757d;
+}
+.btn_kiadmin {
+    background-color: #5d78ff;
+    color: white;
+    padding: 10px 25px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+.btn_kiadmin:hover {
+    background-color: #4a62e0;
+    color: white;
+    transform: translateY(-2px);
+}
+.error_image {
+    width: 70%;
+    height: 50%;
+    /* max-width: 100px; */
+    margin-bottom: 5px;
+}

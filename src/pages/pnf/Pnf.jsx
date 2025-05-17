@@ -23,7 +23,7 @@ const columns = [
     selector: (row) => row.nombre,
     sortable: true,
     grow: 3,
-  },
+  }, 
   {
     name: "+INFO",
     cell: (row) => (

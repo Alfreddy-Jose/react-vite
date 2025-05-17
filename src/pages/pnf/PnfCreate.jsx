@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 
 const initialValues = {
   codigo: "",
-  nombre: "",
+  nombre: "", 
   abreviado: "",
   abreviado_coord: "",
 };

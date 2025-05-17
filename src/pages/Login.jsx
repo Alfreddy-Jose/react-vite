@@ -1,33 +1,94 @@
+import { useFormik } from "formik";
 import styles from "../styles/login.module.css";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import Api from "../services/Api";
+import { AlertaError } from "../components/Alert";
+import { getCsrfToken } from "../services/auth";
+import { useTogglePassword } from "../funciones"; 
 
 export function Login() {
+  const { signIn } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { passwordType, togglePasswordVisibility } = useTogglePassword(); 
+  const from = location.state?.from?.pathname || "/";
+
+  const onSubmit = async (values) => {
+    try {
+       // obtener token Csrf
+      await getCsrfToken();
+
+      // Enviar las credenciales al backend
+      const response = await Api.post("/login", values);
+      
+      // Si la autenticación es exitosa, guardar el usuario y redirigir
+      if (response.status === 200) {
+        signIn(response.data); // Guardar el usuario en el contexto y en localStorage
+        navigate(from, { state: { message: response.data.message } }, { replace: true });
+      }
+    } catch (err) {
+      // Manejar el error de autenticación
+      if (err.response && err.response.status === 401) {
+        AlertaError("Credenciales incorrectas");
+      } else {
+        console.error("Error inesperado:", err);
+        AlertaError("Ocurrió un error inesperado. Inténtalo de nuevo.");
+      }
+    }
+  };
+
+  const formik = useFormik({
+    initialValues: {
+      email: "",
+      password: "",
+    },
+    onSubmit,
+  });
+
   return (
     <>
-    <div className={styles.img}>
+      <div className={styles.img}>
+        <div className={styles.centrar}>
+          <div className={styles.contenedor_login}>
+            <form onSubmit={formik.handleSubmit}>
+              <h1>Inicio Sesión</h1>
 
-      <div className={styles.centrar}>
-        <div className={styles.contenedor_login}>
+              <div className={styles.input_box}>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  onChange={formik.handleChange}
+                  value={formik.values.email}
+                />
+              </div>
 
-            {/* Session Status */}
-            <form method="POST" action="">
-
-                <h1>Inicio Sesión</h1>
-
-                <div className={styles.input_box}>
-                    <input type="text" placeholder="Email" name="email" />
-                </div>
-
-                <div className={styles.input_box}>
-                    <input type="password" placeholder="Contraseña" name="password" />
-                </div>
-
-                <div className={styles.input_box}>
-                    <button type="submit" className={styles.btn}>Iniciar</button>
-                </div>
+              <div className={styles.input_box}>
+                <input
+                  type={passwordType}
+                  name="password"
+                  id="pass"
+                  placeholder="Contraseña"
+                  onChange={formik.handleChange}
+                  value={formik.values.password}
+                />
+              </div>
+              
+              <div className={styles.div_checkbox}>
+                <input type="checkbox" id="verPassword" className={styles.checkbox} onClick={togglePasswordVisibility} />
+                <label htmlFor="verPassword"><span className="text-white">{passwordType === 'password' ? 'Mostrar' : 'Ocultar'}</span></label>
+              </div>
+              
+              <div className={styles.input_box}>
+                <button type="submit" className={styles.btn}>
+                  Iniciar
+                </button>
+              </div>
             </form>
+          </div>
         </div>
-    </div>
-    </div>
+      </div>
     </>
   );
 }

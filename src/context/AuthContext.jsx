@@ -1,44 +1,56 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect } from "react";
-import { login, getUser, logout } from "../services/auth";
+import Api from "../services/Api";
+// import { useLocation } from "react-router-dom";
 
+const isLogin = (path) => location.pathname !== path;
 const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(null);
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
 
   useEffect(() => {
-    const loadUser = async () => {
+    if (isLogin('/login')) {
+      
+    const fetchUser = async () => {
       try {
-        const { data } = await getUser();
-        setUser(data);
+        const response = await Api.get("/user");
+        setUser(response.data);
       } catch (err) {
-        console.log(err);        
-        setUser(null);
-      } finally {
-        setLoading(false);
+        console.error("Error al obtener los datos del usuario:", err);
       }
     };
 
-    loadUser();
-  }, []);
+    if (!user) {
+      fetchUser();
+    }
+  }
+  }, [user]);
 
-  const signIn = async (credentials) => {
-    const { data } = await login(credentials);
-    setUser(data.user);
-    return data;
+  const signIn = (userData) => {
+    setUser(userData.user);
+     // Almcenando datos del usuario en el localStorage
+    localStorage.setItem("user", JSON.stringify(userData.user));
+     // Almcenando token del usuario en el localStorage
+    localStorage.setItem("token", userData.token);
+  };
+  
+  const signOut = () => {
+    setUser(null);
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
   };
 
-  const signOut = async () => {
-    await logout();
-    setUser(null);
-  }
-
   return (
-    <AuthProvider.Provider value={{ user, loading, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, signIn, signOut }}>
       {children}
-    </AuthProvider.Provider>
-  )
-};
+    </AuthContext.Provider>
+  );
+}
 
-export const useAuth = () => useContext(AuthContext);
+export function useAuth() {
+  return useContext(AuthContext);
+}

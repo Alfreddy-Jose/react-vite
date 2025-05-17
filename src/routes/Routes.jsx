@@ -28,6 +28,9 @@ import Layout from "../components/Layout";
 import Persona from "../pages/persona/Persona";
 import PersonaCreate from "../pages/persona/PersonaCreate";
 import PersonaEdit from "../pages/persona/PersonaEdit";
+import Coordinador from "../pages/Coordinador/Coordinador";
+import ProtectedRoute from "../components/ProtectedRoute";
+import NotPage from "../pages/Page404";
 
 export function AppRoutes() {
   return (
@@ -39,9 +42,11 @@ export function AppRoutes() {
         <Route
           path="/"
           element={
-            <Layout>
-              <Panel />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <Panel />
+              </Layout>
+            </ProtectedRoute>
           }
         />
 
@@ -49,17 +54,21 @@ export function AppRoutes() {
         <Route
           path="/usuarios"
           element={
-            <Layout>
-              <Usuario />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <Usuario />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/usuarios/create"
           element={
-            <Layout>
-              <UsuarioCreate />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <UsuarioCreate />
+              </Layout>
+            </ProtectedRoute>
           }
         />
 
@@ -67,25 +76,31 @@ export function AppRoutes() {
         <Route
           path="/pnf"
           element={
-            <Layout>
-              <Pnf />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <Pnf />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/pnf/create"
           element={
-            <Layout>
-              <PnfCreate />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <PnfCreate />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/pnf/:id/edit"
           element={
-            <Layout>
-              <PnfEdit />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <PnfEdit />
+              </Layout>
+            </ProtectedRoute>
           }
         />
 
@@ -93,25 +108,31 @@ export function AppRoutes() {
         <Route
           path="/sede"
           element={
-            <Layout>
-              <Sede />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <Sede />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/sede/create"
           element={
-            <Layout>
-              <SedeCreate />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <SedeCreate />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/sede/:id/edit"
           element={
-            <Layout>
-              <SedeEdit />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <SedeEdit />
+              </Layout>
+            </ProtectedRoute>
           }
         />
 
@@ -119,25 +140,31 @@ export function AppRoutes() {
         <Route
           path="/lapso_academico"
           element={
-            <Layout>
-              <LapsoAcademico />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <LapsoAcademico />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/lapso_academico/create"
           element={
-            <Layout>
-              <LapsoAcademicoCreate />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <LapsoAcademicoCreate />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/lapso_academico/:id/edit"
           element={
-            <Layout>
-              <LapsoAcademicoEdit />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <LapsoAcademicoEdit />
+              </Layout>
+            </ProtectedRoute>
           }
         />
 
@@ -145,25 +172,31 @@ export function AppRoutes() {
         <Route
           path="/tipo_matricula"
           element={
-            <Layout>
-              <TipoMatricula />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <TipoMatricula />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/tipo_matricula/create"
           element={
-            <Layout>
-              <TipoMatriculaCreate />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <TipoMatriculaCreate />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/tipo_matricula/:id/edit"
           element={
-            <Layout>
-              <TipoMatriculaEdit />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <TipoMatriculaEdit />
+              </Layout>
+            </ProtectedRoute>
           }
         />
 
@@ -171,9 +204,11 @@ export function AppRoutes() {
         <Route
           path="/secciones"
           element={
-            <Layout>
-              <Secciones />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <Secciones />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         {/* <Route path="/secciones/create" element={<SeccionesCreate />} /> */}
@@ -182,17 +217,21 @@ export function AppRoutes() {
         <Route
           path="/bloques"
           element={
-            <Layout>
-              <Bloques />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <Bloques />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/bloques/create"
           element={
-            <Layout>
-              <BloquesCreate />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <BloquesCreate />
+              </Layout>
+            </ProtectedRoute>
           }
         />
 
@@ -200,33 +239,41 @@ export function AppRoutes() {
         <Route
           path="/aula"
           element={
-            <Layout>
-              <Aulas />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <Aulas />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/aula/create"
           element={
-            <Layout>
-              <AulasCreate />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <AulasCreate />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/laboratorio"
           element={
-            <Layout>
-              <Laboratorios />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <Laboratorios />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/laboratorio/create"
           element={
-            <Layout>
-              <LaboratoriosCreate />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <LaboratoriosCreate />
+              </Layout>
+            </ProtectedRoute>
           }
         />
 
@@ -234,9 +281,11 @@ export function AppRoutes() {
         <Route
           path="/roles"
           element={
-            <Layout>
-              <Roles />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <Roles />
+              </Layout>
+            </ProtectedRoute>
           }
         />
 
@@ -244,9 +293,11 @@ export function AppRoutes() {
         <Route
           path="/universidad"
           element={
-            <Layout>
-              <Universidad />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <Universidad />
+              </Layout>
+            </ProtectedRoute>
           }
         />
 
@@ -254,27 +305,47 @@ export function AppRoutes() {
         <Route
           path="/persona"
           element={
-            <Layout>
-              <Persona />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <Persona />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/persona/create"
           element={
-            <Layout>
-              <PersonaCreate />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <PersonaCreate />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/persona/:id/edit"
           element={
-            <Layout>
-              <PersonaEdit />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <PersonaEdit />
+              </Layout>
+            </ProtectedRoute>
           }
         />
+        {/* Rutas para Coordinador */}
+        <Route
+          path="/coordinador"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Coordinador />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Pagina 404 */}
+        <Route path="*" element={<NotPage />} />
       </Routes>
     </>
   );

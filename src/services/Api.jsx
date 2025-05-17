@@ -4,20 +4,36 @@ import { AlertaError } from '../components/Alert';
 
 // Configuración basica de Axios
 export const Api = axios.create({
-  baseURL: "https://laravelapi-production-2350.up.railway.app/api", // Dirección de la Api 
+  baseURL: "http://127.0.0.1:8000/api", // Dirección de la Api 
   timeout: 5000, // tiempo máximo de espera
   headers: {
-    "Content-Type": "application/json",
-    //Aquí se pueden agregar más headers como token de autenticación
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+    // Aquí se pueden agregar más headers como token de autenticación
   },
   withCredentials: true, // Necesario para las cookies de Sanctum
+  withXSRFToken: true,
 }) 
 
+// configuracion para enviar token
+Api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token'); // O donde guardes tu token
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 // Traer todos los registros
-export const GetAll = async (setPnf, setLoading, url) => {
+export const GetAll = async (setAll, setLoading, url) => {
   try {
     const response = await Api.get(url);
-    setPnf(response.data);
+    setAll(response.data);
   } catch (error) {
     // Manejo de errores
     AlertaError("Error al cargar los datos");

@@ -48,3 +48,19 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+/* Animacion para botones */
+.traslation {
+    transition: all 0.3s;
+}
+.traslation:hover{
+    transform: translateY(-2px);
+}
+/* clase para el logo del pnfi */
+.logo{
+    padding-left: 20px;
+}
+
+.logo_pnfi{
+    height: 60px;
+    width: 150px;
+}

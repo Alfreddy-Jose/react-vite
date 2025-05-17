@@ -3,16 +3,17 @@ export function InputLabel({
   name,
   placeholder,
   label,
-  formik,     
+  formik,
   disabled = false
 }) {
   return (
     <div className="col-sm-6 col-xl-4">
-      <label className="mt-4">{label}</label>
+      <label htmlFor={name} className="mt-4">{label}</label>
       <input
         className={`form-control ${formik.touched[name] && formik.errors[name] ? "border-danger" : ""}`}
         type={type}
         name={name}
+        id={name}
         disabled={disabled}
         placeholder={placeholder}
         onChange={(e) => {

@@ -1,11 +1,30 @@
+import { useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
+import Alerta from "../components/Alert";
+import { useLocation } from "react-router-dom";
+
 export function Panel() {
+    const { user } = useAuth();
+    const location = useLocation();
+
+      useEffect(() => {
+    
+        // Motrar Alerta al iniciar sesión
+        if (location.state?.message) {
+          Alerta(location.state.message);
+        }
+    
+        // Limpiar el estado de navegacion para no mostrar el mensaje nuevamente
+        window.history.replaceState({}, "");
+      }, [location.state]);
+
     return (
       <>
         <div className="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
           <div>
             <h3 className="fw-bold mb-3">Dashboard</h3>
             <h6 className="op-7 mb-2">
-              Bienvendo al sistema sobre creación de horarios
+              Bienvendo { user?.name } al sistema sobre creación de horarios
             </h6>
           </div>
         </div>
