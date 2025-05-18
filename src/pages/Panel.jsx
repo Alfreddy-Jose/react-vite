@@ -31,7 +31,7 @@ export function Panel() {
         <div className="row">
           <div className="col-sm-6 col-md-3">
             <div className="card card-stats card-round">
-              <div className="card-body">
+              <div className="card-body traslation">
                 <div className="row align-items-center">
                   <div className="col-icon">
                     <div className="icon-big text-center icon-primary bubble-shadow-small">
@@ -48,9 +48,9 @@ export function Panel() {
               </div>
             </div>
           </div>
-          <div className="col-sm-6 col-md-3">
+          <div className="col-sm-6 col-md-3 ">
             <div className="card card-stats card-round">
-              <div className="card-body">
+              <div className="card-body traslation">
                 <div className="row align-items-center">
                   <div className="col-icon">
                     <div className="icon-big text-center icon-info bubble-shadow-small">
@@ -69,7 +69,7 @@ export function Panel() {
           </div>
           <div className="col-sm-6 col-md-3">
             <div className="card card-stats card-round">
-              <div className="card-body">
+              <div className="card-body traslation">
                 <div className="row align-items-center">
                   <div className="col-icon">
                     <div className="icon-big text-center icon-success bubble-shadow-small">
@@ -88,7 +88,7 @@ export function Panel() {
           </div>
           <div className="col-sm-6 col-md-3">
             <div className="card card-stats card-round">
-              <div className="card-body">
+              <div className="card-body traslation">
                 <div className="row align-items-center">
                   <div className="col-icon">
                     <div className="icon-big text-center icon-secondary bubble-shadow-small">
