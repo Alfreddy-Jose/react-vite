@@ -1,12 +1,13 @@
 import axios from "axios";
 import Api from "./Api";
 
+
 export const getCsrfToken = async () => {
   return await axios.get("http://127.0.0.1:8000/sanctum/csrf-cookie");
 };
 
 export const login = async (credentials) => {
-  return await Api.post("/login", credentials);
+    return await Api.post("/login", credentials);
 };
 
 export const getUser = async () => {

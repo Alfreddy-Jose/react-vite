@@ -5,27 +5,41 @@ import { useAuth } from "../context/AuthContext";
 import Api from "../services/Api";
 import { AlertaError } from "../components/Alert";
 //import { getCsrfToken } from "../services/auth";
-import { useTogglePassword } from "../funciones"; 
+import { useTogglePassword } from "../funciones";
+import Swal from "sweetalert2";
 
 export function Login() {
   const { signIn } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const { passwordType, togglePasswordVisibility } = useTogglePassword(); 
+  const { passwordType, togglePasswordVisibility } = useTogglePassword();
   const from = location.state?.from?.pathname || "/";
 
   const onSubmit = async (values) => {
     try {
-       // obtener token Csrf
+      // obtener token Csrf
       //await getCsrfToken();
+
+      // Mostrando loader mientras se procesa
+      Swal.fire({
+        title: "Validando...",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
 
       // Enviar las credenciales al backend
       const response = await Api.post("/login", values);
-      
+
       // Si la autenticación es exitosa, guardar el usuario y redirigir
       if (response.status === 200) {
         signIn(response.data); // Guardar el usuario en el contexto y en localStorage
-        navigate(from, { state: { message: response.data.message } }, { replace: true });
+        navigate(
+          from,
+          { state: { message: response.data.message } },
+          { replace: true }
+        );
       }
     } catch (err) {
       // Manejar el error de autenticación
@@ -35,6 +49,9 @@ export function Login() {
         console.error("Error inesperado:", err);
         AlertaError("Ocurrió un error inesperado. Inténtalo de nuevo.");
       }
+    } finally {
+      // Ocultar el loader
+      Swal.close();
     }
   };
 
@@ -74,12 +91,21 @@ export function Login() {
                   value={formik.values.password}
                 />
               </div>
-              
+
               <div className={styles.div_checkbox}>
-                <input type="checkbox" id="verPassword" className={styles.checkbox} onClick={togglePasswordVisibility} />
-                <label htmlFor="verPassword"><span className="text-white">{passwordType === 'password' ? 'Mostrar' : 'Ocultar'}</span></label>
+                <input
+                  type="checkbox"
+                  id="verPassword"
+                  className={styles.checkbox}
+                  onClick={togglePasswordVisibility}
+                />
+                <label htmlFor="verPassword">
+                  <span className="text-white">
+                    {passwordType === "password" ? "Mostrar" : "Ocultar"}
+                  </span>
+                </label>
               </div>
-              
+
               <div className={styles.input_box}>
                 <button type="submit" className={styles.btn}>
                   Iniciar
