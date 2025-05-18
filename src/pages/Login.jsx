@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Api from "../services/Api";
 import { AlertaError } from "../components/Alert";
-import { getCsrfToken } from "../services/auth";
+//import { getCsrfToken } from "../services/auth";
 import { useTogglePassword } from "../funciones"; 
 
 export function Login() {
@@ -17,7 +17,7 @@ export function Login() {
   const onSubmit = async (values) => {
     try {
        // obtener token Csrf
-      await getCsrfToken();
+      //await getCsrfToken();
 
       // Enviar las credenciales al backend
       const response = await Api.post("/login", values);
