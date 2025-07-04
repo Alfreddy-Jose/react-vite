@@ -4,7 +4,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
-import '/home/alfreddy/Documentos/frontend/src/pages/horario/style.css'
+//import '/home/alfreddy/Documentos/frontend/src/pages/horario/style.css'
 import { useEffect, useState } from 'react';
 import Api, { GetAll } from '../../services/Api';
 
