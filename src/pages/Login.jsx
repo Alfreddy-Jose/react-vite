@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Api from "../services/Api";
 import { AlertaError } from "../components/Alert";
-//import { getCsrfToken } from "../services/auth";
+import { getCsrfToken } from "../services/auth";
 import { useTogglePassword } from "../funciones";
 import Swal from "sweetalert2";
 
@@ -16,9 +16,10 @@ export function Login() {
   const from = location.state?.from?.pathname || "/";
 
   const onSubmit = async (values) => {
+    let cerrar = true;
     try {
       // obtener token Csrf
-      //await getCsrfToken();
+      await getCsrfToken();
 
       // Mostrando loader mientras se procesa
       Swal.fire({
@@ -49,9 +50,12 @@ export function Login() {
         console.error("Error inesperado:", err);
         AlertaError("Ocurrió un error inesperado. Inténtalo de nuevo.");
       }
+      cerrar = false; // Cambia a false si hay error
     } finally {
-      // Ocultar el loader
-      Swal.close();
+      // cerrar loader en caso de exito
+      if (cerrar) {
+        Swal.close();
+      }
     }
   };
 
@@ -93,15 +97,24 @@ export function Login() {
               </div>
 
               <div className={styles.div_checkbox}>
-                <input
+                {/*                 <input
                   type="checkbox"
                   id="verPassword"
                   className={styles.checkbox}
                   onClick={togglePasswordVisibility}
-                />
+                /> */}
                 <label htmlFor="verPassword">
+                  <input
+                    type="checkbox"
+                    id="verPassword"
+                    className={styles.checkbox}
+                    onClick={togglePasswordVisibility}
+                  />
+                  {" "}
                   <span className="text-white">
-                    {passwordType === "password" ? "Mostrar" : "Ocultar"}
+                    {passwordType === "password"
+                      ? "Mostrar Contraseña"
+                      : "Ocultar Contraseña"}
                   </span>
                 </label>
               </div>

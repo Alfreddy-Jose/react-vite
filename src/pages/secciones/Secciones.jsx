@@ -10,7 +10,7 @@ export function Secciones() {
         // Titulo para la tabla
         title="SECCIONES"
         // Boton para crear nuevos registros
-        link={<Create path="/secciones/create" />}
+        link={<Create path="/seccion/create" />}
         // Tabla
         tabla={<Tabla />}
       />

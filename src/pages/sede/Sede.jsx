@@ -8,11 +8,13 @@ import { GetAll } from "../../services/Api";
 import Acciones from "../../components/Acciones";
 import Modal, { ButtomModal } from "../../components/Modal";
 
+// Leer permisos del localStorage
+const permisos = JSON.parse(localStorage.getItem("permissions")) || [];
 
 const columns = [
   {
     name: "ID",
-    selector: (row) => row.id,
+    selector: (row, index) => index + 1, // Muestra el contador incremental
     sortable: true,
   },
   {
@@ -50,7 +52,24 @@ const columns = [
       </div>
     ),
   },
-  {
+  // Mostrar columna solo si tiene al menos uno de los permisos
+  ...(permisos.includes("editar sede") || permisos.includes("eliminar sede")
+    ? [
+        {
+          name: "ACCIONES",
+          cell: (row) => (
+            <Acciones
+              url={`/sede/${row.id}/edit`}
+              urlDelete={`/sede/${row.id}`}
+              navegar="/sede"
+              editar="editar sede"
+              eliminar="eliminar sede"
+            />
+          ),
+        },
+      ]
+    : []),
+  /*   {
     name: "ACCIONES",
     cell: (row) => (
       <Acciones
@@ -59,13 +78,15 @@ const columns = [
         navegar="/sede"
       />
     ),
-  },
+  }, */
 ];
 
 export function Sede() {
   const [sedes, setSedes] = useState([]);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
+  // Leer permisos del localStorage
+  const permisos = JSON.parse(localStorage.getItem("permissions")) || [];
 
   useEffect(() => {
     // Mostrar la lista de PNF
@@ -84,7 +105,11 @@ export function Sede() {
     <>
       <ContainerTable
         title="SEDES"
-        link={<Create path="/sede/create" />}
+        link={
+          permisos.includes("crear sede") ? (
+            <Create path="/sede/create" />
+          ) : null
+        }
         isLoading={loading}
         tabla={<Tabla data={sedes} columns={columns} />}
       />

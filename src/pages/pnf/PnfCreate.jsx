@@ -9,15 +9,15 @@ import { PostAll } from "../../services/Api";
 import { useNavigate } from "react-router-dom";
 
 const initialValues = {
-  codigo: "",
-  nombre: "", 
+  id: "",
+  nombre: "",
   abreviado: "",
   abreviado_coord: "",
 };
 // Validando campos
 const validationSchema = Yup.object({
   nombre: Yup.string().required("Este campo es obligatorio"),
-  codigo: Yup.string()
+  id: Yup.string()
     .required("Este campo es obligatorio") // Campo requerido
     .matches(/^[0-9]*$/, "Solo números permitidos"), // Solo números
   abreviado: Yup.string()
@@ -31,10 +31,21 @@ const validationSchema = Yup.object({
 export function PnfCreate() {
   const navegation = useNavigate();
 
-
   // Funcion para enviar datos al backend
-  const onSubmit = (values) => {
-    PostAll(values, '/pnf', navegation)
+
+  const onSubmit = async (values, { setErrors }) => {
+    try {
+      await PostAll(values, "/pnf", navegation);
+    } catch (error) {
+      if (error.response && error.response.data.errors) {
+        // Transforma los arrays de Laravel a strings para Formik
+        const formikErrors = {};
+        Object.entries(error.response.data.errors).forEach(([key, value]) => {
+          formikErrors[key] = value[0];
+        });
+        setErrors(error.response.data.errors);
+      }
+    }
   };
 
   const formik = useFormik({
@@ -56,7 +67,7 @@ export function PnfCreate() {
             <InputLabel
               label={FORM_LABELS.PNF.CODIGO}
               type="text"
-              name="codigo"
+              name="id"
               placeholder="INGRESE CÓDIGO"
               formik={formik}
             />
@@ -98,8 +109,9 @@ export function PnfCreate() {
             <Buttom
               text="Cancelar"
               title="Cancelar"
-              type="reset"
+              type="button"
               style="btn-danger ms-1"
+              onClick={() => formik.resetForm()}
             />
           </>
         }

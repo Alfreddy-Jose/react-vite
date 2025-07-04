@@ -14,6 +14,7 @@ const columns = [
     name: "ID",
     selector: (row) => row.id,
     sortable: true,
+    
   },
   {
     name: "CÉDULA PERSONA",
@@ -39,10 +40,6 @@ const columns = [
             </p>
             <p>
               <b>PNF: </b> {row.pnf.nombre}
-            </p>
-            <p>
-              <b>ABREVIADO COORDINACIÓN: </b>
-              {row.abreviado_coord}
             </p>
           </Modal>
         </div>
@@ -72,6 +69,7 @@ function Coordinador() {
   useEffect(() => {
     // Mostrar la lista de registros
     GetAll(setCoodinador, setLoading, "/tipo_personas/list");
+    
 
     // Motrar Alerta al registrar un nuevo Coordinador
     if (location.state?.message) {

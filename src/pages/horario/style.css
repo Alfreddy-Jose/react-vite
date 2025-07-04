@@ -1,0 +1,33 @@
+.rbc-addons-dnd-drag-preview {
+  background-color: #f0f8ff;
+  border: 2px dashed #4682b4;
+}
+
+/* Eliminar espacio del header cuando no hay toolbar */
+.rbc-calendar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.rbc-time-view {
+  flex: 1;
+}
+
+/* Estilos para los botones de vista */
+.rbc-toolbar button {
+  color: #333;
+  background: white;
+  border: 1px solid #ddd;
+}
+
+.rbc-toolbar button.rbc-active {
+  background: #3174ad;
+  color: white;
+}
+
+/* Ajustar tamaño de los eventos */
+.rbc-event {
+  padding: 2px 5px;
+  font-size: 0.85em;
+}

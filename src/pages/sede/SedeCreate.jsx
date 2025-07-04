@@ -13,7 +13,7 @@ const initialValues = {
   nombre_sede: "",
   nombre_abreviado: "",
   direccion: "",
-  municipio_sede: "",
+  municipio: "",
 };
 // Validando campos
 const validationSchema = Yup.object({
@@ -35,9 +35,21 @@ const validationSchema = Yup.object({
 
 export function SedeCreate() {
   const navegation = useNavigate();
+
   // Funcion para enviar datos al backend
-  const onSubmit = (values) => {
-    PostAll(values, "/sede", navegation);
+  const onSubmit = async (values, { setErrors }) => {
+    try {
+      await PostAll(values, "/sede", navegation);
+    } catch (error) {
+      if (error.response && error.response.data.errors) {
+        // Transforma los arrays de Laravel a strings para Formik
+        const formikErrors = {};
+        Object.entries(error.response.data.errors).forEach(([key, value]) => {
+          formikErrors[key] = value[0];
+        });
+        setErrors(error.response.data.errors);
+      }
+    }
   };
 
   const formik = useFormik({
@@ -46,7 +58,6 @@ export function SedeCreate() {
     onSubmit,
   });
 
-  console.log(formik.errors);
 
   return (
     <form onSubmit={formik.handleSubmit}>

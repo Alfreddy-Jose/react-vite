@@ -7,10 +7,13 @@ import { GetAll } from "../../services/Api";
 import Alerta from "../../components/Alert";
 import Acciones from "../../components/Acciones";
 
+// Leer permisos del localStorage
+const permisos = JSON.parse(localStorage.getItem("permissions")) || [];
+
 const columns = [
   {
     name: "ID",
-    selector: (row) => row.id,
+    selector: (row, index) => index + 1, // Muestra el contador incremental
     sortable: true,
   },
   {
@@ -24,19 +27,26 @@ const columns = [
   },
   {
     name: "TIPO DE LAPSO",
-    selector: (row) => row.tipo_lapso,
+    selector: (row) => row.tipolapso.nombre,
     sortable: true,
   },
-  {
-    name: "ACCIONES",
-    cell: (row) => (
-      <Acciones
-        url={`/lapso_academico/${row.id}/edit`}
-        urlDelete={`/lapso/${row.id}`}
-        navegar="/lapso_academico"
-      />
-    ),
-  },
+  // Mostrar columna solo si tiene al menos uno de los permisos
+  ...(permisos.includes("editar lapso") || permisos.includes("eliminar lapso")
+    ? [
+        {
+          name: "ACCIONES",
+          cell: (row) => (
+            <Acciones
+              url={`/lapso_academico/${row.id}/edit`}
+              urlDelete={`/lapso/${row.id}`}
+              navegar="/lapso_academico"
+              editar="editar lapso"
+              eliminar="eliminar lapso"
+            />
+          ),
+        },
+      ]
+    : []),
 ];
 
 export function LapsoAcademico() {
@@ -64,7 +74,11 @@ export function LapsoAcademico() {
         // Titulo para la tabla
         title="LAPSO ACADEMICO"
         // Boton para crear nuevos registros
-        link={<Create path="/lapso_academico/create" />}
+        link={
+          permisos.includes("crear lapso") ? (
+            <Create path="/lapso_academico/create" />
+          ) : null
+        }
         // Tabla
         tabla={<Tabla columns={columns} data={lapsos} />}
         isLoading={loading}

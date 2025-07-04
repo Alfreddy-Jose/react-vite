@@ -6,7 +6,6 @@ import { useLocation } from "react-router-dom";
 export function Panel() {
     const { user } = useAuth();
     const location = useLocation();
-
       useEffect(() => {
     
         // Motrar Alerta al iniciar sesión
@@ -17,7 +16,7 @@ export function Panel() {
         // Limpiar el estado de navegacion para no mostrar el mensaje nuevamente
         window.history.replaceState({}, "");
       }, [location.state]);
-
+      
     return (
       <>
         <div className="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">

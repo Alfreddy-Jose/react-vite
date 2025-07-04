@@ -1,6 +1,7 @@
 import { useAuth } from "../../context/AuthContext";
 import { LogoutButton } from "../Logout";
 import logo from "../../img/logo_pnf.svg";
+import { Link } from "react-router-dom";
 
 export function Navbar() {
   const { user } = useAuth();
@@ -63,12 +64,15 @@ export function Navbar() {
                       <div className="u-text">
                         <h4>{user?.name || ''}</h4>
                         <p className="text-muted">{user?.email || ''}</p>
-                        <a
+                        <Link 
+                          to={`/usuario/${user?.id}/edit`}
+                          className="btn btn-xs btn-secondary btn-sm">Ver Perfil</Link>
+{/*                         <a
                           href="#"
                           className="btn btn-xs btn-secondary btn-sm"
                         >
                           Ver Perfil
-                        </a>
+                        </a> */}
                       </div>
                     </div>
                   </li>

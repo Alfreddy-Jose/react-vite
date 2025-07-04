@@ -7,7 +7,7 @@ export function LogoutButton() {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await logout();
+    await logout();  
     signOut(); // Limpia el estado del usuario en el contexto
     navigate("/login"); // Redirige al login
   };

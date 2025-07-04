@@ -1,17 +1,20 @@
-import React, { useEffect, useState } from 'react'
-import Acciones from '../../components/Acciones';
-import Modal, { ButtomModal } from '../../components/Modal';
-import { ContainerTable } from '../../components/ContainerTable';
-import { Create } from '../../components/Link';
-import { Tabla } from '../../components/Tabla';
-import { GetAll } from '../../services/Api';
-import { useLocation } from 'react-router-dom';
-import Alerta from '../../components/Alert';
+import React, { useEffect, useState } from "react";
+import Acciones from "../../components/Acciones";
+import Modal, { ButtomModal } from "../../components/Modal";
+import { ContainerTable } from "../../components/ContainerTable";
+import { Create } from "../../components/Link";
+import { Tabla } from "../../components/Tabla";
+import { GetAll } from "../../services/Api";
+import { useLocation } from "react-router-dom";
+import Alerta from "../../components/Alert";
+
+// Leer permisos del localStorage
+const permisos = JSON.parse(localStorage.getItem("permissions")) || [];
 
 const columns = [
   {
     name: "ID",
-    selector: (row) => row.id,
+    selector: (row, index) => index + 1, // Muestra el contador incremental
     sortable: true,
   },
   {
@@ -61,7 +64,25 @@ const columns = [
       </div>
     ),
   },
-  {
+  // Mostrar columna solo si tiene al menos uno de los permisos
+  ...(permisos.includes("editar persona") ||
+  permisos.includes("eliminar persona")
+    ? [
+        {
+          name: "ACCIONES",
+          cell: (row) => (
+            <Acciones
+              url={`/persona/${row.id}/edit`}
+              urlDelete={`/persona/${row.id}`}
+              navegar="/persona"
+              editar="editar persona"
+              eliminar="eliminar persona"
+            />
+          ),
+        },
+      ]
+    : []),
+  /*   {
     name: "ACCIONES",
     cell: (row) => (
       <Acciones
@@ -70,11 +91,10 @@ const columns = [
         navegar="/persona"
       />
     ),
-  },
+  }, */
 ];
 
 export default function Persona() {
-
   const [personas, setPnf] = useState([]);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
@@ -92,19 +112,22 @@ export default function Persona() {
     window.history.replaceState({}, "");
   }, [location.state]);
 
-
   return (
-        <>
-          {/* Contenedor para la tablas de Personas */}
-          <ContainerTable
-            // Titulo para la tabla Personas
-            title="PERSONAS"
-            // Boton para crear nuevos registros
-            link={<Create path="/persona/create" />}
-            isLoading={loading}
-            // Tabla
-            tabla={<Tabla columns={columns} data={personas} />}
-          />
-        </>
-  )
+    <>
+      {/* Contenedor para la tablas de Personas */}
+      <ContainerTable
+        // Titulo para la tabla Personas
+        title="PERSONAS"
+        // Boton para crear nuevos registros
+        link={
+          permisos.includes("crear persona") ? (
+            <Create path="/persona/create" />
+          ) : null
+        }
+        isLoading={loading}
+        // Tabla
+        tabla={<Tabla columns={columns} data={personas} />}
+      />
+    </>
+  );
 }

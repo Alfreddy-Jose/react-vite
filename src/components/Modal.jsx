@@ -30,7 +30,7 @@ export function Modal({ id, titleModal, children }) {
             <div className="modal-footer">
               <button
                 type="button"
-                className="btn btn-secondary"
+                className="btn btn-secondary traslation"
                 data-bs-dismiss="modal"
               >
                 Cerrar

@@ -1,14 +1,13 @@
-import React from "react";
 import { FORM_LABELS } from "../../constants/formLabels";
 import { InputLabel } from "../../components/InputLabel";
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
-import { PostAll } from "../../services/Api";
+import Api, { PostAll } from "../../services/Api";
 import * as Yup from "yup";
 import { ContainerIput } from "../../components/ContainerInput";
 import { Create } from "../../components/Link";
 import { Buttom } from "../../components/Buttom";
-import Select from "../../components/Select";
+import SelectSearch from "../../components/SelectSearch";
 
 const initialValues = {
   cedula_persona: "",
@@ -39,11 +38,9 @@ const validationSchema = Yup.object({
     .required("Este campo es obligatorio") // Campo requerido
     .min(11, "Mínimo 11 números") // Mínimo 11 números
     .max(11, "Máximo 11 números"), // Máximo 11 números
-  email: Yup.string()
-    .email("Correo no válido")
-    .required("Este campo es obligatorio"),
-  tipo_persona: Yup.string()
-    .required("Este campo es obligatorio"), // Campo requerido
+  email: Yup.string().email("Correo no válido"),
+  //.required("Este campo es obligatorio"),
+  tipo_persona: Yup.string().required("Este campo es obligatorio"), // Campo requerido
   grado_inst: Yup.string()
     .required("Este campo es obligatorio") // Campo requerido
     .matches(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "Solo letras permitidas"), // solo letras permitidas
@@ -53,8 +50,19 @@ function PersonaCreate() {
   const navegation = useNavigate();
 
   // Funcion para enviar datos al backend
-  const onSubmit = (values) => {
-    PostAll(values, "/persona", navegation);
+  const onSubmit = async (values, { setErrors }) => {
+    try {
+      await PostAll(values, "/persona", navegation);
+    } catch (error) {
+      if (error.response && error.response.data.errors) {
+        // Transforma los arrays de Laravel a strings para Formik
+        const formikErrors = {};
+        Object.entries(error.response.data.errors).forEach(([key, value]) => {
+          formikErrors[key] = value[0];
+        });
+        setErrors(error.response.data.errors);
+      }
+    }
   };
 
   const formik = useFormik({
@@ -62,8 +70,6 @@ function PersonaCreate() {
     validationSchema,
     onSubmit,
   });
-
-  console.log(formik.errors);
 
   return (
     <form onSubmit={formik.handleSubmit}>
@@ -136,7 +142,7 @@ function PersonaCreate() {
               formik={formik}
             />
             {/* Select para tipo de PERSONA */}
-            <Select
+            <SelectSearch
               label={FORM_LABELS.PERSONAS.TYPE}
               name="tipo_persona"
               options={[

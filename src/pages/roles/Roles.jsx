@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from "react";
-import Api from "../../services/Api";
+import Api, { GetAll } from "../../services/Api";
 import { useLocation } from "react-router-dom";
 import Alerta from "../../components/Alert";
 import { ContainerTable } from "../../components/ContainerTable";
 import { Create } from "../../components/Link";
 import { Tabla } from "../../components/Tabla";
 import Acciones from "../../components/Acciones";
+import Modal, { ButtomModal } from "../../components/Modal";
 
+// Leer permisos del localStorage
+const permisos = JSON.parse(localStorage.getItem("permissions")) || [];
 
 const columns = [
   {
     name: "ID",
-    selector: (row) => row.id,
+    selector: (row, index) => index + 1, // Muestra el contador incremental
     sortable: true,
   },
   {
@@ -19,21 +22,54 @@ const columns = [
     selector: (row) => row.name,
   },
   {
-    name: "ACCIONES",
+    name: "+INFO",
     cell: (row) => (
-        <Acciones url={`/rol/${row.id}/edit`}/>
+      <div>
+        <ButtomModal id={row.id} />
+
+        <Modal titleModal={`+INFO ${row.name}`} id={row.id}>
+        {/* mostrando permisos */}
+          <p>
+            <b>PERMISOS: </b>
+            {row.permissions.length > 0
+              ? row.permissions.map((permiso) => (
+                  <span key={permiso.id} className="badge bg-secondary me-1">
+                    {permiso.name}
+                  </span>
+                ))
+              : "No hay permisos asignados"}
+          </p>
+        </Modal>
+      </div>
     ),
   },
+  // Mostrar columna solo si tiene al menos uno de los permisos
+  ...(permisos.includes("editar rol") || permisos.includes("eliminar rol")
+    ? [
+        {
+          name: "ACCIONES",
+          cell: (row) => (
+            <Acciones
+              url={`/rol/${row.id}/edit`}
+              urlDelete={`/rol/${row.id}`}
+              navegar="/roles"
+              editar="editar rol"
+              eliminar="eliminar rol"
+            />
+          ),
+        },
+      ]
+    : []),
 ];
-
 
 function Roles() {
   const [roles, setRoles] = useState([]);
+  const [loading, setLoading] = useState(true);
   const location = useLocation();
 
   useEffect(() => {
     // Mostrar la lista de registros
-    getAllRoles();
+    GetAll(setRoles, setLoading, "/roles");
 
     // Motrar Alerta al registrar un nuevo registro
     if (location.state?.message) {
@@ -44,24 +80,23 @@ function Roles() {
     window.history.replaceState({}, "");
   }, [location.state]);
 
-  const getAllRoles = async () => {
-    const response = await Api.get(`/roles`);
-    setRoles(response.data);
-  };
-
   return (
     <>
       {/* Contenedor para la tablas de los datos */}
       <ContainerTable
-        // Titulo para la tabla 
+        // Titulo para la tabla
         title="ROLES"
         // Boton para crear nuevos registros
-        link={<Create path="/rol/create" />}
+        link={
+          permisos.includes("crear rol") ? <Create path="/rol/create" /> : null
+        }
         // Tabla
-        tabla={ <Tabla columns={columns} data={roles} /> }
+        tabla={<Tabla columns={columns} data={roles} />}
+        // Manejar el estado de carga
+        isLoading={loading}
       />
     </>
-  )
+  );
 }
 
 export default Roles;

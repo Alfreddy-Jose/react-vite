@@ -7,31 +7,42 @@ import Alerta from "../../components/Alert";
 import { Tabla } from "../../components/Tabla";
 import Acciones from "../../components/Acciones";
 
+// Leer permisos del localStorage
+const permisos = JSON.parse(localStorage.getItem("permissions")) || [];
+
 const columns = [
   {
     name: "ID",
-    selector: (row) => row.id,
+    selector: (row, index) => index + 1, // Muestra el contador incremental
+    sortable: true,
+  },
+  {
+    name: "NÚMERO",
+    selector: (row) => row.numero,
     sortable: true,
   },
   {
     name: "NOMBRE",
     selector: (row) => row.nombre,
-    sortable: true,
   },
-  {
-    name: "TIPO",
-    selector: (row) => row.tipo,
-  },
-  {
-    name: "ACCIONES",
-    cell: (row) => (
-      <Acciones
-        url={`/tipo_matricula/${row.id}/edit`}
-        urlDelete={`/matricula/${row.id}`}
-        navegar="/tipo_matricula"
-      />
-    ),
-  },
+  // Mostrar columna solo si tiene al menos uno de los permisos
+  ...(permisos.includes("editar matricula") ||
+  permisos.includes("eliminar matricula")
+    ? [
+        {
+          name: "ACCIONES",
+          cell: (row) => (
+            <Acciones
+              url={`/tipo_matricula/${row.id}/edit`}
+              urlDelete={`/matricula/${row.id}`}
+              navegar="/matricula"
+              editar="editar matricula"
+              eliminar="eliminar matricula"
+            />
+          ),
+        },
+      ]
+    : []),
 ];
 
 export function TipoMatricula() {
@@ -59,7 +70,11 @@ export function TipoMatricula() {
         // Titulo para la tabla
         title="TIPO MATRICULA"
         // Boton para crear nuevos registros
-        link={<Create path="/tipo_matricula/create" />}
+        link={
+          permisos.includes("crear matricula") ? (
+            <Create path="/tipo_matricula/create" />
+          ) : null
+        }
         // Tabla
         tabla={<Tabla data={matricula} columns={columns}></Tabla>}
         isLoading={loading}

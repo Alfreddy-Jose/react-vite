@@ -6,28 +6,39 @@ import { Create } from "../../components/Link";
 import { FORM_LABELS } from "../../constants/formLabels";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
-import Api from "../../services/Api";
+import Api, { PostAll } from "../../services/Api";
 // Inicializando los campos
 const initialValues = {
+  numero: "",
   nombre: "",
-  tipo: "",
 };
 // Validando los campos
 const validationSchema = Yup.object({
-  nombre: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
-  tipo: Yup.string()
+  numero: Yup.string()
+    .required("Este campo es obligatorio") // Campo obligatorio
+    .matches(/^[0-9]*$/, "Solo números permitidos"), // Solo números, 
+  nombre: Yup.string()
     .matches(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "Solo letras permitidas") //Solo letras
     .required("Este campo es obligatorio"), // Campo obligatorio
 });
 
 export function TipoMatriculaCreate() {
-  const navegation = useNavigate()
+  const navegation = useNavigate();
   // Funcion para enviar datos al backend
-  const onSubmit = async (values) => {
-    await Api.post(`/matricula`, values).then((response) => {
-      console.log(response)
-      navegation("/tipo_matricula", { state: { message: response.data.message } });
-    })
+
+  const onSubmit = async (values, { setErrors }) => {
+    try {
+      await PostAll(values, "/matricula", navegation);
+    } catch (error) {
+      if (error.response && error.response.data.errors) {
+        // Transforma los arrays de Laravel a strings para Formik
+        const formikErrors = {};
+        Object.entries(error.response.data.errors).forEach(([key, value]) => {
+          formikErrors[key] = value[0];
+        });
+        setErrors(error.response.data.errors);
+      }
+    }
   };
 
 
@@ -43,7 +54,7 @@ export function TipoMatriculaCreate() {
         title="NUEVO TIPO DE MATRICULA"
         link={
           <Create
-            path="/tipo_matricula"
+            path="/matricula"
             text="Volver"
             style="btn btn-secondary mb-4"
           />
@@ -52,20 +63,20 @@ export function TipoMatriculaCreate() {
           <>
             {/* Input para nombre del TIPO DE MATRICULA  */}
             <InputLabel
-              label={FORM_LABELS.TIPO_MATRICULA.NAME}
+              label={FORM_LABELS.TIPO_MATRICULA.NUMBER}
               type="text"
-              name="nombre"
-              placeholder="INGRESE UN NOMBRE"
+              name="numero"
+              placeholder="INGRESE UN NÚMERO"
               onBlur={formik.handleBlur}
               value={formik.values.codigo}
               formik={formik}
             />
             {/* Input para el TIPO DE MATRICULA */}
             <InputLabel
-              label={FORM_LABELS.TIPO_MATRICULA.TYPE}
+              label={FORM_LABELS.TIPO_MATRICULA.NAME}
               type="text"
-              name="tipo"
-              placeholder="TIPO"
+              name="nombre"
+              placeholder="NOMBRE MATRICULA"
               formik={formik}
             />
           </>

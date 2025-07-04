@@ -36,6 +36,7 @@ export function AuthProvider({ children }) {
     localStorage.setItem("user", JSON.stringify(userData.user));
      // Almcenando token del usuario en el localStorage
     localStorage.setItem("token", userData.token);
+    localStorage.setItem("permissions", JSON.stringify(userData.permissions));
   };
   
   const signOut = () => {

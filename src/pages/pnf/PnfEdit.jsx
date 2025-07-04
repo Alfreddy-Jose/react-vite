@@ -6,14 +6,13 @@ import { Create } from "../../components/Link";
 import { FORM_LABELS } from "../../constants/formLabels";
 import * as Yup from "yup";
 import { useNavigate, useParams } from "react-router-dom";
-import Api from "../../services/Api";
+import Api, { PutAll } from "../../services/Api";
 import { useEffect, useState } from "react";
-
 
 // Validando campos
 const validationSchema = Yup.object({
   nombre: Yup.string().required("Este campo es obligatorio"),
-  codigo: Yup.string()
+  id: Yup.string()
     .required("Este campo es obligatorio") // Campo requerido
     .matches(/^[0-9]*$/, "Solo números permitidos"), // Solo números
   abreviado: Yup.string()
@@ -25,26 +24,35 @@ const validationSchema = Yup.object({
 });
 
 function PnfEdit() {
-  const {id} = useParams();
-  const navegation = useNavigate()
+  const { id } = useParams();
+  const navegation = useNavigate();
   const [pnf, setPnf] = useState();
 
   // Funcion para enviar datos al backend
-  const onSubmit = async (values) => {
-    await Api.put(`/pnf/${id}`, values).then((response) => {
-      console.log(response)
-      navegation("/pnf", { state: { message: response.data.message } });
-    })
+  const onSubmit = async (values, { setErrors }) => {
+    try {
+      await PutAll(values, '/pnf', navegation, id, "/pnf");
+      
+    } catch (error) {
+      if (error.response && error.response.data.errors) {
+        // Transforma los arrays de Laravel a strings para Formik
+        const formikErrors = {};
+        Object.entries(error.response.data.errors).forEach(([key, value]) => {
+          formikErrors[key] = value[0];
+        });
+        setErrors(error.response.data.errors);
+      }
+    }
   };
 
   const formik = useFormik({
     enableReinitialize: true,
     // Cargando los datos en los campos
     initialValues: {
-      codigo: pnf?.codigo || '',
-      nombre: pnf?.nombre || '',
-      abreviado: pnf?.abreviado || '',
-      abreviado_coord: pnf?.abreviado_coord || ''
+      id: pnf?.id || "",
+      nombre: pnf?.nombre || "",
+      abreviado: pnf?.abreviado || "",
+      abreviado_coord: pnf?.abreviado_coord || "",
     },
     validationSchema,
     onSubmit,
@@ -52,14 +60,12 @@ function PnfEdit() {
 
   useEffect(() => {
     // Trayendo los datos del registro
-    
     const getPnf = async () => {
-      const response = await Api.get(`pnf/${id}`)
+      const response = await Api.get(`pnf/${id}`);
       setPnf(response.data);
-    }
+    };
 
     getPnf();
-
   }, [id]);
 
   return (
@@ -75,10 +81,9 @@ function PnfEdit() {
             <InputLabel
               label={FORM_LABELS.PNF.CODIGO}
               type="text"
-              name="codigo"
+              name="id"
               placeholder="INGRESE CÓDIGO"
               formik={formik}
-              
             />
             {/* Input para nombre de PNF */}
             <InputLabel

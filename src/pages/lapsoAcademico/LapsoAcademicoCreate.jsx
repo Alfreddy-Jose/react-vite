@@ -6,13 +6,15 @@ import { Create } from "../../components/Link";
 import { FORM_LABELS } from "../../constants/formLabels";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
-import Api from "../../services/Api";
+import { GetAll, PostAll } from "../../services/Api";
+import { useEffect, useState } from "react";
+import SelectSearch from "../../components/SelectSearch";
 
 const initialValues = {
   nombre_lapso: "",
   ano: "",
-  tipo_lapso: "",
-}; 
+  tipo_lapso_id: "",
+};
 
 const validationSchema = Yup.object({
   nombre_lapso: Yup.string()
@@ -27,20 +29,28 @@ const validationSchema = Yup.object({
       return parseInt(value) <= añoActual;
     })
     .required("Este campo es obligatorio"),
-  tipo_lapso: Yup.string()
-    .min(3, "Minimo 3 caracteres")
-    .required("Este campo es obligatorio"),
+  tipo_lapso_id: Yup.string().required("Este campo es obligatorio"),
 });
 
 export function LapsoAcademicoCreate() {
-  const navegation = useNavigate()
+  const navegation = useNavigate();
+  const [tipoLapsos, setTipoLapsos] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // Funcion para enviar datos al backend
-  const onSubmit = async (values) => {
-    await Api.post(`/lapso`, values).then((response) => {
-      console.log(response)
-      navegation("/lapso_academico", { state: { message: response.data.message } });
-    })
+  const onSubmit = async (values, { setErrors }) => {
+    try {
+      await PostAll(values, "/lapsos", navegation);
+    } catch (error) {
+      if (error.response && error.response.data.errors) {
+        // Transforma los arrays de Laravel a strings para Formik
+        const formikErrors = {};
+        Object.entries(error.response.data.errors).forEach(([key, value]) => {
+          formikErrors[key] = value[0];
+        });
+        setErrors(error.response.data.errors);
+      }
+    }
   };
 
   const formik = useFormik({
@@ -49,13 +59,19 @@ export function LapsoAcademicoCreate() {
     onSubmit,
   });
 
+  useEffect(() => {
+    GetAll(setTipoLapsos, setLoading, "/get_tipoLapsos");
+    setLoading(false);
+  }, []);
+  console.log(loading);
+
   return (
     <form onSubmit={formik.handleSubmit}>
       <ContainerIput
         title="NUEVO LAPSO ACADEMICO"
         link={
           <Create
-            path="/lapso_academico"
+            path="/lapsos"
             text="Volver"
             style="btn btn-secondary mb-4"
           />
@@ -78,12 +94,11 @@ export function LapsoAcademicoCreate() {
               placeholder="INGRESE AÑO"
               formik={formik}
             />
-            {/* Input para PNF abreviado */}
-            <InputLabel
+            {/* Select para los tipos de lapsos */}
+            <SelectSearch
               label={FORM_LABELS.LAPSO_ACADEMICO.TYPE}
-              type="text"
-              name="tipo_lapso"
-              placeholder="TIPO LAPSO"
+              options={tipoLapsos}
+              name="tipo_lapso_id"
               formik={formik}
             />
           </>

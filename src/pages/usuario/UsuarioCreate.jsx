@@ -1,10 +1,14 @@
 import { useFormik } from "formik";
 import { ContainerIput } from "../../components/ContainerInput";
 import { Create } from "../../components/Link";
-import { InputLabel } from "../../components/InputLabel";
+import { InputContraseña, InputLabel } from "../../components/InputLabel";
 import { FORM_LABELS } from "../../constants/formLabels";
 import { Buttom } from "../../components/Buttom";
 import * as Yup from "yup";
+import { useEffect, useState } from "react";
+import { GetAll, PostAll } from "../../services/Api";
+import { useNavigate } from "react-router-dom";
+import SelectSearch from "../../components/SelectSearch";
 
 // Inicializando los campos
 const initialValues = {
@@ -12,6 +16,7 @@ const initialValues = {
   email: "",
   password: "",
   confirm: "",
+  rol: "",
 };
 
 // Validaciones para cada campo
@@ -34,9 +39,13 @@ const validationSchema = Yup.object({
 });
 
 export function UsuarioCreate() {
+  const navegation = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [roles, setRoles] = useState([]);
+
   // Funcion para enviar datos al backend
   const onSubmit = (values) => {
-    console.log(values);
+    PostAll(values, '/usuarios', navegation);
   };
 
   const formik = useFormik({
@@ -44,7 +53,13 @@ export function UsuarioCreate() {
     validationSchema,
     onSubmit,
   });
-
+  
+    useEffect(() => {
+      GetAll(setRoles, setLoading, "/get_roles");
+      setLoading(false);
+    }, []);
+    console.log(loading);
+    
   return (
     <>
       <form onSubmit={formik.handleSubmit}>
@@ -80,7 +95,7 @@ export function UsuarioCreate() {
                 formik={formik}
               />
               {/* Input para contraseña de usuario */}
-              <InputLabel
+              <InputContraseña
                 label={FORM_LABELS.USER.PASSWORD}
                 type="password"
                 name="password"
@@ -88,9 +103,11 @@ export function UsuarioCreate() {
                 onBlur={formik.handleBlur}
                 value={formik.values.codigo}
                 formik={formik}
+                // Añadiendo el icono de ojo para mostrar/ocultar contraseña
+                eye={true}
               />
               {/* Input para confirmar la contraseña de usuario */}
-              <InputLabel
+              <InputContraseña
                 label={FORM_LABELS.USER.CONFIRM}
                 type="password"
                 name="confirm"
@@ -99,14 +116,13 @@ export function UsuarioCreate() {
                 value={formik.values.codigo}
                 formik={formik}
               />
-              <div className="col-sm-6 col-xl-4">
-                <label className="mt-4" htmlFor="rol">ROL</label>
-                <select className="form-control" name="rol" id="rol">
-                  <option value="" selected disabled>SELECCIONE UN ROL</option>
-                  <option value="">ADMINISTRADOR</option>
-                  <option value="">SUPERVISOR</option>
-                </select>
-              </div>
+              <SelectSearch
+                name='rol'
+                label={FORM_LABELS.USER.ROL}
+                options={roles}
+                formik={formik}
+                labelKey="name"
+              />
             </>
           }
           buttom={

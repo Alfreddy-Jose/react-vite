@@ -6,9 +6,9 @@ import { Create } from "../../components/Link";
 import { FORM_LABELS } from "../../constants/formLabels";
 import * as Yup from "yup";
 import { useNavigate, useParams } from "react-router-dom";
-import Api from "../../services/Api";
+import Api, { GetAll, PutAll } from "../../services/Api";
 import { useEffect, useState } from "react";
-
+import SelectSearch from "../../components/SelectSearch";
 
 const validationSchema = Yup.object({
   nombre_lapso: Yup.string()
@@ -23,31 +23,42 @@ const validationSchema = Yup.object({
       return parseInt(value) <= añoActual;
     })
     .required("Este campo es obligatorio"),
-  tipo_lapso: Yup.string()
-    .min(3, "Minimo 3 caracteres")
+  tipo_lapso_id: Yup.string()
     .required("Este campo es obligatorio"),
 });
 
 export function LapsoAcademicoEdit() {
-
-  const {id} = useParams();
+  const { id } = useParams();
   const navegation = useNavigate();
   const [lapso, setLapso] = useState();
+  const [tipoLapsos, setTipoLapsos] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // Funcion para enviar datos al backend
-  const onSubmit = async (values) => {
-    await Api.put(`/lapso/${id}`, values).then((response) => {
-      navegation("/lapso_academico", { state: { message: response.data.message } });
-    });
+  const onSubmit = async (values, { setErrors }) => {
+    try {
+      console.log(values);
+      
+      await PutAll(values, "/lapso", navegation, id, "/lapsos");
+    } catch (error) {
+      if (error.response && error.response.data.errors) {
+        // Transforma los arrays de Laravel a strings para Formik
+        const formikErrors = {};
+        Object.entries(error.response.data.errors).forEach(([key, value]) => {
+          formikErrors[key] = value[0];
+        });
+        setErrors(error.response.data.errors);
+      }
+    }
   };
 
   const formik = useFormik({
     enableReinitialize: true,
     // Cargando los datos en los campos
     initialValues: {
-      nombre_lapso: lapso?.nombre_lapso || '',
-      ano: lapso?.ano || '',
-      tipo_lapso: lapso?.tipo_lapso || ''
+      nombre_lapso: lapso?.nombre_lapso || "",
+      ano: lapso?.ano || "",
+      tipo_lapso_id: lapso?.tipo_lapso_id || "",
     },
     validationSchema,
     onSubmit,
@@ -55,25 +66,24 @@ export function LapsoAcademicoEdit() {
 
   useEffect(() => {
     // Trayendo los datos del registro
-      const getLapso = async () => {
-      const response = await Api.get(`lapso/${id}`)
+    const getLapso = async () => {
+      const response = await Api.get(`lapso/${id}`);
       setLapso(response.data);
-    }
+
+      GetAll(setTipoLapsos, setLoading, "/get_tipoLapsos");
+      setLoading(false);
+    };
 
     getLapso();
-
   }, [id]);
-
+  console.log(loading);
+  
   return (
     <form onSubmit={formik.handleSubmit}>
       <ContainerIput
         title="EDITAR LAPSO ACADEMICO"
         link={
-          <Create
-            path="/lapso_academico"
-            text="Volver"
-            style="btn btn-secondary mb-4"
-          />
+          <Create path="/lapsos" text="Volver" style="btn btn-secondary mb-4" />
         }
         input={
           <>
@@ -93,12 +103,11 @@ export function LapsoAcademicoEdit() {
               placeholder="INGRESE AÑO"
               formik={formik}
             />
-            {/* Input para PNF abreviado */}
-            <InputLabel
+            {/* Select para los tipos de lapsos */}
+            <SelectSearch
               label={FORM_LABELS.LAPSO_ACADEMICO.TYPE}
-              type="text"
-              name="tipo_lapso"
-              placeholder="TIPO LAPSO"
+              options={tipoLapsos}
+              name="tipo_lapso_id"
               formik={formik}
             />
           </>

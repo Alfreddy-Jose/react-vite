@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { FORM_LABELS } from "../../constants/formLabels";
@@ -6,18 +6,24 @@ import { ContainerIput } from "../../components/ContainerInput";
 import { Create } from "../../components/Link";
 import { InputLabel } from "../../components/InputLabel";
 import { Buttom } from "../../components/Buttom";
+import Api, { PostAll } from "../../services/Api";
+import { useNavigate } from "react-router-dom";
+import SelectSearch from "../../components/SelectSearch";
 
 // Iniciando variables
 const initialValues = {
-  equipos: "",
-  nombre_lab: "",
+  codigo: "",
+  nombre_aula: "",
   etapa: "",
+  equipos: "",
   abreviado_lab: "",
+  sede_id: "",
 };
 
 // Validaciones para cada campo
 const validationSchema = Yup.object({
-  nombre_lab: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
+  codigo: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
+  nombre_aula: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
   equipos: Yup.string()
     .matches(/^[0-:-9]*$/, "Formato incorrecto") // Solo números
     .required("Este campo es obligatorio"), // Campo obligatorio
@@ -26,12 +32,27 @@ const validationSchema = Yup.object({
     .max(1, "Maximo 1 carácteres") // Máximo 1 carácter
     .required("Este campo es obligatorio"), // Campo obligatorio
   abreviado_lab: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
+  sede_id: Yup.number().required("Este campo es obligatorio"),
 });
 
 export default function LaboratorioCreate() {
+  const navegation = useNavigate();
+  const [sedes, setSedes] = useState([]);
+
   // Funcion para enviar datos al backend
-  const onSubmit = (values) => {
-    console.log(values);
+  const onSubmit = async (values, { setErrors }) => {
+    try {
+      await PostAll(values, "/laboratorio", navegation);
+    } catch (error) {
+      if (error.response && error.response.data.errors) {
+        // Transforma los arrays de Laravel a strings para Formik
+        const formikErrors = {};
+        Object.entries(error.response.data.errors).forEach(([key, value]) => {
+          formikErrors[key] = value[0];
+        });
+        setErrors(error.response.data.errors);
+      }
+    }
   };
 
   const formik = useFormik({
@@ -39,6 +60,16 @@ export default function LaboratorioCreate() {
     validationSchema,
     onSubmit,
   });
+
+  useEffect(() => {
+    // Trayendo los datos del registro
+    const getSedes = async () => {
+      const response = await Api.get(`/espacio/getSedes`);
+      setSedes(response.data);
+    };
+
+    getSedes();
+  }, []);
 
   return (
     <>
@@ -54,20 +85,37 @@ export default function LaboratorioCreate() {
           }
           input={
             <>
-              {/* Input para el nombre del laboratorio */}
+              {/* Select para Sedes */}
+              <SelectSearch
+                label={FORM_LABELS.AULA.SEDE}
+                name="sede_id"
+                options={sedes}
+                formik={formik}
+                valueKey="id"
+                labelKey="nombre_sede"
+              />
+              {/* Input para el codigo del laboratorio */}
               <InputLabel
-                label={FORM_LABELS.LABORATORIO.NAME}
+                label={FORM_LABELS.AULA.CODIGO}
                 type="text"
-                name="nombre_lab"
-                placeholder="INGRESE UN NOMBRE"
+                name="codigo"
+                placeholder="CÓDIGO"
                 formik={formik}
               />
-              {/* Input la etapa del laboratorio */}
+              {/* Input para etapa */}
               <InputLabel
-                label={FORM_LABELS.LABORATORIO.ETAPA}
+                label={FORM_LABELS.AULA.ETAPA}
                 type="text"
                 name="etapa"
                 placeholder="ETAPA"
+                formik={formik}
+              />
+              {/* Input para nombre de laboratorio */}
+              <InputLabel
+                label={FORM_LABELS.LABORATORIO.NAME}
+                type="text"
+                name="nombre_aula"
+                placeholder="NOMBRE"
                 formik={formik}
               />
               {/* Input para laboratorio abreviado */}

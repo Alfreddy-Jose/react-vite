@@ -5,10 +5,9 @@ import { FORM_LABELS } from "../../constants/formLabels";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Create } from "../../components/Link";
-import Api from "../../services/Api";
+import Api, { PutAll } from "../../services/Api";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-
 
 // Validando campos
 const validationSchema = Yup.object({
@@ -29,26 +28,41 @@ const validationSchema = Yup.object({
 });
 
 export function SedeEdit() {
-  const {id} = useParams();
+  const { id } = useParams();
   const navegation = useNavigate();
   const [sede, setSede] = useState();
 
   // Funcion para enviar datos al backend
-  const onSubmit = async (values) => {
+  /*   const onSubmit = async (values) => {
     await Api.put(`/sede/${id}`, values).then((response) => {
       navegation("/sede", { state: { message: response.data.message } });
     });
+  }; */
+
+  const onSubmit = async (values, { setErrors }) => {
+    try {
+      await PutAll(values, '/sede', navegation, id, "/sede");
+    } catch (error) {
+      if (error.response && error.response.data.errors) {
+        // Transforma los arrays de Laravel a strings para Formik
+        const formikErrors = {};
+        Object.entries(error.response.data.errors).forEach(([key, value]) => {
+          formikErrors[key] = value[0];
+        });
+        setErrors(error.response.data.errors);
+      }
+    }
   };
 
   const formik = useFormik({
     enableReinitialize: true,
     // Cargando los datos en los campos
     initialValues: {
-      nro_sede: sede?.nro_sede || '',
-      nombre_sede: sede?.nombre_sede || '',
-      nombre_abreviado: sede?.nombre_abreviado || '',
-      direccion: sede?.direccion || '',
-      municipio: sede?.municipio || ''
+      nro_sede: sede?.nro_sede || "",
+      nombre_sede: sede?.nombre_sede || "",
+      nombre_abreviado: sede?.nombre_abreviado || "",
+      direccion: sede?.direccion || "",
+      municipio: sede?.municipio || "",
     },
     validationSchema,
     onSubmit,
@@ -57,12 +71,11 @@ export function SedeEdit() {
   useEffect(() => {
     // Trayendo los datos del registro
     const getSede = async () => {
-      const response = await Api.get(`sede/${id}`)
+      const response = await Api.get(`sede/${id}`);
       setSede(response.data);
-    }
+    };
 
     getSede();
-
   }, [id]);
 
   return (

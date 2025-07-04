@@ -9,7 +9,7 @@ import { Create } from "../../components/Link";
 import { InputLabel } from "../../components/InputLabel";
 import { Buttom } from "../../components/Buttom";
 import Swal from "sweetalert2";
-import Select from "../../components/Select";
+import SelectSearch from "../../components/SelectSearch";
 
 // Validando campos
 const validationSchema = Yup.object({
@@ -164,7 +164,7 @@ function PersonaEdit() {
               formik={formik}
             />
             {/* Select para tipo de PERSONA */}
-            <Select
+            <SelectSearch
               label={FORM_LABELS.PERSONAS.TYPE}
               name="tipo_persona"
               options={[

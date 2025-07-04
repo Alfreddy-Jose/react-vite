@@ -7,6 +7,9 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
   // Función para verificar si la ruta actual coincide con el enlace
   const isActive = (path) => location.pathname === path;
 
+  // Leer permisos del localStorage
+  const permisos = JSON.parse(localStorage.getItem("permissions")) || [];
+  
   return (
     <>
       <div className="sidebar toggled" data-background-color="dark">
@@ -40,6 +43,14 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                   <p>Dashboard</p>
                 </Link>
               </li>
+              <li
+                className={`nav-item ${isActive("/horario") ? "active" : ""}`}
+              >
+                <Link to="/horario">
+                  <i className="fa-solid fa-calendar"></i>
+                  <p>Horario</p>
+                </Link>
+              </li>
 
               <li className="nav-section">
                 <span className="sidebar-mini-icon">
@@ -51,42 +62,76 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
               <li
                 className={`nav-item ${isActive("/usuarios") ? "active" : ""}`}
               >
-                <Link to="/usuarios">
-                  <i className="fas fa-users"></i>
-                  <p>Usuarios</p>
-                </Link>
+                {permisos.includes("ver usuario") ? (
+                  <Link to="/usuarios">
+                    <i className="fas fa-users"></i>
+                    <p>Usuarios</p>
+                  </Link>
+                ) : null}
               </li>
 
               <li className={`nav-item ${isActive("/roles") ? "active" : ""}`}>
-                <Link to="/roles">
-                  <i className="fas fa-user-shield"></i>
-                  <p>Roles y Permisos</p>
-                </Link>
+                {permisos.includes("ver rol") ? (
+                  <Link to="/roles">
+                    <i className="fas fa-user-shield"></i>
+                    <p>Roles y Permisos</p>
+                  </Link>
+                ) : null}
               </li>
 
               <li className={`nav-item ${isActive("/pnf") ? "active" : ""}`}>
-                <Link to="/pnf">
-                  <i className="fas fa-book-open"></i>
-                  <p>PNF</p>
-                </Link>
+                {permisos.includes("ver pnf") ? (
+                  <Link to="/pnf">
+                    <i className="fas fa-book-open"></i>
+                    <p>PNF</p>
+                  </Link>
+                ) : null}
               </li>
 
               <li className={`nav-item ${isActive("/sede") ? "active" : ""}`}>
-                <Link to="/sede">
-                  <i className="fas fa-map-marker-alt"></i>
-                  <p>Sede</p>
-                </Link>
+                {permisos.includes("ver sede") ? (
+                  <Link to="/sede">
+                    <i className="fas fa-map-marker-alt"></i>
+                    <p>Sede</p>
+                  </Link>
+                ) : null}
               </li>
 
               <li
                 className={`nav-item ${
-                  isActive("/lapso_academico") ? "active" : ""
+                  isActive("/lapsos") ? "active" : ""
                 }`}
               >
-                <Link to="/lapso_academico">
-                  <i className="fas fa-calendar-alt"></i>
-                  <p>Lapso Académico</p>
-                </Link>
+                {permisos.includes("ver lapso") ? (
+                  <Link to="/lapsos">
+                    <i className="fas fa-calendar-alt"></i>
+                    <p>Lapso Académico</p>
+                  </Link>
+                ) : null}
+              </li>
+
+              <li
+                className={`nav-item ${isActive("/trayectos") ? "active" : ""}`}
+              >
+                {permisos.includes("ver trayecto") ? (
+                  <Link to="/trayectos">
+                    <i className="fas fa-hourglass"></i>
+                    <p>Trayectos</p>
+                  </Link>
+                ) : null}
+              </li>
+
+              <li
+                className={`nav-item ${
+                  isActive("/unidad_curricular") ? "active" : ""
+                }`}
+              >
+                {permisos.includes("ver unidad") ? (
+                  <Link to="/unidad_curricular">
+                    <i className="fas fa-book"></i>
+                    <p>Unidad Curricular</p>
+                  </Link>
+                ) : null}
               </li>
 
               <li
@@ -94,22 +139,26 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                   isActive("/tipo_matricula") ? "active" : ""
                 }`}
               >
-                <Link to="/tipo_matricula">
-                  <i className="fas fa-clipboard-list"></i>
-                  <p>Tipo Matricula</p>
-                </Link>
+                {permisos.includes("ver matricula") ? (
+                  <Link to="/matricula">
+                    <i className="fas fa-clipboard-list"></i>
+                    <p>Tipo Matricula</p>
+                  </Link>
+                ) : null}
               </li>
 
               <li className="nav-item">
-                <a data-bs-toggle="collapse" href="#seccion">
-                  <i className="fas fa-layer-group"></i>
-                  <p>Secciones</p>
-                  <span className="caret"></span>
-                </a>
+                {permisos.includes("ver seccion") ? (
+                  <a data-bs-toggle="collapse" href="#seccion">
+                    <i className="fas fa-layer-group"></i>
+                    <p>Secciones</p>
+                    <span className="caret"></span>
+                  </a>
+                ) : null}
                 <div className="collapse" id="seccion">
                   <ul className="nav nav-collapse">
                     <li>
-                      <Link to="secciones">
+                      <Link to="/secciones">
                         <span className="sub-item">Secciones</span>
                       </Link>
                     </li>
@@ -128,49 +177,59 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
               </li>
 
               <li className="nav-item">
-                <a data-bs-toggle="collapse" href="#espacios">
-                  <i className="fas fa-chalkboard-teacher"></i>
-                  <p>Espacios</p>
-                  <span className="caret"></span>
-                </a>
+                {permisos.includes("Gestionar Espacios") ? (
+                  <a data-bs-toggle="collapse" href="#espacios">
+                    <i className="fas fa-chalkboard-teacher"></i>
+                    <p>Espacios</p>
+                    <span className="caret"></span>
+                  </a>
+                ) : null}
                 <div className="collapse" id="espacios">
                   <ul className="nav nav-collapse">
+                    {permisos.includes("ver aula") ? (
+                      <li>
+                        <Link to="/aula">
+                          <span className="sub-item">Aulas</span>
+                        </Link>
+                      </li>
+                    ) : null}
                     <li>
-                      <Link to="/aula">
-                        <span className="sub-item">Aulas</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="/laboratorio">
-                        <span className="sub-item">Laboratorios</span>
-                      </Link>
+                      {permisos.includes("ver laboratorio") ? (
+                        <Link to="/laboratorio">
+                          <span className="sub-item">Laboratorios</span>
+                        </Link>
+                      ) : null}
                     </li>
                   </ul>
                 </div>
               </li>
 
-              <li
-                className={`nav-item ${isActive("/bloques") ? "active" : ""}`}
-              >
-                <Link to="/bloques">
-                  <i className="fas fa-stopwatch"></i>
-                  <p>Bloques de horas</p>
-                </Link>
+              <li className={`nav-item ${isActive("/turnos") ? "active" : ""}`}>
+                {permisos.includes("ver turno") ? (
+                  <Link to="/turnos">
+                    <i className="fas fa-history"></i>
+                    <p>Turnos</p>
+                  </Link>
+                ) : null}
               </li>
 
               <li className="nav-item">
-                <a href="#">
-                  <i className="fas fa-project-diagram"></i>
-                  <p>Malla del PNF</p> 
-                </a>
+                {permisos.includes("ver malla") ? (
+                  <a href="#">
+                    <i className="fas fa-project-diagram"></i>
+                    <p>Malla del PNF</p>
+                  </a>
+                ) : null}
               </li>
 
               <li className="nav-item">
-                <a data-bs-toggle="collapse" href="#persona">
-                  <i className="fas fa-person"></i>
-                  <p>Gestion de Personas</p>
-                  <span className="caret"></span>
-                </a>
+                {permisos.includes("gestionar persona") ? (
+                  <a data-bs-toggle="collapse" href="#persona">
+                    <i className="fas fa-person"></i>
+                    <p>Gestion de Personas</p>
+                    <span className="caret"></span>
+                  </a>
+                ) : null}
                 <div className="collapse" id="persona">
                   <ul className="nav nav-collapse">
                     <li>
@@ -179,62 +238,84 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                       </Link>
                     </li>
                     <li>
-                    <a data-bs-toggle="collapse" href="#tipos">
+                      <a data-bs-toggle="collapse" href="#tipos">
                         <span className="sub-item">Tipos</span>
                         <span className="caret"></span>
-                    </a>
-                    <div className="collapse" id="tipos">
-                      <ul className="nav nav-collapse subnav">
-                        <li>
-                          <Link to="/coordinador">
-                            <span className="sub-item">Coodinador</span>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link to="/tipo_doc">
-                            <span className="sub-item">Docente</span>
-                          </Link>
-                        </li>
-                      </ul>
-                    </div>
+                      </a>
+                      <div className="collapse" id="tipos">
+                        <ul className="nav nav-collapse subnav">
+                          <li>
+                            <Link to="/coordinador">
+                              <span className="sub-item">Coodinador</span>
+                            </Link>
+                          </li>
+                          <li>
+                            <Link to="/docente">
+                              <span className="sub-item">Docente</span>
+                            </Link>
+                          </li>
+                        </ul>
+                      </div>
                     </li>
                   </ul>
                 </div>
               </li>
 
-              <li className="nav-item">
-                <a href="#">
-                  <i className="fas fa-user-tie"></i>
-                  <p>Coordinador Municipal</p>
-                </a>
-              </li>
+              {permisos.includes("ver coordinador") ? (
+                <li className="nav-item">
+                  <a href="#">
+                    <i className="fas fa-user-tie"></i>
+                    <p>Coordinador Municipal</p>
+                  </a>
+                </li>
+              ) : null}
+
+              {permisos.includes("ver asistente") ? (
+                <li className="nav-item">
+                  <a href="#">
+                    <i className="fas fa-clipboard-check"></i>
+                    <p>Asistentes Administrativo</p>
+                  </a>
+                </li>
+              ) : null}
+
+              {permisos.includes("ver vocero") ? (
+                <li className="nav-item">
+                  <a href="#">
+                    <i className="fas fa-bullhorn"></i>
+                    <p>Voceros y Suplentes</p>
+                  </a>
+                </li>
+              ) : null}
 
               <li className="nav-item">
-                <a href="#">
-                  <i className="fas fa-clipboard-check"></i>
-                  <p>Asistentes Administrativo</p>
-                </a>
-              </li>
-
-              <li className="nav-item">
-                <a href="#">
-                  <i className="fas fa-bullhorn"></i>
-                  <p>Voceros y Suplentes</p>
-                </a>
-              </li>
-
-              <li className="nav-item">
-                <a href="#">
-                  <i className="fas fa-chart-line"></i>
-                  <p>Estadísticas de Instrucción</p>
-                </a>
-              </li>
-
-              <li className="nav-item">
-                <a href="#">
-                  <i className="fas fa-chart-bar"></i>
-                  <p>Estadística de General</p>
-                </a>
+                {permisos.includes("ver estadisticas") ? (
+                  <a data-bs-toggle="collapse" href="#estadisticas">
+                    <i className="fas fa-person"></i>
+                    <p>Estadísticas</p>
+                    <span className="caret"></span>
+                  </a>
+                ) : null}
+                <div className="collapse" id="estadisticas">
+                  <ul className="nav nav-collapse">
+                    {permisos.includes("ver instrucciones") ? (
+                      <li>
+                        <Link to="/estadistica_instruccion">
+                          <span className="sub-item">
+                            Estadísticas de Instrucción
+                          </span>
+                        </Link>
+                      </li>
+                    ) : null}
+                    {permisos.includes("ver general") ? (
+                      <li>
+                        <Link to="/estadistica_general">
+                          <span className="sub-item">Estadísticas General</span>
+                        </Link>
+                      </li>
+                    ) : null}
+                  </ul>
+                </div>
               </li>
 
               <li className="nav-item">

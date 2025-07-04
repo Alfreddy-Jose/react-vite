@@ -8,22 +8,25 @@ import { Modal, ButtomModal } from "../../components/Modal";
 import { Tabla } from "../../components/Tabla";
 import Acciones from "../../components/Acciones";
 
+// Leer permisos del localStorage
+const permisos = JSON.parse(localStorage.getItem("permissions")) || [];
+
 const columns = [
-  {
+{
     name: "ID",
-    selector: (row) => row.id,
-    sortable: true,
+    selector: (row, index) => index + 1, // Muestra el contador incremental
+    sortable: false,
   },
   {
     name: "CODIGO",
-    selector: (row) => row.codigo,
+    selector: (row) => row.id,
   },
   {
     name: "NOMBRE",
     selector: (row) => row.nombre,
     sortable: true,
     grow: 3,
-  }, 
+  },
   {
     name: "+INFO",
     cell: (row) => (
@@ -48,16 +51,23 @@ const columns = [
       </div>
     ),
   },
-  {
-    name: "ACCIONES",
-    cell: (row) => (
-      <Acciones
-        url={`/pnf/${row.id}/edit`}
-        urlDelete={`/pnf/${row.id}`}
-        navegar="/pnf"
-      />
-    ),
-  },
+  // Mostrar columna solo si tiene al menos uno de los permisos
+  ...(permisos.includes("editar pnf") || permisos.includes("eliminar pnf")
+    ? [
+        {
+          name: "ACCIONES",
+          cell: (row) => (
+            <Acciones
+              url={`/pnf/${row.id}/edit`}
+              urlDelete={`/pnf/${row.id}`}
+              navegar="/pnf"
+              editar="editar pnf"
+              eliminar="eliminar pnf"
+            />
+          ),
+        },
+      ]
+    : []),
 ];
 
 export function Pnf() {
@@ -85,7 +95,9 @@ export function Pnf() {
         // Titulo para la tabla PNF
         title="PNF"
         // Boton para crear nuevos registros
-        link={<Create path="/pnf/create" />}
+        link={
+          permisos.includes("crear pnf") ? <Create path="/pnf/create" /> : null
+        }
         isLoading={loading}
         // Tabla
         tabla={<Tabla columns={columns} data={pnf} />}
