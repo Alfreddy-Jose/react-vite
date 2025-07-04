@@ -4,7 +4,7 @@ import { AlertaError } from "../components/Alert";
 
 // Configuración basica de Axios
 export const Api = axios.create({
-  baseURL: "http://127.0.0.1:8000/api", // Dirección de la Api
+  baseURL: "https://laravelapi-1-2cah.onrender.com/api", // Dirección de la Api
   timeout: 5000, // tiempo máximo de espera
   headers: {
     Accept: "application/json",
