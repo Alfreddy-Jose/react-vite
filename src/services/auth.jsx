@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import { AlertaError } from "../components/Alert";
 
 export const getCsrfToken = async () => {
-  return await axios.get("http://127.0.0.1:8000/sanctum/csrf-cookie");
+  return await axios.get("https://laravelapi-1-2cah.onrender.com/sanctum/csrf-cookie");
 };
 
 export const login = async (credentials) => {
