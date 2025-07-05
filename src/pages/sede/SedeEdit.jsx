@@ -148,12 +148,6 @@ export function SedeEdit() {
                 type="submit"
                 style="btn-success"
               />
-              <Buttom
-                text="Cancelar"
-                title="Cancelar"
-                type="reset"
-                style="btn-danger ms-1"
-              />
             </>
           }
         />

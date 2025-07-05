@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 // Validando campos
 const validationSchema = Yup.object({
   nombre: Yup.string().required("Este campo es obligatorio"),
-  id: Yup.string()
+  codigo: Yup.string()
     .required("Este campo es obligatorio") // Campo requerido
     .matches(/^[0-9]*$/, "Solo números permitidos"), // Solo números
   abreviado: Yup.string()
@@ -49,7 +49,7 @@ function PnfEdit() {
     enableReinitialize: true,
     // Cargando los datos en los campos
     initialValues: {
-      id: pnf?.id || "",
+      codigo: pnf?.codigo || "",
       nombre: pnf?.nombre || "",
       abreviado: pnf?.abreviado || "",
       abreviado_coord: pnf?.abreviado_coord || "",
@@ -81,7 +81,7 @@ function PnfEdit() {
             <InputLabel
               label={FORM_LABELS.PNF.CODIGO}
               type="text"
-              name="id"
+              name="codigo"
               placeholder="INGRESE CÓDIGO"
               formik={formik}
             />

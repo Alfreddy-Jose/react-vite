@@ -9,7 +9,7 @@ import { PostAll } from "../../services/Api";
 import { useNavigate } from "react-router-dom";
 
 const initialValues = {
-  id: "",
+  codigo: "",
   nombre: "",
   abreviado: "",
   abreviado_coord: "",
@@ -17,7 +17,7 @@ const initialValues = {
 // Validando campos
 const validationSchema = Yup.object({
   nombre: Yup.string().required("Este campo es obligatorio"),
-  id: Yup.string()
+  codigo: Yup.string()
     .required("Este campo es obligatorio") // Campo requerido
     .matches(/^[0-9]*$/, "Solo números permitidos"), // Solo números
   abreviado: Yup.string()
@@ -67,7 +67,7 @@ export function PnfCreate() {
             <InputLabel
               label={FORM_LABELS.PNF.CODIGO}
               type="text"
-              name="id"
+              name="codigo"
               placeholder="INGRESE CÓDIGO"
               formik={formik}
             />

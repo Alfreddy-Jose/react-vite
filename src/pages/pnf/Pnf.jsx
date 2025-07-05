@@ -19,7 +19,7 @@ const columns = [
   },
   {
     name: "CODIGO",
-    selector: (row) => row.id,
+    selector: (row) => row.codigo,
   },
   {
     name: "NOMBRE",

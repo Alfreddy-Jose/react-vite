@@ -134,6 +134,7 @@ export function SedeCreate() {
                 title="Cancelar"
                 type="reset"
                 style="btn-danger ms-1"
+                onClick={() => formik.resetForm()}
               />
             </>
           }
