@@ -8,67 +8,17 @@ import { Create } from "../../components/Link";
 import { Modal, ButtomModal } from "../../components/Modal";
 import Acciones from "../../components/Acciones";
 
-// Leer permisos del localStorage
-const permisos = JSON.parse(localStorage.getItem("permissions")) || [];
-
-const columns = [
-  { name: "ID", selector: (row, index) => index + 1, sortable: true },
-  { name: "NOMBRE", selector: (row) => row.nombre, sortable: true },
-  {
-    name: "+INFO",
-    cell: (row) => (
-      <div>
-        <ButtomModal id={row.id} />
-
-        <Modal titleModal={`+INFO ${row.abreviado}`} id={row.id}>
-          <p>
-            <b>NOMBRE: </b> {row.nombre}
-          </p>
-          <p>
-            <b>INICIO: </b> {row.inicio}
-          </p>
-          <p>
-            <b>FINAL: </b> {row.final}
-          </p>
-        </Modal>
-      </div>
-    ),
-  },
-  // Mostrar columna solo si tiene al menos uno de los permisos
-  ...(permisos.includes("editar turno") || permisos.includes("eliminar turno")
-    ? [
-        {
-          name: "ACCIONES",
-          cell: (row) => (
-            <Acciones
-              url={`/turno/${row.id}/edit`}
-              urlDelete={`/turno/${row.id}`}
-              navegar="/turnos"
-              editar="editar turno"
-              eliminar="eliminar turno"
-            />
-          ),
-        },
-      ]
-    : []),
-  /*   {
-    name: "ACCIONES",
-    cell: (row) => (
-      <Acciones
-        url={`/turno/${row.id}/edit`}
-        urlDelete={`/turno/${row.id}`}
-        navegar="/turnos"
-      />
-    ),
-  }, */
-];
-
 function Turno() {
   const [loading, setLoading] = useState(true);
   const [turnos, setTurnos] = useState([]);
+  const [permisos, setPermisos] = useState([]);
   const location = useLocation();
 
   useEffect(() => {
+    // Leer permisos del localStorage
+    const permisosLS = JSON.parse(localStorage.getItem("permissions")) || [];
+    setPermisos(permisosLS);
+
     GetAll(setTurnos, setLoading, "/turnos");
 
     // Motrar Alerta al registrar un nuevo PNF
@@ -79,6 +29,49 @@ function Turno() {
     // Limpiar el estado de navegacion para no mostrar el mensaje nuevamente
     window.history.replaceState({}, "");
   }, [location.state]);
+
+  // Definir las columnas de la tabla
+  const columns = [
+    { name: "ID", selector: (row, index) => index + 1, sortable: true },
+    { name: "NOMBRE", selector: (row) => row.nombre, sortable: true },
+    {
+      name: "+INFO",
+      cell: (row) => (
+        <div>
+          <ButtomModal id={row.id} />
+
+          <Modal titleModal={`+INFO ${row.abreviado}`} id={row.id}>
+            <p>
+              <b>NOMBRE: </b> {row.nombre}
+            </p>
+            <p>
+              <b>INICIO: </b> {row.inicio}
+            </p>
+            <p>
+              <b>FINAL: </b> {row.final}
+            </p>
+          </Modal>
+        </div>
+      ),
+    },
+    // Mostrar columna solo si tiene al menos uno de los permisos
+    ...(permisos.includes("editar turno") || permisos.includes("eliminar turno")
+      ? [
+          {
+            name: "ACCIONES",
+            cell: (row) => (
+              <Acciones
+                url={`/turno/${row.id}/edit`}
+                urlDelete={`/turno/${row.id}`}
+                navegar="/turnos"
+                editar="editar turno"
+                eliminar="eliminar turno"
+              />
+            ),
+          },
+        ]
+      : []),
+  ];
 
   return (
     <>

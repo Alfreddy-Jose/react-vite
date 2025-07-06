@@ -7,6 +7,7 @@ import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 //import '/home/alfreddy/Documentos/frontend/src/pages/horario/style.css'
 import { useEffect, useState } from 'react';
 import Api, { GetAll } from '../../services/Api';
+import { event } from 'jquery';
 
 
 
@@ -77,15 +78,6 @@ function Horario() {
     }));
   }
 
-  // Ejemplo: bloques para toda la semana (lunes a sábado)
-  let eventosBloques = [];
-  for (let dia = 1; dia <= 6; dia++) {
-    eventosBloques = [
-      ...eventosBloques,
-      ...generarEventosBloques(bloquesManana, dia),
-      ...generarEventosBloques(bloquesTarde, dia),
-    ];
-  }
 
   return (
     <div style={{ height: '90vh', padding: '20px' }}>
@@ -98,7 +90,7 @@ function Horario() {
         defaultDate={moment().toDate()}
         defaultView="week"
         localizer={localizer}
-        events={eventosBloques}
+        /* events={eventos} */
         resizable
         loading={loading}
         min={minHora}

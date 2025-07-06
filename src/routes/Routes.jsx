@@ -1,51 +1,50 @@
 import { Route, Routes } from "react-router-dom";
-import { Login } from "../pages/Login";
-import { Panel } from "../pages/Panel";
-import { Usuario } from "../pages/usuario/Usuario";
-import { Pnf } from "../pages/pnf/Pnf";
-import { LapsoAcademico } from "../pages/lapsoAcademico/LapsoAcademico";
-import { Sede } from "../pages/sede/Sede";
-import { TipoMatricula } from "../pages/tipoMatricula/TipoMatricula";
-import { UsuarioCreate } from "../pages/usuario/UsuarioCreate";
-import { PnfCreate } from "../pages/pnf/PnfCreate";
-import { SedeCreate } from "../pages/sede/SedeCreate";
-import { LapsoAcademicoCreate } from "../pages/lapsoAcademico/LapsoAcademicoCreate";
-import { TipoMatriculaCreate } from "../pages/tipoMatricula/TipoMatriculaCreate";
-import { Secciones } from "../pages/secciones/Secciones";
+import Layout from "../components/Layout";
+import ProtectedRoute from "../components/ProtectedRoute";
+import Coordinador from "../pages/Coordinador/Coordinador";
+import Docente from "../pages/docente/Docente";
+import DocenteCreate from "../pages/docente/DocenteCreate";
+import AulasEdit from "../pages/espacios/AulaEdit";
 import Aulas from "../pages/espacios/Aulas";
 import AulasCreate from "../pages/espacios/AulasCreate";
-import Laboratorios from "../pages/espacios/Laboratorios";
 import LaboratoriosCreate from "../pages/espacios/LaboratorioCreate";
-import PnfEdit from "../pages/pnf/PnfEdit";
-import Roles from "../pages/roles/Roles";
-import { TipoMatriculaEdit } from "../pages/tipoMatricula/MatriculaEdit";
-import { Universidad } from "../pages/universidad/Universidad";
-import { SedeEdit } from "../pages/sede/SedeEdit";
+import LaboratorioEdit from "../pages/espacios/LaboratorioEdit";
+import Laboratorios from "../pages/espacios/Laboratorios";
+import HorarioFull from "../pages/horario/HorarioFull";
+import { LapsoAcademico } from "../pages/lapsoAcademico/LapsoAcademico";
+import { LapsoAcademicoCreate } from "../pages/lapsoAcademico/LapsoAcademicoCreate";
 import { LapsoAcademicoEdit } from "../pages/lapsoAcademico/LapsoAcademicoEdit";
-import Layout from "../components/Layout";
+import { Login } from "../pages/Login";
+import NotPage from "../pages/Page404";
+import { Panel } from "../pages/Panel";
 import Persona from "../pages/persona/Persona";
 import PersonaCreate from "../pages/persona/PersonaCreate";
 import PersonaEdit from "../pages/persona/PersonaEdit";
-import Coordinador from "../pages/Coordinador/Coordinador";
-import ProtectedRoute from "../components/ProtectedRoute";
-import NotPage from "../pages/Page404";
-import UsuarioEdit from "../pages/usuario/UsuarioEdit";
-import Horario from "../pages/horario/Horario";
-import Turno from "../pages/turnos/Turno";
+import { Pnf } from "../pages/pnf/Pnf";
+import { PnfCreate } from "../pages/pnf/PnfCreate";
+import PnfEdit from "../pages/pnf/PnfEdit";
+import Roles from "../pages/roles/Roles";
+import RolesCreate from "../pages/roles/RolesCreate";
+import RolesEdit from "../pages/roles/RolesEdit";
+import { Secciones } from "../pages/secciones/Secciones";
+import { SeccionesCreate } from "../pages/secciones/SeccionesCreate";
+import { Sede } from "../pages/sede/Sede";
+import { SedeCreate } from "../pages/sede/SedeCreate";
+import { SedeEdit } from "../pages/sede/SedeEdit";
+import { TipoMatriculaEdit } from "../pages/tipoMatricula/MatriculaEdit";
+import { TipoMatricula } from "../pages/tipoMatricula/TipoMatricula";
+import { TipoMatriculaCreate } from "../pages/tipoMatricula/TipoMatriculaCreate";
 import Trayecto from "../pages/trayectos/Trayecto";
+import TrayectoCreate from "../pages/trayectos/TrayectoCreate";
+import Turno from "../pages/turnos/Turno";
 import TurnoCreate from "../pages/turnos/TurnoCreate";
 import UnidadCurricular from "../pages/unidad_curricular/UnidadCurricular";
 import UnidadCurricularCreate from "../pages/unidad_curricular/UnidadCurricularCreate";
-import Docente from "../pages/docente/Docente";
-import DocenteCreate from "../pages/docente/DocenteCreate";
-import TrayectoCreate from "../pages/trayectos/TrayectoCreate";
-import RolesCreate from "../pages/roles/RolesCreate";
-import RolesEdit from "../pages/roles/RolesEdit";
-import { SeccionesCreate } from "../pages/secciones/SeccionesCreate";
 import UnidadCurricularEdit from "../pages/unidad_curricular/UnidadCurricularEdit";
-import AulasEdit from "../pages/espacios/AulaEdit";
-import LaboratorioEdit from "../pages/espacios/LaboratorioEdit";
-import HorarioFullCalendar from "../pages/horario/HorarioFullCalendar";
+import { Universidad } from "../pages/universidad/Universidad";
+import { Usuario } from "../pages/usuario/Usuario";
+import { UsuarioCreate } from "../pages/usuario/UsuarioCreate";
+import UsuarioEdit from "../pages/usuario/UsuarioEdit";
 
 export function AppRoutes() {
   return (
@@ -525,7 +524,7 @@ export function AppRoutes() {
           element={
             <ProtectedRoute>
               <Layout>
-                <HorarioFullCalendar/>
+                <HorarioFull/>
               </Layout>
             </ProtectedRoute>
           }

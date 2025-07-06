@@ -7,50 +7,17 @@ import Alerta from "../../components/Alert";
 import { Tabla } from "../../components/Tabla";
 import Acciones from "../../components/Acciones";
 
-// Leer permisos del localStorage
-const permisos = JSON.parse(localStorage.getItem("permissions")) || [];
-
-const columns = [
-  {
-    name: "ID",
-    selector: (row, index) => index + 1, // Muestra el contador incremental
-    sortable: true,
-  },
-  {
-    name: "NÚMERO",
-    selector: (row) => row.numero,
-    sortable: true,
-  },
-  {
-    name: "NOMBRE",
-    selector: (row) => row.nombre,
-  },
-  // Mostrar columna solo si tiene al menos uno de los permisos
-  ...(permisos.includes("editar matricula") ||
-  permisos.includes("eliminar matricula")
-    ? [
-        {
-          name: "ACCIONES",
-          cell: (row) => (
-            <Acciones
-              url={`/tipo_matricula/${row.id}/edit`}
-              urlDelete={`/matricula/${row.id}`}
-              navegar="/matricula"
-              editar="editar matricula"
-              eliminar="eliminar matricula"
-            />
-          ),
-        },
-      ]
-    : []),
-];
-
 export function TipoMatricula() {
   const [loading, setLoading] = useState(true);
   const [matricula, setMatricula] = useState([]);
+  const [permisos, setPermisos] = useState([]);
   const location = useLocation();
 
   useEffect(() => {
+    // Leer permisos del localStorage
+    const permisosLS = JSON.parse(localStorage.getItem("permissions")) || [];
+    setPermisos(permisosLS);
+
     // Mostrar la lista de Matricula
     GetAll(setMatricula, setLoading, "/matriculas");
 
@@ -62,6 +29,42 @@ export function TipoMatricula() {
     // Limpiar el estado de navegacion para no mostrar el mensaje nuevamente
     window.history.replaceState({}, "");
   }, [location.state]);
+
+  // Definir las columnas de la tabla
+  const columns = [
+    {
+      name: "ID",
+      selector: (row, index) => index + 1, // Muestra el contador incremental
+      sortable: true,
+    },
+    {
+      name: "NÚMERO",
+      selector: (row) => row.numero,
+      sortable: true,
+    },
+    {
+      name: "NOMBRE",
+      selector: (row) => row.nombre,
+    },
+    // Mostrar columna solo si tiene al menos uno de los permisos
+    ...(permisos.includes("editar matricula") ||
+    permisos.includes("eliminar matricula")
+      ? [
+          {
+            name: "ACCIONES",
+            cell: (row) => (
+              <Acciones
+                url={`/tipo_matricula/${row.id}/edit`}
+                urlDelete={`/matricula/${row.id}`}
+                navegar="/matricula"
+                editar="editar matricula"
+                eliminar="eliminar matricula"
+              />
+            ),
+          },
+        ]
+      : []),
+  ];
 
   return (
     <>

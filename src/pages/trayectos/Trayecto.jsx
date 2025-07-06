@@ -7,48 +7,17 @@ import { Tabla } from "../../components/Tabla";
 import { Create } from "../../components/Link";
 import Acciones from "../../components/Acciones";
 
-// Leer permisos del localStorage
-const permisos = JSON.parse(localStorage.getItem("permissions")) || [];
-
-const columns = [
-  { name: "ID", selector: (row, index) => index + 1, sortable: true },
-  { name: "NOMBRE", selector: (row) => row.nombre, sortable: true },
-  // Mostrar columna solo si tiene al menos uno de los permisos
-  ...(permisos.includes("editar trayecto") ||
-  permisos.includes("eliminar trayecto")
-    ? [
-        {
-          name: "ACCIONES",
-          cell: (row) => (
-            <Acciones
-              url={`/trayecto/${row.id}/edit`}
-              urlDelete={`/trayecto/${row.id}`}
-              navegar="/trayectos"
-              editar="editar trayecto"
-              eliminar="eliminar trayecto"
-            />
-          ),
-        },
-      ]
-    : []),
-  /*   {
-    name: "ACCIONES",
-    cell: (row) => (
-      <Acciones
-        url={`/trayecto/${row.id}/edit`}
-        urlDelete={`/trayecto/${row.id}`}
-        navegar="/trayectos"
-      />
-    ),
-  }, */
-];
-
 export default function Trayecto() {
   const [loading, setLoading] = useState(true);
   const [trayectos, setTrayectos] = useState([]);
+  const [permisos, setPermisos] = useState([]);
   const location = useLocation();
 
   useEffect(() => {
+    // Leer permisos del localStorage
+    const permisosLS = JSON.parse(localStorage.getItem("permissions")) || [];
+    setPermisos(permisosLS);
+
     GetAll(setTrayectos, setLoading, "/trayectos");
 
     // Motrar Alerta al registrar un nuevo PNF
@@ -59,6 +28,30 @@ export default function Trayecto() {
     // Limpiar el estado de navegacion para no mostrar el mensaje nuevamente
     window.history.replaceState({}, "");
   }, [location.state]);
+
+  // Definir las columnas de la tabla
+  const columns = [
+    { name: "ID", selector: (row, index) => index + 1, sortable: true },
+    { name: "NOMBRE", selector: (row) => row.nombre, sortable: true },
+    // Mostrar columna solo si tiene al menos uno de los permisos
+    ...(permisos.includes("editar trayecto") ||
+    permisos.includes("eliminar trayecto")
+      ? [
+          {
+            name: "ACCIONES",
+            cell: (row) => (
+              <Acciones
+                url={`/trayecto/${row.id}/edit`}
+                urlDelete={`/trayecto/${row.id}`}
+                navegar="/trayectos"
+                editar="editar trayecto"
+                eliminar="eliminar trayecto"
+              />
+            ),
+          },
+        ]
+      : []),
+  ];
 
   return (
     <>
