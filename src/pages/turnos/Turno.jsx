@@ -21,7 +21,7 @@ function Turno() {
 
     GetAll(setTurnos, setLoading, "/turnos");
 
-    // Motrar Alerta al registrar un nuevo PNF
+    // Motrar Alerta al registrar un nuevo TURNO
     if (location.state?.message) {
       Alerta(location.state.message);
     }
@@ -55,7 +55,7 @@ function Turno() {
       ),
     },
     // Mostrar columna solo si tiene al menos uno de los permisos
-    ...(permisos.includes("editar turno") || permisos.includes("eliminar turno")
+    ...(permisos.includes("turno.editar") || permisos.includes("turno.eliminar")
       ? [
           {
             name: "ACCIONES",
@@ -64,8 +64,8 @@ function Turno() {
                 url={`/turno/${row.id}/edit`}
                 urlDelete={`/turno/${row.id}`}
                 navegar="/turnos"
-                editar="editar turno"
-                eliminar="eliminar turno"
+                editar="turno.editar"
+                eliminar="turno.eliminar"
               />
             ),
           },
@@ -81,7 +81,7 @@ function Turno() {
         title="TURNOS"
         // Boton para crear nuevos registros
         link={
-          permisos.includes("crear turno") ? (
+          permisos.includes("turno.crear") ? (
             <Create path="/turno/create" />
           ) : null
         }

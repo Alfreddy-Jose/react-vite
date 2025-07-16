@@ -72,7 +72,7 @@ export function Pnf() {
       ),
     },
     // Mostrar columna solo si tiene al menos uno de los permisos
-    ...(permisos.includes("editar pnf") || permisos.includes("eliminar pnf")
+    ...(permisos.includes("pnf.editar") || permisos.includes("pnf.eliminar")
       ? [
           {
             name: "ACCIONES",
@@ -81,8 +81,8 @@ export function Pnf() {
                 url={`/pnf/${row.id}/edit`}
                 urlDelete={`/pnf/${row.id}`}
                 navegar="/pnf"
-                editar="editar pnf"
-                eliminar="eliminar pnf"
+                editar="pnf.editar"
+                eliminar="pnf.eliminar"
               />
             ),
           },
@@ -98,7 +98,7 @@ export function Pnf() {
         title="PNF"
         // Boton para crear nuevos registros
         link={
-          permisos.includes("crear pnf") ? <Create path="/pnf/create" /> : null
+          permisos.includes("pnf.crear") ? <Create path="/pnf/create" /> : null
         }
         isLoading={loading}
         // Tabla

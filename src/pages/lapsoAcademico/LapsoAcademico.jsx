@@ -51,7 +51,7 @@ export function LapsoAcademico() {
       sortable: true,
     },
     // Mostrar columna solo si tiene al menos uno de los permisos
-    ...(permisos.includes("editar lapso") || permisos.includes("eliminar lapso")
+    ...(permisos.includes("lapso.editar") || permisos.includes("lapso.eliminar")
       ? [
           {
             name: "ACCIONES",
@@ -60,8 +60,8 @@ export function LapsoAcademico() {
                 url={`/lapso_academico/${row.id}/edit`}
                 urlDelete={`/lapso/${row.id}`}
                 navegar="/lapso_academico"
-                editar="editar lapso"
-                eliminar="eliminar lapso"
+                editar="lapso.editar"
+                eliminar="lapso.eliminar"
               />
             ),
           },
@@ -77,7 +77,7 @@ export function LapsoAcademico() {
         title="LAPSO ACADEMICO"
         // Boton para crear nuevos registros
         link={
-          permisos.includes("crear lapso") ? (
+          permisos.includes("lapso.crear") ? (
             <Create path="/lapso_academico/create" />
           ) : null
         }

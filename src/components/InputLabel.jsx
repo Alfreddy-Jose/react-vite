@@ -7,9 +7,10 @@ export function InputLabel({
   label,
   formik,
   disabled = false,
+  hidden = false,
 }) {
   return (
-    <div className="col-sm-6 col-xl-4">
+    <div hidden={hidden} className="col-sm-6 col-xl-4">
       <label htmlFor={name} className="mt-4">
         {label}
       </label>
@@ -20,8 +21,10 @@ export function InputLabel({
         type={type}
         name={name}
         id={name}
+        hidden={hidden}
         disabled={disabled}
         placeholder={placeholder}
+        autoComplete="off"
         onChange={(e) => {
           const upperCaseValue = e.target.value.toUpperCase();
           formik.setFieldValue(name, upperCaseValue);

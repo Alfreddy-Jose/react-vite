@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import Api, { GetAll } from "../../services/Api";
+import { useEffect, useState } from "react";
+import { GetAll } from "../../services/Api";
 import { useLocation } from "react-router-dom";
 import Alerta from "../../components/Alert";
 import { ContainerTable } from "../../components/ContainerTable";
@@ -48,23 +48,22 @@ function Roles() {
           <ButtomModal id={row.id} />
 
           <Modal titleModal={`+INFO ${row.name}`} id={row.id}>
-            {/* mostrando permisos */}
-            <p>
-              <b>PERMISOS: </b>
-              {row.permissions.length > 0
-                ? row.permissions.map((permiso) => (
-                    <span key={permiso.id} className="badge bg-secondary me-1">
-                      {permiso.name}
-                    </span>
-                  ))
-                : "No hay permisos asignados"}
-            </p>
+            <div className="p-3">
+              <h4 className="fw-bold">PERMISOS:</h4>
+
+              {row.groupedPermissions &&
+              Object.keys(row.groupedPermissions).length > 0 ? (
+                <PermisosPorModulo permisos={row.groupedPermissions} />
+              ) : (
+                <p className="text-muted">No hay permisos asignados</p>
+              )}
+            </div>
           </Modal>
         </div>
       ),
     },
     // Mostrar columna solo si tiene al menos uno de los permisos
-    ...(permisos.includes("editar rol") || permisos.includes("eliminar rol")
+    ...(permisos.includes("rol.editar") || permisos.includes("rol.eliminar")
       ? [
           {
             name: "ACCIONES",
@@ -73,8 +72,8 @@ function Roles() {
                 url={`/rol/${row.id}/edit`}
                 urlDelete={`/rol/${row.id}`}
                 navegar="/roles"
-                editar="editar rol"
-                eliminar="eliminar rol"
+                editar="rol.editar"
+                eliminar="rol.eliminar"
               />
             ),
           },
@@ -90,7 +89,7 @@ function Roles() {
         title="ROLES"
         // Boton para crear nuevos registros
         link={
-          permisos.includes("crear rol") ? <Create path="/rol/create" /> : null
+          permisos.includes("rol.crear") ? <Create path="/rol/create" /> : null
         }
         // Tabla
         tabla={<Tabla columns={columns} data={roles} />}
@@ -100,5 +99,24 @@ function Roles() {
     </>
   );
 }
+
+const PermisosPorModulo = ({ permisos }) => {
+  return (
+    <div className="permisos-modulos">
+      {Object.entries(permisos).map(([modulo, permisosLista]) => (
+        <div key={modulo} className="modulo mb-3 p-3 border rounded">
+          <h5 className="fw-bold text-capitalize">{modulo}</h5>
+          <div className="d-flex flex-wrap gap-2 mt-2">
+            {permisosLista.map((permiso) => (
+              <span key={permiso.id} className="badge bg-primary">
+                {permiso.action}
+              </span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 export default Roles;

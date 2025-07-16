@@ -1,33 +1,108 @@
-.rbc-addons-dnd-drag-preview {
-  background-color: #f0f8ff;
-  border: 2px dashed #4682b4;
+.calendar-table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-/* Eliminar espacio del header cuando no hay toolbar */
-.rbc-calendar {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.rbc-time-view {
-  flex: 1;
-}
-
-/* Estilos para los botones de vista */
-.rbc-toolbar button {
-  color: #333;
-  background: white;
+.calendar-cell {
+  position: relative;
   border: 1px solid #ddd;
+  padding: 0;
+  overflow: hidden;
 }
 
-.rbc-toolbar button.rbc-active {
-  background: #3174ad;
-  color: white;
+.event-resizer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 10px;
+  background: rgba(0, 0, 0, 0.1);
+  cursor: ns-resize;
+  z-index: 3;
+  transition: background 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* Ajustar tamaño de los eventos */
-.rbc-event {
-  padding: 2px 5px;
-  font-size: 0.85em;
+.event-resizer::after {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 1px;
+}
+
+.event-resizer:hover,
+.evento-resizing .event-resizer {
+  background: rgba(0, 150, 255, 0.3);
+}
+
+.event-resizer:active {
+  background: rgba(0, 150, 255, 0.5);
+}
+
+.calendar-table td {
+  padding: 0;
+  position: relative;
+}
+
+.event-resizer:active {
+  background: rgba(0, 0, 0, 0.5);
+  cursor: grabbing;
+}
+
+.evento {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  padding: 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  text-align: center;
+  white-space: pre-line;
+  user-select: none;
+  cursor: move;
+  box-sizing: border-box;
+  overflow: hidden;
+  transition: height 0.2s ease-out;
+  will-change: height, transform;
+  z-index: 1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+
+.evento:hover {
+  z-index: 2;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
+}
+
+.evento-resizing {
+  transition: none !important;
+  z-index: 1000;
+  opacity: 0.9;
+  box-shadow: 0 0 0 2px rgba(0, 150, 255, 0.6);
+  will-change: height;
+}
+
+@keyframes resize-pulse {
+  0% {
+    opacity: 0.9;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.9;
+  }
+}
+
+/* Mejora para celdas durante el drag */
+td.highlight-cell {
+  background-color: rgba(0, 150, 255, 0.08) !important;
+  transition: background-color 0.2s ease;
 }

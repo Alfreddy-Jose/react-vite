@@ -7,7 +7,7 @@ import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 //import '/home/alfreddy/Documentos/frontend/src/pages/horario/style.css'
 import { useEffect, useState } from 'react';
 import Api, { GetAll } from '../../services/Api';
-import { event } from 'jquery';
+
 
 
 

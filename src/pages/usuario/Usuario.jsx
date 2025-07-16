@@ -40,8 +40,8 @@ export function Usuario() {
       sortable: true,
     },
     // Mostrar columna solo si tiene al menos uno de los permisos
-    ...(permisos.includes("editar usuario") ||
-    permisos.includes("eliminar usuario")
+    ...(permisos.includes("usuario.editar") ||
+    permisos.includes("usuario.eliminar")
       ? [
           {
             name: "ACCIONES",
@@ -50,8 +50,8 @@ export function Usuario() {
                 url={`/usuario/${row.id}/edit`}
                 urlDelete={`/usuario/${row.id}`}
                 navegar="/Usuarios"
-                editar="editar usuario"
-                eliminar="eliminar usuario"
+                editar="usuario.editar"
+                eliminar="usuario.eliminar"
               />
             ),
           },
@@ -67,7 +67,7 @@ export function Usuario() {
         title="USUARIOS"
         // Boton para crear nuevos registros
         link={
-          permisos.includes("crear usuario") ? (
+          permisos.includes("usuario.crear") ? (
             <Create path="/usuarios/create" />
           ) : null
         }

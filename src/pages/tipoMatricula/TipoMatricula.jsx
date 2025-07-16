@@ -47,8 +47,8 @@ export function TipoMatricula() {
       selector: (row) => row.nombre,
     },
     // Mostrar columna solo si tiene al menos uno de los permisos
-    ...(permisos.includes("editar matricula") ||
-    permisos.includes("eliminar matricula")
+    ...(permisos.includes("Tipo Matricula.editar") ||
+    permisos.includes("Tipo Matricula.eliminar")
       ? [
           {
             name: "ACCIONES",
@@ -57,8 +57,8 @@ export function TipoMatricula() {
                 url={`/tipo_matricula/${row.id}/edit`}
                 urlDelete={`/matricula/${row.id}`}
                 navegar="/matricula"
-                editar="editar matricula"
-                eliminar="eliminar matricula"
+                editar="Tipo Matricula.editar"
+                eliminar="Tipo Matricula.eliminar"
               />
             ),
           },
@@ -74,7 +74,7 @@ export function TipoMatricula() {
         title="TIPO MATRICULA"
         // Boton para crear nuevos registros
         link={
-          permisos.includes("crear matricula") ? (
+          permisos.includes("Tipo Matricula.crear") ? (
             <Create path="/tipo_matricula/create" />
           ) : null
         }

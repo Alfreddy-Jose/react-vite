@@ -62,7 +62,7 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
               <li
                 className={`nav-item ${isActive("/usuarios") ? "active" : ""}`}
               >
-                {permisos.includes("ver usuario") ? (
+                {permisos.includes("usuario.ver") ? (
                   <Link to="/usuarios">
                     <i className="fas fa-users"></i>
                     <p>Usuarios</p>
@@ -71,7 +71,7 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
               </li>
 
               <li className={`nav-item ${isActive("/roles") ? "active" : ""}`}>
-                {permisos.includes("ver rol") ? (
+                {permisos.includes("rol.ver") ? (
                   <Link to="/roles">
                     <i className="fas fa-user-shield"></i>
                     <p>Roles y Permisos</p>
@@ -80,7 +80,7 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
               </li>
 
               <li className={`nav-item ${isActive("/pnf") ? "active" : ""}`}>
-                {permisos.includes("ver pnf") ? (
+                {permisos.includes("pnf.ver") ? (
                   <Link to="/pnf">
                     <i className="fas fa-book-open"></i>
                     <p>PNF</p>
@@ -89,7 +89,7 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
               </li>
 
               <li className={`nav-item ${isActive("/sede") ? "active" : ""}`}>
-                {permisos.includes("ver sede") ? (
+                {permisos.includes("sede.ver") ? (
                   <Link to="/sede">
                     <i className="fas fa-map-marker-alt"></i>
                     <p>Sede</p>
@@ -102,7 +102,7 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                   isActive("/lapsos") ? "active" : ""
                 }`}
               >
-                {permisos.includes("ver lapso") ? (
+                {permisos.includes("lapso.ver") ? (
                   <Link to="/lapsos">
                     <i className="fas fa-calendar-alt"></i>
                     <p>Lapso Académico</p>
@@ -113,7 +113,7 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
               <li
                 className={`nav-item ${isActive("/trayectos") ? "active" : ""}`}
               >
-                {permisos.includes("ver trayecto") ? (
+                {permisos.includes("trayecto.ver") ? (
                   <Link to="/trayectos">
                     <i className="fas fa-hourglass"></i>
                     <p>Trayectos</p>
@@ -126,7 +126,7 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                   isActive("/unidad_curricular") ? "active" : ""
                 }`}
               >
-                {permisos.includes("ver unidad") ? (
+                {permisos.includes("unidad Curricular.ver") ? (
                   <Link to="/unidad_curricular">
                     <i className="fas fa-book"></i>
                     <p>Unidad Curricular</p>
@@ -139,7 +139,7 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                   isActive("/tipo_matricula") ? "active" : ""
                 }`}
               >
-                {permisos.includes("ver matricula") ? (
+                {permisos.includes("Tipo Matricula.ver") ? (
                   <Link to="/matricula">
                     <i className="fas fa-clipboard-list"></i>
                     <p>Tipo Matricula</p>
@@ -148,7 +148,7 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
               </li>
 
               <li className="nav-item">
-                {permisos.includes("ver seccion") ? (
+                {permisos.includes("seccion.ver") ? (
                   <a data-bs-toggle="collapse" href="#seccion">
                     <i className="fas fa-layer-group"></i>
                     <p>Secciones</p>
@@ -164,14 +164,14 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                     </li>
                     <li>
                       <a href="#">
-                        <span className="sub-item">Secciones por Sede</span>
+                        <span className="sub-item">Buscar secciones</span>
                       </a>
                     </li>
-                    <li>
+{/*                     <li>
                       <a href="#">
                         <span className="sub-item">Secciones por Trayecto</span>
                       </a>
-                    </li>
+                    </li> */}
                   </ul>
                 </div>
               </li>
@@ -186,7 +186,7 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                 ) : null}
                 <div className="collapse" id="espacios">
                   <ul className="nav nav-collapse">
-                    {permisos.includes("ver aula") ? (
+                    {permisos.includes("aula.ver") ? (
                       <li>
                         <Link to="/aula">
                           <span className="sub-item">Aulas</span>
@@ -194,7 +194,7 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                       </li>
                     ) : null}
                     <li>
-                      {permisos.includes("ver laboratorio") ? (
+                      {permisos.includes("laboratorio.ver") ? (
                         <Link to="/laboratorio">
                           <span className="sub-item">Laboratorios</span>
                         </Link>
@@ -205,7 +205,7 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
               </li>
 
               <li className={`nav-item ${isActive("/turnos") ? "active" : ""}`}>
-                {permisos.includes("ver turno") ? (
+                {permisos.includes("turno.ver") ? (
                   <Link to="/turnos">
                     <i className="fas fa-history"></i>
                     <p>Turnos</p>
@@ -214,7 +214,7 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
               </li>
 
               <li className="nav-item">
-                {permisos.includes("ver malla") ? (
+                {permisos.includes("malla.ver") ? (
                   <a href="#">
                     <i className="fas fa-project-diagram"></i>
                     <p>Malla del PNF</p>
@@ -261,7 +261,7 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                 </div>
               </li>
 
-              {permisos.includes("ver coordinador") ? (
+              {permisos.includes("coordinador.ver") ? (
                 <li className="nav-item">
                   <a href="#">
                     <i className="fas fa-user-tie"></i>
@@ -270,7 +270,7 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                 </li>
               ) : null}
 
-              {permisos.includes("ver asistente") ? (
+              {permisos.includes("asistente.ver") ? (
                 <li className="nav-item">
                   <a href="#">
                     <i className="fas fa-clipboard-check"></i>
@@ -279,7 +279,7 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                 </li>
               ) : null}
 
-              {permisos.includes("ver vocero") ? (
+              {permisos.includes("vocero.ver") ? (
                 <li className="nav-item">
                   <a href="#">
                     <i className="fas fa-bullhorn"></i>

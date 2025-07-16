@@ -77,8 +77,8 @@ function UnidadCurricular() {
       ),
     },
     // Mostrar columna solo si tiene al menos uno de los permisos
-    ...(permisos.includes("editar unidad") ||
-    permisos.includes("eliminar unidad")
+    ...(permisos.includes("unidad Curricular.editar") ||
+    permisos.includes("unidad Curricular.eliminar")
       ? [
           {
             name: "ACCIONES",
@@ -87,8 +87,8 @@ function UnidadCurricular() {
                 url={`/unidad_curricular/${row.id}/edit`}
                 urlDelete={`/unidad_curricular/${row.id}`}
                 navegar="/unidad_curricular"
-                editar="editar unidad"
-                eliminar="eliminar unidad"
+                editar="unidad Curricular.editar"
+                eliminar="unidad Curricular.eliminar"
               />
             ),
           },
@@ -104,7 +104,7 @@ function UnidadCurricular() {
         title="UNIDADES CURRICULARES"
         // Boton para crear nuevos registros
         link={
-          permisos.includes("crear unidad") ? (
+          permisos.includes("unidad Curricular.crear") ? (
             <Create path="/unidad_curricular/create" />
           ) : null
         }

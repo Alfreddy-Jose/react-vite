@@ -34,8 +34,8 @@ export default function Trayecto() {
     { name: "ID", selector: (row, index) => index + 1, sortable: true },
     { name: "NOMBRE", selector: (row) => row.nombre, sortable: true },
     // Mostrar columna solo si tiene al menos uno de los permisos
-    ...(permisos.includes("editar trayecto") ||
-    permisos.includes("eliminar trayecto")
+    ...(permisos.includes("trayecto.editar") ||
+    permisos.includes("trayecto.eliminar")
       ? [
           {
             name: "ACCIONES",
@@ -44,8 +44,8 @@ export default function Trayecto() {
                 url={`/trayecto/${row.id}/edit`}
                 urlDelete={`/trayecto/${row.id}`}
                 navegar="/trayectos"
-                editar="editar trayecto"
-                eliminar="eliminar trayecto"
+                editar="trayecto.editar"
+                eliminar="trayecto.eliminar"
               />
             ),
           },
@@ -63,7 +63,7 @@ export default function Trayecto() {
         link={<Create path="/trayecto/create" />}
         // Tabla
         tabla={
-          permisos.includes("crear trayecto") ? (
+          permisos.includes("trayecto.crear") ? (
             <Tabla columns={columns} data={trayectos} />
           ) : null
         }

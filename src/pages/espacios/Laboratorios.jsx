@@ -65,8 +65,8 @@ export default function Laboratorios() {
       ),
     },
     // Mostrar columna solo si tiene al menos uno de los permisos
-    ...(permisos.includes("editar laboratorio") ||
-    permisos.includes("eliminar laboratorio")
+    ...(permisos.includes("laboratorio.editar") ||
+    permisos.includes("laboratorio.eliminar")
       ? [
           {
             name: "ACCIONES",
@@ -75,8 +75,8 @@ export default function Laboratorios() {
                 url={`/laboratorio/${row.id}/edit`}
                 urlDelete={`/laboratorio/${row.id}`}
                 navegar="/laboratorio"
-                editar="editar laboratorio"
-                eliminar="eliminar laboratorio"
+                editar="laboratorio.editar"
+                eliminar="laboratorio.eliminar"
               />
             ),
           },
@@ -92,7 +92,7 @@ export default function Laboratorios() {
         title="LABORATORIO"
         // Boton para crear nuevos registros
         link={
-          permisos.includes("crear laboratorio") ? (
+          permisos.includes("laboratorio.crear") ? (
             <Create path="/laboratorio/create" />
           ) : null
         }

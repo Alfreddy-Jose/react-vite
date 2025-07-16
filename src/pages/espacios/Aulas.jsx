@@ -62,7 +62,7 @@ export default function Aulas() {
       ),
     },
     // Mostrar columna solo si tiene al menos uno de los permisos
-    ...(permisos.includes("editar aula") || permisos.includes("eliminar aula")
+    ...(permisos.includes("aula.editar") || permisos.includes("aula.eliminar")
       ? [
           {
             name: "ACCIONES",
@@ -71,8 +71,8 @@ export default function Aulas() {
                 url={`/aula/${row.id}/edit`}
                 urlDelete={`/aula/${row.id}`}
                 navegar="/aula"
-                editar="editar aula"
-                eliminar="eliminar aula"
+                editar="aula.editar"
+                eliminar="aula.eliminar"
               />
             ),
           },
@@ -88,7 +88,7 @@ export default function Aulas() {
         title="AULAS"
         // Boton para crear nuevos registros
         link={
-          permisos.includes("crear aula") ? (
+          permisos.includes("aula.crear") ? (
             <Create path="/aula/create" />
           ) : null
         }

@@ -86,8 +86,8 @@ export default function Persona() {
       ),
     },
     // Mostrar columna solo si tiene al menos uno de los permisos
-    ...(permisos.includes("editar persona") ||
-    permisos.includes("eliminar persona")
+    ...(permisos.includes("persona.editar") ||
+    permisos.includes("persona.eliminar")
       ? [
           {
             name: "ACCIONES",
@@ -96,8 +96,8 @@ export default function Persona() {
                 url={`/persona/${row.id}/edit`}
                 urlDelete={`/persona/${row.id}`}
                 navegar="/persona"
-                editar="editar persona"
-                eliminar="eliminar persona"
+                editar="persona.editar"
+                eliminar="persona.eliminar"
               />
             ),
           },
@@ -113,7 +113,7 @@ export default function Persona() {
         title="PERSONAS"
         // Boton para crear nuevos registros
         link={
-          permisos.includes("crear persona") ? (
+          permisos.includes("persona.crear") ? (
             <Create path="/persona/create" />
           ) : null
         }

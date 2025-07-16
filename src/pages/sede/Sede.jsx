@@ -73,7 +73,7 @@ export function Sede() {
       ),
     },
     // Mostrar columna solo si tiene al menos uno de los permisos
-    ...(permisos.includes("editar sede") || permisos.includes("eliminar sede")
+    ...(permisos.includes("sede.editar") || permisos.includes("sede.eliminar")
       ? [
           {
             name: "ACCIONES",
@@ -82,8 +82,8 @@ export function Sede() {
                 url={`/sede/${row.id}/edit`}
                 urlDelete={`/sede/${row.id}`}
                 navegar="/sede"
-                editar="editar sede"
-                eliminar="eliminar sede"
+                editar="sede.editar"
+                eliminar="sede.eliminar"
               />
             ),
           },
@@ -96,7 +96,7 @@ export function Sede() {
       <ContainerTable
         title="SEDES"
         link={
-          permisos.includes("crear sede") ? (
+          permisos.includes("sede.crear") ? (
             <Create path="/sede/create" />
           ) : null
         }

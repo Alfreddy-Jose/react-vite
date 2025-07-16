@@ -29,6 +29,25 @@ Api.interceptors.request.use(
   }
 );
 
+// Interceptor para manejar respuestas no autorizadas
+Api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (
+      error.response &&
+      (error.response.status === 401 || error.response.status === 419)
+    ) {
+      // Limpia el token si lo usas
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("permissions");
+      // Redirige al login
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Traer todos los registros
 export const GetAll = async (setAll, setLoading, url) => {
   try {
@@ -90,7 +109,6 @@ export const PutAll = async (values, url, navegation, id, urlNavegar) => {
   });
   try {
     const response = await Api.put(`${url}/${id}`, values);
-    console.log(response);
     navegation(urlNavegar, { state: { message: response.data.message } });
   } catch (error) {
     console.log(error);

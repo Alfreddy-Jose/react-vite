@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import Api from "../services/Api";
+import { AlertaError } from "./Alert";
 
 export default function Acciones({ url, urlDelete, navegar, editar = null, eliminar = null }) {
   const navegation = useNavigate();
@@ -35,7 +36,8 @@ export default function Acciones({ url, urlDelete, navegar, editar = null, elimi
         navegation({ navegar }, { state: { message: response.data.message } });
       }
     } catch (error) {
-      console.log("Ocurrio un error: " + error);
+      AlertaError("Error al eliminar el registro");
+      console.log(error);
     }
   };
 

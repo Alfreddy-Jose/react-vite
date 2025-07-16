@@ -74,8 +74,8 @@ export function Secciones() {
       ),
     },
     // Mostrar columna solo si tiene al menos uno de los permisos
-    ...(permisos.includes("editar seccion") ||
-    permisos.includes("eliminar seccion")
+    ...(permisos.includes("seccion.editar") ||
+    permisos.includes("seccion.eliminar")
       ? [
           {
             name: "ACCIONES",
@@ -84,8 +84,8 @@ export function Secciones() {
                 url={`/seccion/${row.id}/edit`}
                 urlDelete={`/seccion/${row.id}`}
                 navegar="/secciones"
-                editar="editar seccion"
-                eliminar="eliminar seccion"
+                editar="seccion.editar"
+                eliminar="seccion.eliminar"
               />
             ),
           },
@@ -101,7 +101,7 @@ export function Secciones() {
         title="SECCIONES"
         // Boton para crear nuevos registros
         link={
-          permisos.includes("crear seccion") ? (
+          permisos.includes("seccion.crear") ? (
             <Create path="/seccion/create" />
           ) : null
         }
