@@ -43,7 +43,6 @@ const validationSchema = Yup.object({
   tipo_persona: Yup.string().required("Este campo es obligatorio"), // Campo requerido
   grado_inst: Yup.string()
     .required("Este campo es obligatorio") // Campo requerido
-    .matches(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "Solo letras permitidas"), // solo letras permitidas
 });
 
 function PersonaCreate() {
@@ -153,12 +152,17 @@ function PersonaCreate() {
               formik={formik}
             />
             {/* Input para grado de la PERSONA */}
-            <InputLabel
+            <SelectSearch 
               label={FORM_LABELS.PERSONAS.GRADO}
-              type="text"
               name="grado_inst"
-              placeholder="GRADO INSTITUCIONAL"
               formik={formik}
+              options={[
+                { id: "INGENIERO", nombre: "INGENIERO" },
+                { id: "LICENCIADO", nombre: "LICENCIADO" },
+                { id: "DOCTOR", nombre: "DOCTOR" },
+                { id: "TECNICO SUPERIOR", nombre: "TECNICO SUPERIOR" },
+                { id: "BACHILLER", nombre: "BACHILLER" },
+              ]}
             />
           </>
         }

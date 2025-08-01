@@ -90,6 +90,7 @@ export function Login() {
                   type={passwordType}
                   name="password"
                   id="pass"
+                  autoComplete="off"
                   placeholder="Contraseña"
                   onChange={formik.handleChange}
                   value={formik.values.password}
@@ -97,12 +98,6 @@ export function Login() {
               </div>
 
               <div className={styles.div_checkbox}>
-                {/*                 <input
-                  type="checkbox"
-                  id="verPassword"
-                  className={styles.checkbox}
-                  onClick={togglePasswordVisibility}
-                /> */}
                 <label htmlFor="verPassword">
                   <input
                     type="checkbox"

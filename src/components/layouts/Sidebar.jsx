@@ -9,7 +9,7 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
 
   // Leer permisos del localStorage
   const permisos = JSON.parse(localStorage.getItem("permissions")) || [];
-  
+
   return (
     <>
       <div className="sidebar toggled" data-background-color="dark">
@@ -97,11 +97,7 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                 ) : null}
               </li>
 
-              <li
-                className={`nav-item ${
-                  isActive("/lapsos") ? "active" : ""
-                }`}
-              >
+              <li className={`nav-item ${isActive("/lapsos") ? "active" : ""}`}>
                 {permisos.includes("lapso.ver") ? (
                   <Link to="/lapsos">
                     <i className="fas fa-calendar-alt"></i>
@@ -147,33 +143,15 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                 ) : null}
               </li>
 
-              <li className="nav-item">
+              <li
+                className={`nav-item ${isActive("/secciones") ? "active" : ""}`}
+              >
                 {permisos.includes("seccion.ver") ? (
-                  <a data-bs-toggle="collapse" href="#seccion">
+                  <Link to="/secciones">
                     <i className="fas fa-layer-group"></i>
                     <p>Secciones</p>
-                    <span className="caret"></span>
-                  </a>
+                  </Link>
                 ) : null}
-                <div className="collapse" id="seccion">
-                  <ul className="nav nav-collapse">
-                    <li>
-                      <Link to="/secciones">
-                        <span className="sub-item">Secciones</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <a href="#">
-                        <span className="sub-item">Buscar secciones</span>
-                      </a>
-                    </li>
-{/*                     <li>
-                      <a href="#">
-                        <span className="sub-item">Secciones por Trayecto</span>
-                      </a>
-                    </li> */}
-                  </ul>
-                </div>
               </li>
 
               <li className="nav-item">
@@ -212,7 +190,7 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                   </Link>
                 ) : null}
               </li>
-
+              {/* 
               <li className="nav-item">
                 {permisos.includes("malla.ver") ? (
                   <a href="#">
@@ -221,7 +199,7 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                   </a>
                 ) : null}
               </li>
-
+ */}
               <li className="nav-item">
                 {permisos.includes("gestionar persona") ? (
                   <a data-bs-toggle="collapse" href="#persona">
@@ -254,21 +232,17 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                               <span className="sub-item">Docente</span>
                             </Link>
                           </li>
+                          <li>
+                            <a href="#">
+                              <span className="sub-item">Vocero</span>
+                            </a>
+                          </li>
                         </ul>
                       </div>
                     </li>
                   </ul>
                 </div>
               </li>
-
-              {permisos.includes("coordinador.ver") ? (
-                <li className="nav-item">
-                  <a href="#">
-                    <i className="fas fa-user-tie"></i>
-                    <p>Coordinador Municipal</p>
-                  </a>
-                </li>
-              ) : null}
 
               {permisos.includes("asistente.ver") ? (
                 <li className="nav-item">
@@ -279,14 +253,14 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                 </li>
               ) : null}
 
-              {permisos.includes("vocero.ver") ? (
+              {/*               {permisos.includes("vocero.ver") ? (
                 <li className="nav-item">
                   <a href="#">
                     <i className="fas fa-bullhorn"></i>
-                    <p>Voceros y Suplentes</p>
+                    <p>Voceros</p>
                   </a>
                 </li>
-              ) : null}
+              ) : null} */}
 
               <li className="nav-item">
                 {permisos.includes("ver estadisticas") ? (

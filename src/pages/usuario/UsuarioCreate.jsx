@@ -28,13 +28,11 @@ const validationSchema = Yup.object({
     .email("Correo no válido")
     .required("Este campo es obligatorio"),
   password: Yup.string()
-    .min(4, "Minimo 4 caracteres")
-    .max(8, "Maximo 8 caracteres")
+    .min(6, "Minimo 6 caracteres")
     .required("Este campo es obligatorio"),
   confirm: Yup.string()
-    .min(4, "Minimo 4 caracteres")
+    .min(6, "Minimo 6 caracteres")
     .oneOf([Yup.ref("password"), undefined], "Las contraseñas no coinciden")
-    .max(8, "Maximo 8 caracteres")
     .required("Este campo es obligatorio"),
 });
 

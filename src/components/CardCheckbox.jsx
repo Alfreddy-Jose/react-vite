@@ -15,10 +15,10 @@ export function Checkbox({
   value,
   formik,
   disabled = false,
-  onChange,
+  onChange, 
   ...props
 }) {
-  return (
+  return ( 
     <label>
       <input
         type="checkbox"

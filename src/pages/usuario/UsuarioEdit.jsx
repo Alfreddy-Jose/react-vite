@@ -16,7 +16,7 @@ const validationSchema = Yup.object({
   email: Yup.string()
     .email("Ingrese un email válido") // Validación de email
     .required("Este campo es obligatorio"), // Campo requerido
-  rol: Yup.string().required('Debes seleccionar una opción')
+  rol: Yup.string().required("Debes seleccionar una opción"),
 });
 
 function UsuarioEdit() {
@@ -27,8 +27,19 @@ function UsuarioEdit() {
   const [roles, setRoles] = useState([]);
 
   // Funcion para enviar datos al backend
-  const onSubmit = async (values) => {
-    await PutAll(values, "/usuarios", navegation, id, "/usuarios");
+    const onSubmit = async (values, { setErrors }) => {
+    try {
+      await PutAll(values, "/usuarios", navegation, id, "/usuarios");
+    } catch (error) {
+      if (error.response && error.response.data.errors) {
+        // Transforma los arrays de Laravel a strings para Formik
+        const formikErrors = {};
+        Object.entries(error.response.data.errors).forEach(([key, value]) => {
+          formikErrors[key] = value[0];
+        });
+        setErrors(error.response.data.errors);
+      }
+    }
   };
 
   const formik = useFormik({
@@ -122,26 +133,18 @@ function UsuarioEdit() {
 export function FormPassword() {
   // Validando Contraseñas
   const validationSchema = Yup.object({
-    password: Yup.string()
-      .min(4, "Minimo 4 caracteres")
-      .max(8, "Maximo 8 caracteres")
+    current_password: Yup.string()
+      .min(6, "Minimo 6 caracteres")
       .required("Este campo es obligatorio"),
-    confirm: Yup.string()
-      .min(4, "Minimo 4 caracteres")
-      .oneOf([Yup.ref("password"), undefined], "Las contraseñas no coinciden")
-      .max(8, "Maximo 8 caracteres")
+    new_password: Yup.string()
+      .min(6, "Minimo 6 caracteres")
       .required("Este campo es obligatorio"),
-    newPassword: Yup.string()
-      .min(4, "Minimo 4 caracteres")
-      .max(8, "Maximo 8 caracteres")
-      .required("Este campo es obligatorio"),
-    newConfirm: Yup.string()
-      .min(4, "Minimo 4 caracteres")
+    new_password_confirmation: Yup.string()
+      .min(6, "Minimo 6 caracteres")
       .oneOf(
-        [Yup.ref("newPassword"), undefined],
+        [Yup.ref("new_password"), undefined],
         "Las nuevas contraseñas no coinciden"
       )
-      .max(8, "Maximo 8 caracteres")
       .required("Este campo es obligatorio"),
   });
 
@@ -149,18 +152,28 @@ export function FormPassword() {
   const navegation = useNavigate();
 
   // Funcion para enviar datos al backend
-  const onSubmit = async (values) => {
-    await PutAll(values, "/password", navegation, id, "/usuarios");
+  const onSubmit = async (values, { setErrors }) => {
+    try {
+      await PutAll(values, "/password", navegation, id, "/usuarios");
+    } catch (error) {
+      if (error.response && error.response.data.errors) {
+        // Transforma los arrays de Laravel a strings para Formik
+        const formikErrors = {};
+        Object.entries(error.response.data.errors).forEach(([key, value]) => {
+          formikErrors[key] = value[0];
+        });
+        setErrors(error.response.data.errors);
+      }
+    }
   };
 
   const formik = useFormik({
     enableReinitialize: true,
     // Cargando los datos en los campos
     initialValues: {
-      password: "",
-      confirm: "",
-      newPassword: "",
-      newConfirm: "",
+      current_password: "",
+      new_password: "",
+      new_password_confirmation: "",
     },
     validationSchema,
     onSubmit,
@@ -177,28 +190,18 @@ export function FormPassword() {
               <InputContraseña
                 label={FORM_LABELS.USER.PASSWORD_ACTUAL}
                 type="password"
-                name="password"
+                name="current_password"
                 placeholder="CONTRASEÑA ACTUAL"
                 onBlur={formik.handleBlur}
                 value={formik.values.codigo}
                 formik={formik}
                 eye={true}
               />
-              {/* Input para confirmar contraseña de usuario */}
-              <InputContraseña
-                label={FORM_LABELS.USER.CONFIRM}
-                type="password"
-                name="confirm"
-                placeholder="CONFIRME CONTRASEÑA ACTUAL"
-                onBlur={formik.handleBlur}
-                value={formik.values.codigo}
-                formik={formik}
-              />
               {/* Input para nueva contraseña de usuario */}
               <InputContraseña
                 label={FORM_LABELS.USER.NEW_PASSWORD}
                 type="password"
-                name="newPassword"
+                name="new_password"
                 placeholder="NUEVA CONTRASEÑA"
                 onBlur={formik.handleBlur}
                 value={formik.values.codigo}
@@ -209,7 +212,7 @@ export function FormPassword() {
               <InputContraseña
                 label={FORM_LABELS.USER.NEW_CONFIRM}
                 type="password"
-                name="newConfirm"
+                name="new_password_confirmation"
                 placeholder="CONFIRME CONTRASEÑA"
                 onBlur={formik.handleBlur}
                 value={formik.values.codigo}

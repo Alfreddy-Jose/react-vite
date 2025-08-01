@@ -49,8 +49,6 @@ function RolesCreate() {
   // Funcion para enviar datos al backend
   const onSubmit = async (values, { setErrors }) => {
     try {
-      console.log(values);
-
       await PostAll(values, "/roles", navegation);
     } catch (error) {
       if (error.response && error.response.data.errors) {

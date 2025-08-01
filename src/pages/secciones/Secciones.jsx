@@ -3,16 +3,35 @@ import { ContainerTable } from "../../components/ContainerTable";
 import { Create } from "../../components/Link";
 import { Tabla } from "../../components/Tabla";
 import { useLocation } from "react-router-dom";
-import Alerta from "../../components/Alert";
-import { GetAll } from "../../services/Api";
+import Alerta, { AlertaError } from "../../components/Alert";
+import Api, { GetAll } from "../../services/Api";
 import Modal, { ButtomModal } from "../../components/Modal";
 import Acciones from "../../components/Acciones";
+import { useFormik } from "formik";
+import { FORM_LABELS } from "../../constants/formLabels";
+import SelectSearch from "../../components/SelectSearch";
+import { Buttom } from "../../components/Buttom";
 
 export function Secciones() {
   const [secciones, setSecciones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [permisos, setPermisos] = useState([]);
   const location = useLocation();
+
+  // Nueva función para buscar secciones
+  const buscarSecciones = async (parametros) => {
+    setLoading(true);
+    try {
+      // Llamada a la API con los parámetros de búsqueda
+      const response = await GetAll(
+        setSecciones,
+        setLoading,
+        `/secciones?${new URLSearchParams(parametros).toString()}`
+      );
+    } catch (error) {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Leer permisos del localStorage
@@ -97,6 +116,9 @@ export function Secciones() {
     <>
       {/* Contenedor para la tablas */}
       <ContainerTable
+        header_parametros={
+          <SeccionParametros buscarSecciones={buscarSecciones} />
+        }
         // Titulo para la tabla
         title="SECCIONES"
         // Boton para crear nuevos registros
@@ -111,5 +133,132 @@ export function Secciones() {
         isLoading={loading}
       />
     </>
+  );
+}
+
+export function SeccionParametros({ buscarSecciones }) {
+  const [opciones, setOpciones] = useState({});
+
+  const initialValues = {
+    lapso: "",
+    sede: "",
+    pnf: "",
+    trayecto: "",
+    matricula: "",
+  };
+
+  const formik = useFormik({
+    initialValues,
+    //validationSchema,
+    onSubmit: () => {},
+  });
+
+  /*   const handleGenerarPDF = () => {
+    const params = new URLSearchParams(formik.values).toString();
+    window.open(`api/secciones/pdf?${params}`, "_blank");
+  }; */
+  const handleGenerarPDF = async () => {
+    const params = new URLSearchParams(
+      Object.fromEntries(
+        Object.entries(formik.values).filter(([_, v]) => v !== "")
+      )
+    );
+
+    try {
+      const response = await Api.get(`/secciones/pdf?${params}`, {
+        responseType: "blob",
+        withCredentials: true,
+      });
+
+      // Crear enlace de descarga
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "secciones.pdf");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error("Detalles del error:", {
+        status: error.response?.status,
+        data: error.response?.data,
+        config: error.config,
+      });
+      AlertaError(
+        `Error ${error.response?.status}: ${
+          error.response?.data?.message || "Sin detalles"
+        }`
+      );
+    }
+  };
+
+  // Dispara la búsqueda en cada cambio
+  useEffect(() => {
+    // Obtener opciones para los selects
+    const getOpciones = async () => {
+      const response = await Api.get(`/seccion/getDataSelect`);
+      setOpciones(response.data);
+    };
+
+    getOpciones();
+
+    buscarSecciones(formik.values);
+  }, [formik.values]);
+
+  return (
+    <div className="row">
+      <div className="col-12">
+        <form onSubmit={formik.handleSubmit}>
+          <div className="row mb-5">
+            {/* Input para codigo de PNF */}
+            <SelectSearch
+              label={FORM_LABELS.SECCION.LAPSO}
+              name="lapso"
+              options={opciones.lapsos || []}
+              formik={formik}
+              valueKey="id"
+              labelKey="ano"
+            />
+            {/* Input para nombre de PNF */}
+            <SelectSearch
+              label={FORM_LABELS.SECCION.SEDE}
+              name="sede"
+              options={opciones.sedes || []}
+              labelKey="nombre_sede"
+              formik={formik}
+            />
+            {/* Input para PNF abreviado */}
+            <SelectSearch
+              label={FORM_LABELS.SECCION.PNF}
+              name="pnf"
+              options={opciones.pnfs || []}
+              formik={formik}
+            />
+            {/* Input para PNF abreviado coodinacion */}
+            <SelectSearch
+              label={FORM_LABELS.SECCION.TRAYECTO}
+              name="trayecto"
+              options={opciones.trayectos || []}
+              formik={formik}
+            />
+            {/* Boton para enviar */}
+            <div className="col-sm-6 col-xl-4 d-flex justify-content-star align-items-end mt-4">
+              <Buttom
+                text="Limpiar"
+                onClick={() => formik.resetForm()}
+                style="btn-secondary me-2"
+              />
+              <Buttom
+                type="button"
+                text="Generar PDF"
+                title="PDF"
+                style="btn-danger me-2"
+                onClick={handleGenerarPDF}
+              />
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 }

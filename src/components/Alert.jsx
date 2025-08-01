@@ -22,7 +22,7 @@ export function Alerta(mensaje) {
 }
 export function AlertaError(mensaje) {
           Swal.fire({
-            icon: "error",
+            icon: "warning",
             title: "ERROR...",
             text: mensaje,
             confirmButtonText: "Cerrar", // Cambia el texto del botón

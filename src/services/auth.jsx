@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import { AlertaError } from "../components/Alert";
 
 export const getCsrfToken = async () => {
-  return await axios.get("https://laravelapi-1-2cah.onrender.com/sanctum/csrf-cookie") // Cambia la URL según tu configuración "https://laravelapi-1-2cah.onrender.com/sanctum/csrf-cookie";
+  return await axios.get("https://laravelapi-1-2cah.onrender.com/sanctum/csrf-cookie"); // Cambia la URL según tu configuración "https://laravelapi-1-2cah.onrender.com/sanctum/csrf-cookie";
 };
 
 export const login = async (credentials) => {
@@ -17,20 +17,20 @@ export const getUser = async () => {
 
 export const logout = async () => {
   let cerrar = true; // Variable local
-
-
-  // Mostrando loader mientras se procesa
-  Swal.fire({
-    title: "Cerrando Sesión",
-    allowOutsideClick: false,
-    didOpen: () => {
-      Swal.showLoading();
-    },
-  });
-
   try {
-    const response = await Api.post("/logout");
-    return response.data;
+
+      // Mostrando loader mientras se procesa
+      Swal.fire({
+        title: "Cerrando Sesión...",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      const response = await Api.post("/logout");
+      return response.data;
+    
   } catch (error) {
     console.error(
       "Error al cerrar sesión:",

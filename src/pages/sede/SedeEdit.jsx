@@ -33,12 +33,6 @@ export function SedeEdit() {
   const [sede, setSede] = useState();
 
   // Funcion para enviar datos al backend
-  /*   const onSubmit = async (values) => {
-    await Api.put(`/sede/${id}`, values).then((response) => {
-      navegation("/sede", { state: { message: response.data.message } });
-    });
-  }; */
-
   const onSubmit = async (values, { setErrors }) => {
     try {
       await PutAll(values, '/sede', navegation, id, "/sede");

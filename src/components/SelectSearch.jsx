@@ -9,6 +9,7 @@ function SelectSearch({
   labelKey = "nombre",
   disabled = false,
   placeholder = "SELECCIONE UNA OPCIÓN",
+  div_style = "col-sm-6 col-xl-4",
 }) {
   // Adaptar las opciones al formato que espera react-select
   const selectOptions = options.map((option) => ({
@@ -22,7 +23,7 @@ function SelectSearch({
   ) || null;
 
   return (
-    <div className="col-sm-6 col-xl-4">
+    <div className={div_style}>
       <label className="mt-4">{label}</label>
       <Select
         id={name}
@@ -39,6 +40,10 @@ function SelectSearch({
         }}
         onBlur={() => formik.setFieldTouched(name, true, false)}
         isClearable
+        menuPortalTarget={document.body}
+        styles={{
+          menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+        }}
       />
       {formik.touched[name] && formik.errors[name] && (
         <div className="text-danger">{formik.errors[name]}</div>

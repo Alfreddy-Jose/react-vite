@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { useLocation } from "react-router-dom";
-import { GetAll } from "../../services/Api";
 import {
   DndContext,
   useDraggable,
@@ -13,6 +11,11 @@ import {
 } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import "./style.css";
+import { AlertaError } from "../../components/Alert";
+import Select from "react-select";
+import Api from "../../services/Api";
+import SelectControl from "../../components/SelectDependiente";
+import { ContainerIput } from "../../components/ContainerInput";
 
 function Evento({ evento, onResizeStart, isResizing }) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
@@ -79,7 +82,6 @@ function Celda({ id, eventosDia, onResizeStart }) {
         border: "1px solid #ddd",
         backgroundColor: isOver ? "#f0f8ff" : "transparent", // Feedback visual al arrastrar
       }}
-      // Eliminé los manejadores de redimensionamiento que no pertenecen aquí
     >
       {eventosEnCelda.map(
         (evento) =>
@@ -113,6 +115,53 @@ export default function Calendar() {
 
   const dias = ["LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO"];
 
+  // Datos para selects
+  const [sedes, setSedes] = useState([]);
+  const [sedeSelecionada, setSedeSeleccionada] = useState([]);
+
+  useEffect(() => {
+    const obtenerSedes = async () => {
+      try {
+        const response = await Api.get("/horarios/sedes");
+        setSedes(response.data);
+        setSedeSeleccionada(response.data[0]); // Selecciona la primera sede por defecto
+      } catch (error) {
+        AlertaError("Error al cargar las sedes");
+        console.error(error);
+      }
+    };
+    obtenerSedes();
+  }, []);
+
+  const [pnfs, setPnfs] = useState([]);
+  const [pnfSeleccionado, setPnfSeleccionado] = useState([]);
+
+  const [aulas, setAulas] = useState([]);
+  const [aulaSeleccionada, setAulaSeleccionada] = useState([]);
+
+  const [trimestres, setTrimestres] = useState([]);
+  const [trimestreSeleccionada, setTrimestreSeleccionada] = useState([]);
+
+  const [trayectos, setTrayecto] = useState([]);
+  const [trayectoSeleccionado, setTrayectoSeleccionado] = useState([]);
+
+  const [materias, setMaterias] = useState([]);
+  const [materiaSeleccionada, setMateriaSeleccionada] = useState([]);
+
+  useEffect(() => {
+    const obtenerTrayectos = async () => {
+      try {
+        const response = await Api.get(`/horarios/trayectos`);
+        setTrayecto(response.data);
+        setTrayectoSeleccionado(response.data[0]); // Selecciona el primer trayecto por defecto
+      } catch (error) {
+        AlertaError("Error al cargar los trayectos");
+        console.error(error);
+      }
+    };
+    obtenerTrayectos();
+  }, []);
+
   const [eventos, setEventos] = useState([
     {
       id: "1",
@@ -140,6 +189,47 @@ export default function Calendar() {
     },
   ]);
 
+  // Adaptar datos para react-select
+  const sedesOptions = sedes.map((s) => ({
+    value: s.value || s.id,
+    label: s.label || s.nombre_sede,
+  }));
+  const pnfOptions = pnfs.map((p) => ({
+    value: p.id,
+    label: p.nombre,
+  }));
+  const aulaOptions = aulas.map((a) => ({ value: a.id, label: a.nombre_aula }));
+  const diaOptions = dias.map((d) => ({ value: d, label: d }));
+  const bloqueOptions = bloques.map((b) => ({
+    value: b.id,
+    label: `${b.rango} ${b.periodo}`,
+  }));
+  const trayectoOptions = trayectos.map((t) => ({
+    value: t.id,
+    label: t.nombre,
+  }));
+  const trimestreOptions = trimestres.map((t) => ({
+    value: t.id,
+    label: t.nombre,
+  }));
+  const materiasOptions = materias.map((m) => ({
+    value: m.id,
+    label: m.text,
+  }));
+
+  // Nuevo evento con valores compatibles con react-select
+  const [nuevoEvento, setNuevoEvento] = useState({
+    sede: null,
+    pnf: null,
+    trayecto: null,
+    trimestre: null,
+    materias: null,
+    aula: null,
+    dia: null,
+    bloque: null,
+    duracion: 1,
+  });
+
   const resizeData = useRef({
     initialY: null,
     initialDuracion: null,
@@ -150,9 +240,6 @@ export default function Calendar() {
   const [activeEvent, setActiveEvent] = useState(null);
   const [resizingEventId, setResizingEventId] = useState(null);
   const [isResizing, setIsResizing] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [turnos, setTurnos] = useState([]);
-  const location = useLocation();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -161,10 +248,6 @@ export default function Calendar() {
       },
     })
   );
-
-  useEffect(() => {
-    GetAll(setTurnos, setLoading, "/turnos");
-  }, [location.state]);
 
   const handleDragStart = useCallback(
     ({ active }) => {
@@ -291,65 +374,347 @@ export default function Calendar() {
     [eventos]
   );
 
-  if (loading) return <div>Loading...</div>;
+  // Formulario para agregar eventos
 
+  const handleInputChange = (e) => {
+    setNuevoEvento((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleAgregarEvento = (e) => {
+    e.preventDefault();
+    if (
+      !sedeSelecionada ||
+      !pnfSeleccionado ||
+      !trayectoSeleccionado ||
+      !trimestreSeleccionada ||
+      !materiaSeleccionada ||
+      !nuevoEvento.dia ||
+      nuevoEvento.bloque === null
+    ) {
+      AlertaError("Completa todos los campos");
+      return;
+    }
+
+    const bloqueNum = parseInt(nuevoEvento.bloque.value);
+    const duracionNum = parseInt(nuevoEvento.duracion);
+
+    // Evitar solapamientos
+    const haySolapamiento = eventos.some(
+      (e) =>
+        e.dia === nuevoEvento.dia.value &&
+        ((e.bloque >= bloqueNum && e.bloque < bloqueNum + duracionNum) ||
+          (e.bloque + e.duracion > bloqueNum &&
+            e.bloque + e.duracion <= bloqueNum + duracionNum))
+    );
+    if (haySolapamiento) {
+      AlertaError("¡Ya existe un evento en ese bloque!");
+      return;
+    }
+
+    setEventos([
+      ...eventos,
+      {
+        id: Date.now().toString(),
+        dia: nuevoEvento.dia.value,
+        bloque: bloqueNum,
+        duracion: duracionNum,
+        texto: `${nuevoEvento.sede.label}\n${nuevoEvento.pnf.label}\n${nuevoEvento.trimestre.label}`,
+        color: "#e3f2fd",
+      },
+    ]);
+    setNuevoEvento({
+      sede: null,
+      pnf: null,
+      trayecto: null,
+      trimestre: null,
+      materias: null,
+      aula: null,
+      dia: null,
+      bloque: null,
+      duracion: 1,
+    });
+  };
+
+  // Si quieres cargar eventos desde backend, puedes usar useEffect aquí
+
+  // Render
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-    >
-      <table className="table table-bordered table-striped text-center">
-        <thead>
-          <tr>
-            <th style={{ minWidth: "100px" }}>HORA</th>
-            {dias.map((dia) => (
-              <th key={dia} style={{ minWidth: "100px" }}>
-                {dia}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {bloques.map((bloque, bloqueIndex) => (
-            <tr key={bloque.id} style={{ height: "60px" }}>
-              <td>
-                {bloque.rango} {bloque.periodo}
-              </td>
-              {dias.map((dia) => (
-                <Celda
-                  key={`${dia}-${bloqueIndex}`}
-                  id={`${dia}-${bloqueIndex}`}
-                  eventosDia={eventos.filter((e) => e.dia === dia)}
-                  onResizeStart={handleResizeStart}
+    <div>
+      <form
+        className="mb-4 d-flex flex-wrap gap-2"
+        onSubmit={handleAgregarEvento}
+      >
+        <ContainerIput
+          title={"NUEVO EVENTO"}
+          input={
+            <>
+              <SelectControl
+                label="SEDE"
+                name="sede"
+                value={nuevoEvento.sede}
+                options={sedesOptions}
+                onChange={(option) => {
+                  setSedeSeleccionada(
+                    sedes.find((e) => String(e.id) === String(option?.value)) ||
+                      {}
+                  );
+                  setPnfs([]);
+                  setPnfSeleccionado(null);
+                  setNuevoEvento((prev) => ({
+                    ...prev,
+                    sede: option,
+                    pnf: null,
+                  }));
+                }}
+                onValueChange={async (option) => {
+                  // Cargar PNFs cuando cambie la sede
+                  if (option) {
+                    try {
+                      const response = await Api.get(
+                        `/horarios/sedes/${option.value}/pnfs`
+                      );
+                      setPnfs(response.data);
+                      setPnfSeleccionado(response.data[0]);
+                    } catch (error) {
+                      AlertaError("Error al cargar los PNFs");
+                      console.log(error);
+                    }
+                  }
+                }}
+              />
+              <SelectControl
+                label="PNF"
+                name="pnf"
+                value={nuevoEvento.pnf}
+                options={pnfOptions}
+                onChange={(option) => {
+                  setPnfSeleccionado(
+                    pnfs.find((e) => String(e.id) === String(option?.value)) ||
+                      null
+                  );
+                  setNuevoEvento((prev) => ({ ...prev, pnf: option }));
+                }}
+                onValueChange={async (option) => {
+                  if (option) {
+                    try {
+                      const response = await Api.get(
+                        `/horarios/pnf/${option.value}/espacios`
+                      );
+                      setAulas(response.data);
+                      setAulaSeleccionada(response.data[0]);
+                    } catch (error) {
+                      AlertaError("Error al cargar las aulas");
+                      console.log(error);
+                    }
+                  }
+                }}
+              />
+              <SelectControl
+                label="TRAYECTO"
+                name="trayecto"
+                value={nuevoEvento.trayecto}
+                options={trayectoOptions}
+                onChange={(option) => {
+                  setTrayectoSeleccionado(
+                    trayectos.find(
+                      (e) => String(e.id) === String(option?.value)
+                    ) || null
+                  );
+                  setNuevoEvento((prev) => ({ ...prev, trayecto: option }));
+                }}
+                onValueChange={async (option) => {
+                  if (option) {
+                    try {
+                      const response = await Api.get(
+                        `/horarios/trayectos/${option.value}/trimestres`
+                      );
+                      setTrimestres(response.data);
+                      setTrimestreSeleccionada(response.data[0]);
+                    } catch (error) {
+                      AlertaError("Error al cargar los trimestres");
+                      console.log(error);
+                    }
+                  }
+                }}
+              />
+              <SelectControl
+                label="TRIMESTRE"
+                name="trimestre"
+                value={nuevoEvento.trimestre}
+                options={trimestreOptions}
+                onChange={(option) => {
+                  setTrimestreSeleccionada(
+                    trimestres.find(
+                      (t) => String(t.id) === String(option?.value)
+                    ) || null
+                  );
+                  setNuevoEvento((prev) => ({ ...prev, trimestre: option }));
+                }}
+                onValueChange={async (option) => {
+                  if (option) {
+                    try {
+                      const response = await Api.get(
+                        `/horarios/trimestres/${option.value}/unidadesCurriculares`
+                      );
+                      setMaterias(response.data);
+                      setMateriaSeleccionada(response.data[0]);
+                    } catch (error) {
+                      AlertaError("Error al cargar las materias");
+                      console.log(error);
+                    }
+                  }
+                }}
+              />
+              <SelectControl
+                label="MATERIA"
+                name="materias"
+                value={nuevoEvento.materias}
+                options={materiasOptions}
+                onChange={(option) => {
+                  setMateriaSeleccionada(
+                    materias.find(
+                      (m) => String(m.id) === String(option?.value)
+                    ) || null
+                  );
+                  setNuevoEvento((prev) => ({ ...prev, materias: option }));
+                }}
+              />
+              <SelectControl
+                label="AULA"
+                name="aula"
+                value={nuevoEvento.aula}
+                options={aulaOptions}
+                onChange={(option) => {
+                  setAulaSeleccionada(
+                    aulas.find((e) => String(e.id) === String(option?.value)) ||
+                      null
+                  );
+                  setNuevoEvento((prev) => ({ ...prev, aula: option }));
+                }}
+              />
+              <SelectControl
+                label="DÍA"
+                name="dia"
+                value={nuevoEvento.dia}
+                options={diaOptions}
+                onChange={(option) =>
+                  setNuevoEvento((prev) => ({ ...prev, dia: option }))
+                }
+              />
+              <SelectControl
+                label="BLOQUE"
+                name="bloque"
+                value={nuevoEvento.bloque}
+                options={bloqueOptions}
+                onChange={(option) =>
+                  setNuevoEvento((prev) => ({ ...prev, bloque: option }))
+                }
+              />
+              <div className="col-sm-5 col-xl-3">
+                <label htmlFor="duracion" className="mt-4">
+                  DURACIÓN (BLOQUES)
+                </label>
+                <input
+                  type="number"
+                  name="duracion"
+                  min={1}
+                  max={bloques.length}
+                  value={nuevoEvento.duracion}
+                  onChange={handleInputChange}
+                  style={{ width: 140 }}
+                  id="duracion"
+                  className="form-control"
+                  required
                 />
+              </div>
+            </>
+          }
+          buttom={
+            <>
+              <button type="submit" className="btn btn-success">
+                Agregar Evento
+              </button>
+              <button
+                type="reset"
+                className="btn btn-secondary ms-1"
+                onClick={() =>
+                  setNuevoEvento({
+                    sede: null,
+                    pnf: null,
+                    trayecto: null,
+                    trimestre: null,
+                    aula: null,
+                    dia: null,
+                    bloque: null,
+                    materias: null,
+                    duracion: 1,
+                  })
+                }
+              >
+                Limpiar
+              </button>
+            </>
+          }
+        />
+      </form>
+
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
+        <table className="table table-bordered table-striped text-center">
+          <thead>
+            <tr>
+              <th style={{ minWidth: "100px" }}>HORA</th>
+              {dias.map((dia) => (
+                <th key={dia} style={{ minWidth: "100px" }}>
+                  {dia}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {bloques.map((bloque, bloqueIndex) => (
+              <tr key={bloque.id} style={{ height: "60px" }}>
+                <td>
+                  {bloque.rango} {bloque.periodo}
+                </td>
+                {dias.map((dia) => (
+                  <Celda
+                    key={`${dia}-${bloqueIndex}`}
+                    id={`${dia}-${bloqueIndex}`}
+                    eventosDia={eventos.filter((e) => e.dia === dia)}
+                    onResizeStart={handleResizeStart}
+                  />
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
 
-      <DragOverlay>
-        {activeEvent && (
-          <div
-            style={{
-              backgroundColor: activeEvent.color,
-              padding: "6px",
-              borderRadius: "4px",
-              whiteSpace: "pre-line",
-              fontWeight: "bold",
-              textAlign: "center",
-              boxShadow: "0 0 10px rgba(0,0,0,0.3)",
-              width: "90%",
-              height: `${activeEvent.duracion * 60 - 12}px`,
-            }}
-          >
-            {activeEvent.texto}
-          </div>
-        )}
-      </DragOverlay>
-    </DndContext>
+        <DragOverlay>
+          {activeEvent && (
+            <div
+              style={{
+                backgroundColor: activeEvent.color,
+                padding: "6px",
+                borderRadius: "4px",
+                whiteSpace: "pre-line",
+                fontWeight: "bold",
+                textAlign: "center",
+                boxShadow: "0 0 10px rgba(0,0,0,0.3)",
+                width: "90%",
+                height: `${activeEvent.duracion * 60 - 12}px`,
+              }}
+            >
+              {activeEvent.texto}
+            </div>
+          )}
+        </DragOverlay>
+      </DndContext>
+    </div>
   );
 }
 
