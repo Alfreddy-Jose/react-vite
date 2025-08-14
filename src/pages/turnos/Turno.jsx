@@ -45,10 +45,10 @@ function Turno() {
               <b>NOMBRE: </b> {row.nombre}
             </p>
             <p>
-              <b>INICIO: </b> {row.inicio}
+              <b>INICIO: </b> {`${row.inicio} ${row.inicio_periodo}`}
             </p>
             <p>
-              <b>FINAL: </b> {row.final}
+              <b>FINAL: </b> {`${row.final} ${row.final_periodo}`}
             </p>
           </Modal>
         </div>

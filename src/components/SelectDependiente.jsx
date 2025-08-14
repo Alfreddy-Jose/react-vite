@@ -12,6 +12,8 @@ export default function SelectControl({
   classNamePrefix = "react-select",
   hidden = false,
   name,
+  disabled = false,
+  className = "col-sm-6 col-xl-4",
 }) {
   useEffect(() => {
     if (onValueChange && value) {
@@ -21,11 +23,12 @@ export default function SelectControl({
   }, [value]);
 
   return (
-    <div hidden={hidden} className="col-sm-6 col-xl-4">
+    <div hidden={hidden} className={className}>
       <label htmlFor={name} className="mt-4">
         {label}
       </label>
       <Select
+        isDisabled={disabled}
         name={name}
         value={value}
         id={name}

@@ -8,8 +8,8 @@ import Alerta from "../../components/Alert";
 import { GetAll } from "../../services/Api";
 import Modal, { ButtomModal } from "../../components/Modal";
 
-  // Leer permisos del localStorage
-  //const permisos = JSON.parse(localStorage.getItem("permissions")) || [];
+// Leer permisos del localStorage
+const permisos = JSON.parse(localStorage.getItem("permissions")) || [];
 
 const columns = [
   {
@@ -19,7 +19,7 @@ const columns = [
   },
   {
     name: "CÉDULA PERSONA",
-    selector: (row) => row.cedula_persona,
+    selector: (row) => row.persona.cedula_persona,
   },
   {
     name: "PERSONA",
@@ -34,6 +34,9 @@ const columns = [
 
         <Modal titleModal={`+INFO ${row.persona.nombre}`} id={row.id}>
           <p>
+            <b>CÉDULA: </b> {row.persona.cedula_persona}
+          </p>
+          <p>
             <b>NOMBRE: </b> {row.persona.nombre}
           </p>
           <p>
@@ -42,30 +45,59 @@ const columns = [
           <p>
             <b>PNF: </b> {row.pnf.nombre}
           </p>
+          <p>
+            <b>DIRECCIÓN: </b> {row.persona.direccion}
+          </p>
+          <p>
+            <b>MUNICIPIO: </b> {row.persona.municipio}
+          </p>
+          <p>
+            <b>TELEFONO: </b> {row.persona.telefono}
+          </p>
+          <p>
+            <b>EMAIL: </b> {row.persona.email}
+          </p>
+          <p>
+            <b>TIPO PERSONA:</b> {row.persona.tipo_persona}
+          </p>
+          <p>
+            <b>GRADO INTITUCIONAL:</b> {row.persona.grado_inst}
+          </p>
+          <p>
+            <b>CATEGORÍA:</b> {row.categoria}
+          </p>
         </Modal>
       </div>
     ),
   },
-  {
-    name: "ACCIONES",
-    cell: (row) => (
-      <Acciones
-        url={`/pnf/${row.id}/edit`}
-        urlDelete={`/pnf/${row.id}`}
-        navegar="/pnf"
-      />
-    ),
-  },
+  // Mostrar columna solo si tiene al menos uno de los permisos
+  ...(permisos.includes("docente.editar") ||
+  permisos.includes("docente.eliminar")
+    ? [
+        {
+          name: "ACCIONES",
+          cell: (row) => (
+            <Acciones
+              url={`/docente/${row.id}/edit`}
+              urlDelete={`/docente/${row.id}`}
+              navegar="/docentes"
+              editar="docente.editar"
+              eliminar="docente.eliminar"
+            />
+          ),
+        },
+      ]
+    : []),
 ];
 
 function Docente() {
-  const [docente, setDocente] = useState([]);
+  const [docentes, setDocentes] = useState([]);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
 
   useEffect(() => {
     // Mostrar la lista de registros
-    GetAll(setDocente, setLoading, "/docente");
+    GetAll(setDocentes, setLoading, "/docentes");
 
     // Motrar Alerta al registrar un nuevo Coordinador
     if (location.state?.message) {
@@ -83,10 +115,15 @@ function Docente() {
         // Titulo para la tabla PNF
         title="DOCENTES"
         // Boton para crear nuevos registros
-        link={<Create path="/docente/create" />}
+
+        link={
+          permisos.includes("docente.crear") ? (
+            <Create path="/docente/create" />
+          ) : null
+        }
         isLoading={loading}
         // Tabla
-        tabla={<Tabla columns={columns} data={docente} />}
+        tabla={<Tabla columns={columns} data={docentes} />}
       />
     </>
   );

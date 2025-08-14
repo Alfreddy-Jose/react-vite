@@ -24,6 +24,8 @@ const initialValues = {
 const validationSchema = Yup.object({
   cedula_persona: Yup.string()
     .matches(/^[0-9]*$/, "Solo números permitidos") // Solo números
+    .max(8, "Máximo 8 números")
+    .min(7, "Mínimo 7 números")
     .required("Este campo es obligatorio"), // Campo requerido
   nombre: Yup.string()
     .matches(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "Solo letras permitidas") // solo letras permitidas

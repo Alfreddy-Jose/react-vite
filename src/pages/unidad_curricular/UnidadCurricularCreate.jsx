@@ -37,7 +37,7 @@ const validationSchema = Yup.object({
     .matches(/^[0-:-9]*$/, "Solo números"), // Solo números
   periodo: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
   trimestre_id: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
-  descripcion: Yup.string().required("Este campo es obligatorio"),
+  descripcion: Yup.string().max(255, "Máximo 255 caracteres"),
 });
 
 function UnidadCurricularCreate() {

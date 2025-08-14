@@ -46,6 +46,7 @@ import { Usuario } from "../pages/usuario/Usuario";
 import { UsuarioCreate } from "../pages/usuario/UsuarioCreate";
 import UsuarioEdit from "../pages/usuario/UsuarioEdit";
 import { SeccionesEdit } from "../pages/secciones/SeccionesEdit";
+import DocenteEdit from "../pages/docente/DocenteEdit";
 
 export function AppRoutes() {
   return (
@@ -507,7 +508,7 @@ export function AppRoutes() {
 
         {/* Rutas para Docente */}
         <Route
-          path="/docente"
+          path="/docentes"
           element={
             <ProtectedRoute>
               <Layout>
@@ -516,7 +517,6 @@ export function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/docente/create"
           element={
@@ -527,7 +527,16 @@ export function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
+        <Route
+          path="/docente/:id/edit"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <DocenteEdit />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
         {/* Rutas para Horario */}
         <Route
           path="/horario"

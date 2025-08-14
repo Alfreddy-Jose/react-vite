@@ -44,7 +44,7 @@ function PersonaEdit() {
 
   // Funcion para enviar datos al backend
   const onSubmit = async (values) => {
-    PutAll(values, "/persona", navegation, id);
+    PutAll(values, "/persona", navegation, id, "/persona");
   };
 
   const formik = useFormik({
@@ -174,13 +174,18 @@ function PersonaEdit() {
               ]}
               formik={formik}
             />
-            {/* Input para grado de la PERSONA */}
-            <InputLabel
+            {/* Select para grado de la PERSONA */}
+            <SelectSearch 
               label={FORM_LABELS.PERSONAS.GRADO}
-              type="text"
               name="grado_inst"
-              placeholder="GRADO INSTITUCIONAL"
               formik={formik}
+              options={[
+                { id: "INGENIERO", nombre: "INGENIERO" },
+                { id: "LICENCIADO", nombre: "LICENCIADO" },
+                { id: "DOCTOR", nombre: "DOCTOR" },
+                { id: "TECNICO SUPERIOR", nombre: "TECNICO SUPERIOR" },
+                { id: "BACHILLER", nombre: "BACHILLER" },
+              ]}
             />
           </>
         }

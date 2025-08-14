@@ -228,7 +228,7 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                             </Link>
                           </li>
                           <li>
-                            <Link to="/docente">
+                            <Link to="/docentes">
                               <span className="sub-item">Docente</span>
                             </Link>
                           </li>

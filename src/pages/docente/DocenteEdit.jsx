@@ -1,25 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { FORM_LABELS } from "../../constants/formLabels";
 import { InputLabel } from "../../components/InputLabel";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useFormik } from "formik";
-import Api, { PostAll } from "../../services/Api";
+import Api, { PutAll } from "../../services/Api";
 import * as Yup from "yup";
 import { ContainerIput } from "../../components/ContainerInput";
 import { Create } from "../../components/Link";
 import { Buttom } from "../../components/Buttom";
 import SelectSearch from "../../components/SelectSearch";
-
-const initialValues = {
-  persona_id: "",
-  pnf_id: "",
-  categoria: "",
-  fecha_inicio: "",
-  fecha_fin: "",
-  dedicacion: "",
-  tipo: "",
-  unidad_curricular_id: [],
-};
 
 // Validando campos
 const validationSchema = Yup.object({
@@ -33,14 +22,16 @@ const validationSchema = Yup.object({
   tipo: Yup.string().required("Este campo es obligatorio"),
 });
 
-function DocenteCreate() {
+function DocenteEdit() {
+  const { id } = useParams();
+  const [docente, setDocente] = useState();
   const navegation = useNavigate();
   const [dataSelect, setDataSelect] = useState([]);
 
   // Funcion para enviar datos al backend
   const onSubmit = async (values, { setErrors }) => {
     try {
-      await PostAll(values, "/docentes", navegation);    
+      await PutAll(values, "/docente", navegation, id, "/docentes");
     } catch (error) {
       if (error.response && error.response.data.errors) {
         // Transforma los arrays de Laravel a strings para Formik
@@ -54,7 +45,19 @@ function DocenteCreate() {
   };
 
   const formik = useFormik({
-    initialValues,
+    enableReinitialize: true,
+    initialValues: {
+    persona_id: docente?.persona_id || "",
+    pnf_id: docente?.pnf?.id || "",
+    categoria: docente?.categoria || "",
+    fecha_inicio: docente?.condicion_contrato?.fecha_inicio || "",
+    fecha_fin: docente?.condicion_contrato?.fecha_fin || "",
+    dedicacion: docente?.condicion_contrato?.dedicacion || "",
+    tipo: docente?.condicion_contrato?.tipo || "",
+    unidad_curricular_id: docente?.unidades_curriculares
+      ? docente.unidades_curriculares.map((item) => item.id)
+      : [],
+    },
     validationSchema,
     onSubmit,
   });
@@ -63,17 +66,24 @@ function DocenteCreate() {
     // Trayendo los datos del registro
     const getDataSelect = async () => {
       const response = await Api.get(`/docente/getDataSelect`);
-
       setDataSelect(response.data);
     };
 
+    // Trayendo los datos del registro
+    const getDocente = async () => {
+      const response = await Api.get(`/docente/${id}`);
+      setDocente(response.data);
+    };
+
+    getDocente();
+
     getDataSelect();
-  }, []);
+  }, [id]);
 
   return (
     <form onSubmit={formik.handleSubmit}>
       <ContainerIput
-        title="NUEVO DOCENTE"
+        title="EDITAR DOCENTE"
         link={
           <Create
             path="/docentes"
@@ -86,9 +96,9 @@ function DocenteCreate() {
             <SelectSearch
               label={FORM_LABELS.DOCENTE.BUSCAR}
               name="persona_id"
-              options={dataSelect.docentes}
+              options={dataSelect.docentesEdit}
               formik={formik}
-              valueKey="id"
+              disabled={true}
               labelKey="nombre"
               placeholder="BUSCAR PERSONA"
             />
@@ -171,16 +181,10 @@ function DocenteCreate() {
         buttom={
           <>
             <Buttom
-              text="Guardar"
-              title="Guardar"
+              text="Editar"
+              title="Editar"
               type="submit"
               style="btn-success"
-            />
-            <Buttom
-              text="Cancelar"
-              title="Cancelar"
-              type="reset"
-              style="btn-danger ms-1"
             />
           </>
         }
@@ -189,4 +193,4 @@ function DocenteCreate() {
   );
 }
 
-export default DocenteCreate;
+export default DocenteEdit;
