@@ -87,3 +87,16 @@
     gap: 6px;
     margin-top: 8px;
 }
+
+/* Reglas específicas para FontAwesome */
+.fa-icon-fix {
+    display: inline-block;
+    width: 1.25em;
+    height: 1.25em;
+    vertical-align: middle;
+}
+
+/* Reset para SVG */
+svg[data-prefix="fas"] {
+    flex-shrink: 0;
+}

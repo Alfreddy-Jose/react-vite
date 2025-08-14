@@ -13,7 +13,7 @@ export function Login() {
   const location = useLocation();
   const navigate = useNavigate();
   const { passwordType, togglePasswordVisibility } = useTogglePassword();
-  const from = location.state?.from?.pathname || "/";
+  const from = location.state?.from?.pathname || "/panel";
 
   const onSubmit = async (values) => {
     let cerrar = true;

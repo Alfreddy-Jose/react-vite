@@ -38,7 +38,7 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
           <div className="sidebar-content">
             <ul className="nav nav-secondary">
               <li className={`nav-item ${isActive("/") ? "active" : ""}`}>
-                <Link to="/">
+                <Link to="/panel">
                   <i className="fas fa-home"></i>
                   <p>Dashboard</p>
                 </Link>

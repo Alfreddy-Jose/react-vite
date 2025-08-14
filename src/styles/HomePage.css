@@ -1,0 +1,112 @@
+/* Contenedor general */
+.landing-container {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f8f9fc;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Encabezado */
+.landing-header {
+    background-color: #1e3a8a;
+    color: white;
+    padding: 2rem 1rem;
+}
+
+.landing-header h1 {
+    margin-bottom: 0.5rem;
+}
+
+.landing-header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* Imagen */
+.landing-image {
+    margin: 2rem 0;
+}
+
+.landing-image img {
+    max-width: 90%;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Botón */
+.landing-btn {
+    background-color: #10b981;
+    color: white;
+    padding: 0.8rem 2rem;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: 2rem;
+    transition: background-color 0.3s ease;
+}
+
+.landing-btn:hover {
+    background-color: #059669;
+}
+
+/* Tarjetas */
+.landing-cards {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 0 1rem 3rem;
+}
+
+.card {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1rem;
+    width: 200px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.card h5 {
+    margin-top: 0.8rem;
+}
+
+/* Iconos */
+.icon {
+    margin-bottom: 0.5rem;
+}
+
+.icon.blue {
+    color: #2563eb;
+}
+
+.icon.green {
+    color: #10b981;
+}
+
+.icon.purple {
+    color: #8b5cf6;
+}
+
+.icon.orange {
+    color: #f59e0b;
+}
+
+/* Footer */
+.landing-footer {
+    background-color: white;
+    padding: 1rem;
+    border-top: 1px solid #e5e7eb;
+    font-size: 0.9rem;
+}
+
+.landing-footer a {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.landing-footer a:hover {
+    text-decoration: underline;
+}

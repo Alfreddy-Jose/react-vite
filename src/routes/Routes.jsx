@@ -47,16 +47,18 @@ import { UsuarioCreate } from "../pages/usuario/UsuarioCreate";
 import UsuarioEdit from "../pages/usuario/UsuarioEdit";
 import { SeccionesEdit } from "../pages/secciones/SeccionesEdit";
 import DocenteEdit from "../pages/docente/DocenteEdit";
+import HomePage from "../pages/HomePage";
 
 export function AppRoutes() {
   return (
     <>
       <Routes>
+        <Route path="/" element={<HomePage /> } />
         <Route path="/login" element={<Login />} />
 
         {/* Ruta del Dashboard */}
         <Route
-          path="/"
+          path="/panel"
           element={
             <ProtectedRoute>
               <Layout>

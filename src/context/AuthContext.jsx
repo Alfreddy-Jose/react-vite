@@ -13,7 +13,7 @@ export function AuthProvider({ children }) {
   });
 
   useEffect(() => {
-    if (isLogin('/login')) {
+    if (isLogin('/login') && isLogin('/')) {
       
     const fetchUser = async () => {
       try {

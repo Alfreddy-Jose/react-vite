@@ -290,7 +290,7 @@ export default function Calendar() {
       console.log(typeof datosParaPDF.encabezado === "object");
 
       // Enviar datos al backend
-      const response = await Api.get("/generar-horario-pdf", datosParaPDF, {
+      const response = await Api.get("/generar_horario_pdf", datosParaPDF, {
         responseType: "blob",
         withCredentials: true,
       });
@@ -314,6 +314,8 @@ export default function Calendar() {
         }
       } else {
         AlertaError("Error al exportar PDF: " + error.message);
+        console.log(error.message);
+        
       }
       console.error(error);
     }
