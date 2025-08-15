@@ -693,9 +693,7 @@ export default function Calendar() {
     });
   };
 
-  // Si quieres cargar eventos desde backend, puedes usar useEffect aquí
-
-  // Render
+  
   return (
     <div>
       <form

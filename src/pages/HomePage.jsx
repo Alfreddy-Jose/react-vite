@@ -10,6 +10,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import img from "../img/universitarios.jpg";
 import { Footer } from "../components/layouts/Footer";
+import { Link } from "react-router-dom";
 
 function HomePage() {
   return (
@@ -60,8 +61,8 @@ function HomePage() {
                 educativos.
               </p>
               <div className="d-flex justify-content-center justify-content-lg-start gap-3">
-                <a
-                  href="/login"
+                <Link
+                  to="/login"
                   className="btn btn-success btn-lg px-4 py-3 fw-bold traslation"
                 >
                   <FontAwesomeIcon
@@ -69,7 +70,7 @@ function HomePage() {
                     className="me-2 fa-icon-fix"
                   />
                   Acceder al Sistema
-                </a>
+                </Link>
               </div>
             </div>
           </div>
