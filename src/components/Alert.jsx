@@ -33,4 +33,16 @@ export function AlertaError(mensaje) {
           });
 }
 
+export function AlertaConfirm(mensaje, title = "Estas seguro?", confirmarText = "Si!" ) {
+  return Swal.fire({
+    title: title,
+    text: mensaje,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: confirmarText,
+  });
+}
+
 export default Alerta;

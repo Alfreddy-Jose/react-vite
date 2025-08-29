@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import Select from "react-select";
 
 export default function SelectControl({
+  styles = '',
   label,
   value,
   options,
@@ -31,6 +32,7 @@ export default function SelectControl({
         isDisabled={disabled}
         name={name}
         value={value}
+        styles={styles}
         id={name}
         onChange={onChange}
         options={options}

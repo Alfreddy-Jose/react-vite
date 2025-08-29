@@ -1,7 +1,6 @@
 import { useFormik } from "formik";
 import { Buttom } from "../../components/Buttom";
 import { ContainerIput } from "../../components/ContainerInput";
-import { InputLabel } from "../../components/InputLabel";
 import { Create } from "../../components/Link";
 import { FORM_LABELS } from "../../constants/formLabels";
 import * as Yup from "yup";
@@ -9,14 +8,14 @@ import { useEffect, useState } from "react";
 import { PostAll, GetAll } from "../../services/Api";
 import SelectSearch from "../../components/SelectSearch";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 const initialValues = {
   pnf_id: "",
   matricula_id: "",
   trayecto_id: "",
   sede_id: "",
-  numero_seccion: "",
-  lapso_id: "",
+  //lapso_id: "",
 };
 
 const validationSchema = Yup.object({
@@ -24,19 +23,19 @@ const validationSchema = Yup.object({
   pnf_id: Yup.number().required("Este campo es obligatorio"),
   trayecto_id: Yup.number().required("Este campo es obligatorio"),
   sede_id: Yup.number().required("Este campo es obligatorio"),
-  numero_seccion: Yup.number().required("Este campo es obligatorio"),
-  lapso_id: Yup.number().required("Este campo es obligatorio"),
+  //lapso_id: Yup.number().required("Este campo es obligatorio"),
 });
 
 export function SeccionesCreate() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({});
   const navegation = useNavigate();
+  const { lapsoActual } = useAuth();
 
   // Funcion para enviar datos al backend
   const onSubmit = async (values, { setErrors }) => {
     try {
-      await PostAll(values, "/secciones", navegation);
+      await PostAll(values, "/secciones", navegation, lapsoActual.id);
     } catch (error) {
       if (error.response && error.response.data.errors) {
         // Transforma los arrays de Laravel a strings para Formik
@@ -73,14 +72,14 @@ export function SeccionesCreate() {
         }
         input={
           <>
-            <SelectSearch
+{/*             <SelectSearch
               name="lapso_id"
               label={FORM_LABELS.SECCION.LAPSO}
               options={data.lapsos || []}
               formik={formik}
               valueKey="id"
               labelKey="ano"
-            />
+            /> */}
 
             <SelectSearch
               name="pnf_id"
@@ -114,14 +113,6 @@ export function SeccionesCreate() {
               labelKey="nombre_sede"
               valueKey="id"
             />
-
-            <InputLabel
-              name="numero_seccion"
-              label={FORM_LABELS.SECCION.NRO_SECCION}
-              formik={formik}
-              type="text"
-              placeholder="INGRESE NÚMERO DE SECCIÓN"
-            />
           </>
         }
         // Botones para enviar y cancelar
@@ -136,8 +127,9 @@ export function SeccionesCreate() {
             <Buttom
               text="Cancelar"
               title="Cancelar"
-              type="reset"
+              type="button"
               style="btn-danger ms-1"
+              onClick={() => formik.resetForm()}
             />
           </>
         }

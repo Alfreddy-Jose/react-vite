@@ -130,7 +130,7 @@ function RolesEdit() {
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.VER}
-                      value="ver usuario"
+                      value="usuario.ver"
                       formik={formik}
                       // Habilitado siempre
                       disabled={false}
@@ -138,26 +138,26 @@ function RolesEdit() {
                         handleModuleToggle("usuario")(e);
                         formik.handleChange(e);
                       }}
-                      checked={formik.values.permisos.includes("ver usuario")}
+                      checked={formik.values.permisos.includes("usuario.ver")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.CREAR}
-                      value="crear usuario"
+                      value="usuario.crear"
                       formik={formik}
                       disabled={!isModuleEnabled("usuario")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.EDITAR}
-                      value="editar usuario"
+                      value="usuario.editar"
                       formik={formik}
                       disabled={!isModuleEnabled("usuario")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.ELIMINAR}
-                      value="eliminar usuario"
+                      value="usuario.eliminar"
                       formik={formik}
                       disabled={!isModuleEnabled("usuario")}
                     />
@@ -172,33 +172,33 @@ function RolesEdit() {
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.VER}
-                      value="ver rol"
+                      value="rol.ver"
                       formik={formik}
                       disabled={false}
                       onChange={(e) => {
                         handleModuleToggle("roles")(e);
                         formik.handleChange(e);
                       }}
-                      checked={formik.values.permisos.includes("ver rol")}
+                      checked={formik.values.permisos.includes("rol.ver")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.CREAR}
-                      value="crear rol"
+                      value="rol.crear"
                       formik={formik}
                       disabled={!isModuleEnabled("roles")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.EDITAR}
-                      value="editar rol"
+                      value="rol.editar"
                       formik={formik}
                       disabled={!isModuleEnabled("roles")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.ELIMINAR}
-                      value="eliminar rol"
+                      value="rol.eliminar"
                       formik={formik}
                       disabled={!isModuleEnabled("roles")}
                     />
@@ -213,33 +213,33 @@ function RolesEdit() {
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.VER}
-                      value="ver pnf"
+                      value="pnf.ver"
                       formik={formik}
                       disabled={false}
                       onChange={(e) => {
                         handleModuleToggle("pnf")(e);
                         formik.handleChange(e);
                       }}
-                      checked={formik.values.permisos.includes("ver pnf")}
+                      checked={formik.values.permisos.includes("pnf.ver")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.CREAR}
-                      value="crear pnf"
+                      value="pnf.crear"
                       formik={formik}
                       disabled={!isModuleEnabled("pnf")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.EDITAR}
-                      value="editar pnf"
+                      value="pnf.editar"
                       formik={formik}
                       disabled={!isModuleEnabled("pnf")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.ELIMINAR}
-                      value="eliminar pnf"
+                      value="pnf.eliminar"
                       formik={formik}
                       disabled={!isModuleEnabled("pnf")}
                     />
@@ -254,33 +254,33 @@ function RolesEdit() {
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.VER}
-                      value="ver sede"
+                      value="sede.ver"
                       formik={formik}
                       disabled={false}
                       onChange={(e) => {
                         handleModuleToggle("sede")(e);
                         formik.handleChange(e);
                       }}
-                      checked={formik.values.permisos.includes("ver sede")}
+                      checked={formik.values.permisos.includes("sede.ver")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.CREAR}
-                      value="crear sede"
+                      value="sede.crear"
                       formik={formik}
                       disabled={!isModuleEnabled("sede")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.EDITAR}
-                      value="editar sede"
+                      value="sede.editar"
                       formik={formik}
                       disabled={!isModuleEnabled("sede")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.ELIMINAR}
-                      value="eliminar sede"
+                      value="sede.eliminar"
                       formik={formik}
                       disabled={!isModuleEnabled("sede")}
                     />
@@ -295,33 +295,33 @@ function RolesEdit() {
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.VER}
-                      value="ver lapso"
+                      value="lapso.ver"
                       formik={formik}
                       disabled={false}
                       onChange={(e) => {
                         handleModuleToggle("lapso")(e);
                         formik.handleChange(e);
                       }}
-                      checked={formik.values.permisos.includes("ver lapso")}
+                      checked={formik.values.permisos.includes("lapso.ver")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.CREAR}
-                      value="crear lapso"
+                      value="apso.crear"
                       formik={formik}
                       disabled={!isModuleEnabled("lapso")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.EDITAR}
-                      value="editar lapso"
+                      value="lapso.editar"
                       formik={formik}
                       disabled={!isModuleEnabled("lapso")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.ELIMINAR}
-                      value="eliminar lapso"
+                      value="lapso.eliminar"
                       formik={formik}
                       disabled={!isModuleEnabled("lapso")}
                     />
@@ -336,33 +336,33 @@ function RolesEdit() {
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.VER}
-                      value="ver trayecto"
+                      value="trayecto.ver"
                       formik={formik}
                       disabled={false}
                       onChange={(e) => {
                         handleModuleToggle("trayecto")(e);
                         formik.handleChange(e);
                       }}
-                      checked={formik.values.permisos.includes("ver trayecto")}
+                      checked={formik.values.permisos.includes("trayecto.ver")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.CREAR}
-                      value="crear trayecto"
+                      value="trayecto.crear"
                       formik={formik}
                       disabled={!isModuleEnabled("trayecto")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.EDITAR}
-                      value="editar trayecto"
+                      value="trayecto.editar"
                       formik={formik}
                       disabled={!isModuleEnabled("trayecto")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.ELIMINAR}
-                      value="eliminar trayecto"
+                      value="trayecto.eliminar"
                       formik={formik}
                       disabled={!isModuleEnabled("trayecto")}
                     />
@@ -377,33 +377,33 @@ function RolesEdit() {
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.VER}
-                      value="ver matricula"
+                      value="Tipo Matricula.ver"
                       formik={formik}
                       disabled={false}
                       onChange={(e) => {
                         handleModuleToggle("matricula")(e);
                         formik.handleChange(e);
                       }}
-                      checked={formik.values.permisos.includes("ver matricula")}
+                      checked={formik.values.permisos.includes("Tipo Matricula.ver")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.CREAR}
-                      value="crear matricula"
+                      value="Tipo Matricula.crear"
                       formik={formik}
                       disabled={!isModuleEnabled("matricula")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.EDITAR}
-                      value="editar matricula"
+                      value="Tipo Matricula.editar"
                       formik={formik}
                       disabled={!isModuleEnabled("matricula")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.ELIMINAR}
-                      value="eliminar matricula"
+                      value="Tipo Matricula.eliminar"
                       formik={formik}
                       disabled={!isModuleEnabled("matricula")}
                     />
@@ -418,33 +418,33 @@ function RolesEdit() {
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.VER}
-                      value="ver seccion"
+                      value="seccion.ver"
                       formik={formik}
                       disabled={false}
                       onChange={(e) => {
                         handleModuleToggle("seccion")(e);
                         formik.handleChange(e);
                       }}
-                      checked={formik.values.permisos.includes("ver seccion")}
+                      checked={formik.values.permisos.includes("seccion.ver")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.CREAR}
-                      value="crear seccion"
+                      value="seccion.crear"
                       formik={formik}
                       disabled={!isModuleEnabled("seccion")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.EDITAR}
-                      value="editar seccion"
+                      value="seccion.editar"
                       formik={formik}
                       disabled={!isModuleEnabled("seccion")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.ELIMINAR}
-                      value="eliminar seccion"
+                      value="seccion.eliminar"
                       formik={formik}
                       disabled={!isModuleEnabled("seccion")}
                     />
@@ -459,33 +459,33 @@ function RolesEdit() {
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.VER}
-                      value="ver turno"
+                      value="turno.ver"
                       formik={formik}
                       disabled={false}
                       onChange={(e) => {
                         handleModuleToggle("turno")(e);
                         formik.handleChange(e);
                       }}
-                      checked={formik.values.permisos.includes("ver turno")}
+                      checked={formik.values.permisos.includes("turno.ver")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.CREAR}
-                      value="crear turno"
+                      value="turno.crear"
                       formik={formik}
                       disabled={!isModuleEnabled("turno")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.EDITAR}
-                      value="editar turno"
+                      value="turno.editar"
                       formik={formik}
                       disabled={!isModuleEnabled("turno")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.ELIMINAR}
-                      value="eliminar turno"
+                      value="turno.eliminar"
                       formik={formik}
                       disabled={!isModuleEnabled("turno")}
                     />
@@ -494,54 +494,13 @@ function RolesEdit() {
               />
 
               <CardCheckbox
-                title="MALLA DEL PNF"
+                title="COORDINADOR"
                 checkbox={
                   <>
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.VER}
-                      value="ver malla"
-                      formik={formik}
-                      disabled={false}
-                      onChange={(e) => {
-                        handleModuleToggle("malla")(e);
-                        formik.handleChange(e);
-                      }}
-                      checked={formik.values.permisos.includes("ver malla")}
-                    />
-                    <Checkbox
-                      name="permisos"
-                      label={FORM_LABELS.ROLES_PERMISOS.CREAR}
-                      value="crear malla"
-                      formik={formik}
-                      disabled={!isModuleEnabled("malla")}
-                    />
-                    <Checkbox
-                      name="permisos"
-                      label={FORM_LABELS.ROLES_PERMISOS.EDITAR}
-                      value="editar malla"
-                      formik={formik}
-                      disabled={!isModuleEnabled("malla")}
-                    />
-                    <Checkbox
-                      name="permisos"
-                      label={FORM_LABELS.ROLES_PERMISOS.ELIMINAR}
-                      value="eliminar malla"
-                      formik={formik}
-                      disabled={!isModuleEnabled("malla")}
-                    />
-                  </>
-                }
-              />
-
-              <CardCheckbox
-                title="COORDINADOR MUNICIPAL"
-                checkbox={
-                  <>
-                    <Checkbox
-                      name="permisos"
-                      label={FORM_LABELS.ROLES_PERMISOS.VER}
-                      value="ver coordinador"
+                      value="coordinador.ver"
                       formik={formik}
                       disabled={false}
                       onChange={(e) => {
@@ -549,27 +508,27 @@ function RolesEdit() {
                         formik.handleChange(e);
                       }}
                       checked={formik.values.permisos.includes(
-                        "ver coordinador"
+                        "coordinador.ver"
                       )}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.CREAR}
-                      value="crear coordinador"
+                      value="coordinador.crear"
                       formik={formik}
                       disabled={!isModuleEnabled("coordinador")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.EDITAR}
-                      value="editar coordinador"
+                      value="coordinador.editar"
                       formik={formik}
                       disabled={!isModuleEnabled("coordinador")}
                     />
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.ELIMINAR}
-                      value="eliminar coordinador"
+                      value="coordinador.eliminar"
                       formik={formik}
                       disabled={!isModuleEnabled("coordinador")}
                     />
@@ -584,15 +543,8 @@ function RolesEdit() {
             <Buttom
               type="submit"
               style="btn-success"
-              title="Guardar"
-              text="Guardar"
-            />
-            <Buttom
-              type="button"
-              style="btn-danger ms-1"
-              title="Cancelar"
-              text="Cancelar"
-              onClick={() => formik.resetForm()}
+              title="Editar"
+              text="Editar"
             />
           </>
         }

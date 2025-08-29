@@ -40,7 +40,9 @@ function DocenteCreate() {
   // Funcion para enviar datos al backend
   const onSubmit = async (values, { setErrors }) => {
     try {
-      await PostAll(values, "/docentes", navegation);    
+      //calcular el campo horas de dedicacion si es tiempo completo 18 horas sino 12
+      values.horas_dedicacion = values.dedicacion === "TIEMPO COMPLETO" ? 18 : 12;
+      await PostAll(values, "/docentes", navegation); 
     } catch (error) {
       if (error.response && error.response.data.errors) {
         // Transforma los arrays de Laravel a strings para Formik
@@ -179,8 +181,9 @@ function DocenteCreate() {
             <Buttom
               text="Cancelar"
               title="Cancelar"
-              type="reset"
+              type="button"
               style="btn-danger ms-1"
+              onClick={() => formik.resetForm()}
             />
           </>
         }

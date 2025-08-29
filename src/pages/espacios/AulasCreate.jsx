@@ -13,7 +13,6 @@ import SelectSearch from "../../components/SelectSearch";
 // Iniciando variables
 const initialValues = {
   codigo: "",
-  nombre_aula: "",
   etapa: "",
   nro_aula: "",
   sede_id: "",
@@ -21,7 +20,6 @@ const initialValues = {
 
 // Validaciones para cada campo
 const validationSchema = Yup.object({
-  nombre_aula: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
   codigo: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
   etapa: Yup.string()
     .matches(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "Solo letras permitidas") // Solo letras
@@ -111,14 +109,6 @@ export default function AulasCreate() {
                 placeholder="NÚMERO DE AULA"
                 formik={formik}
               />
-              {/* Input para confirmar la contraseña de usuario */}
-              <InputLabel
-                label={FORM_LABELS.AULA.NAME}
-                type="text"
-                name="nombre_aula"
-                placeholder="NOMBRE DE AULA"
-                formik={formik}
-              />
             </>
           }
           buttom={
@@ -130,10 +120,11 @@ export default function AulasCreate() {
                 text="Guardar"
               />
               <Buttom
-                type="reset"
+                type="button"
                 style="btn-danger ms-1"
                 title="Cancelar"
                 text="Cancelar"
+                onClick={() => formik.resetForm()}
               />
             </>
           }

@@ -11,7 +11,7 @@ import {
 } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import "./style.css";
-import { AlertaError } from "../../components/Alert";
+import Alerta, { AlertaConfirm, AlertaError } from "../../components/Alert";
 import Api from "../../services/Api";
 import SelectControl from "../../components/SelectDependiente";
 import { ContainerIput } from "../../components/ContainerInput";
@@ -27,7 +27,7 @@ function Evento({ evento, onResizeStart, isResizing, onEditar, onEliminar }) {
   // Cierra el menú si se hace click fuera
   React.useEffect(() => {
     if (!menuAbierto) return;
-    const handleClick = (e) => setMenuAbierto(false);
+    const handleClick = () => setMenuAbierto(false);
     document.addEventListener("click", handleClick);
     return () => document.removeEventListener("click", handleClick);
   }, [menuAbierto]);
@@ -36,14 +36,12 @@ function Evento({ evento, onResizeStart, isResizing, onEditar, onEliminar }) {
     transform: CSS.Translate.toString(transform),
     backgroundColor: evento.color,
     height: `${evento.duracion * 60 - 4}px`,
-    // Resto de tus estilos
   };
 
   return (
     <div
       ref={(node) => {
         setNodeRef(node);
-        // Guardamos la referencia del elemento para acceso directo
       }}
       style={estilo}
       className={`evento ${isResizing ? "evento-resizing" : ""}`}
@@ -69,8 +67,6 @@ function Evento({ evento, onResizeStart, isResizing, onEditar, onEliminar }) {
           }}
           onClick={(e) => {
             e.stopPropagation();
-            /* const rect = e.target.getBoundingClientRect(); */
-            /* setMenuPosition({ top: rect.bottom, left: rect.right - 120 }); */
             setMenuAbierto((v) => !v);
           }}
           style={{
@@ -278,21 +274,16 @@ export default function Calendar() {
           texto: e.texto,
           color: e.color,
         })),
-        dias: dias, 
+        dias: dias,
       };
 
       console.log(
         "Datos enviados a Laravel:",
         JSON.stringify(datosParaPDF, null, 2)
       );
-      console.log("Datos enviados:", datosParaPDF);
-      console.log(Array.isArray(datosParaPDF.dias));
-      console.log(typeof datosParaPDF.encabezado === "object");
-
       // Enviar datos al backend
-      const response = await Api.get("/generar_horario_pdf", datosParaPDF, {
+      const response = await Api.post("/generar_horario_pdf", datosParaPDF, {
         responseType: "blob",
-        withCredentials: true,
       });
 
       // Crear y descargar el PDF
@@ -315,7 +306,6 @@ export default function Calendar() {
       } else {
         AlertaError("Error al exportar PDF: " + error.message);
         console.log(error.message);
-        
       }
       console.error(error);
     }
@@ -382,32 +372,87 @@ export default function Calendar() {
     obtenerTrayectos();
   }, []);
 
-  const [eventos, setEventos] = useState([
-    {
-      id: "1",
-      dia: "JUEVES",
-      bloque: 0,
-      duracion: 2,
-      texto: "LAB / E - 07",
-      color: "#e3f2fd",
-    },
-    {
-      id: "2",
-      dia: "JUEVES",
-      bloque: 2,
-      duracion: 1,
-      texto: "ELECTIVA III\nJENNIFER PAIVA",
-      color: "#fff9c4",
-    },
-    {
-      id: "3",
-      dia: "JUEVES",
-      bloque: { value: 147, label: "07:30 AM - 08:15 AM" },
-      duracion: 3,
-      texto: "PROYECTO III\nDORA MENDOZA",
-      color: "#ffe0b2",
-    },
-  ]);
+  const obtenerValor = (prop) => {
+    if (prop === null || prop === undefined) {
+      return prop;
+    }
+
+    if (typeof prop === "object") {
+      if ("value" in prop) {
+        return prop.value;
+      }
+      if ("id" in prop) {
+        return prop.id;
+      }
+      if (prop instanceof Date) {
+        return prop.toISOString();
+      }
+      return JSON.stringify(prop);
+    }
+
+    return prop;
+  };
+
+  // Función para actualizar el evento en la base de datos
+  const actualizarEventoEnBD = useCallback(async (eventoActualizado) => {
+    try {
+      if (!eventoActualizado || !eventoActualizado.id) {
+        console.error("Evento inválido para actualizar:", eventoActualizado);
+        return;
+      }
+
+      let eventoId = eventoActualizado.id;
+      if (typeof eventoId === "object" && eventoId !== null) {
+        // Si el ID es un objeto, intentar extraer el valor real
+        if (eventoId.value !== undefined) {
+          eventoId = eventoId.value;
+        } else if (eventoId.id !== undefined) {
+          eventoId = eventoId.id;
+        } else {
+          console.error(
+            "ID de evento en formato de objeto no reconocido:",
+            eventoId
+          );
+          return;
+        }
+      }
+
+      eventoId = eventoId.toString();
+
+      // Asegurarse de extraer correctamente los valores numéricos
+      const bloqueValue = obtenerValor(eventoActualizado.bloque);
+      const bloqueId =
+        typeof bloqueValue === "object"
+          ? parseInt(obtenerValor(bloqueValue))
+          : parseInt(bloqueValue);
+
+      const payload = {
+        dia: eventoActualizado.dia,
+        bloque_id: bloqueId,
+        duracion: eventoActualizado.duracion,
+      };
+
+      const response = await Api.put(`/evento/${eventoId}`, payload);
+    } catch (error) {
+      if (error.response) {
+        console.error(
+          "Error del servidor:",
+          error.response.status,
+          error.response.data
+        );
+        AlertaError(
+          `Error ${error.response.status}: ${
+            error.response.data.message || "Error al actualizar el evento"
+          }`
+        );
+      } else {
+        console.error("Error al actualizar evento:", error.message);
+        AlertaError("Error al actualizar el evento: " + error.message);
+      }
+    }
+  }, []);
+
+  const [eventos, setEventos] = useState([]);
 
   // Adaptar datos para react-select
   const sedesOptions = sedes.map((s) => ({
@@ -417,6 +462,7 @@ export default function Calendar() {
   const docentesOptions = docentes.map((d) => ({
     value: d.value || d.id,
     label: d.label || d.persona.nombre_completo,
+    horas: d.horas_dedicacion,
   }));
   const pnfOptions = pnfs.map((p) => ({
     value: p.id,
@@ -496,36 +542,53 @@ export default function Calendar() {
 
       const [newDia, newBloque] = over.id.split("-");
       const bloqueNum = parseInt(newBloque);
+      const duracionEvento = activeEvent.duracion;
 
       setEventos((prevEventos) => {
         const eventoActivo = prevEventos.find((e) => e.id === active.id);
         if (!eventoActivo) return prevEventos;
 
+        // Validación robusta de solapamiento
         const haySolapamiento = prevEventos.some(
           (e) =>
             e.id !== active.id &&
             e.dia === newDia &&
-            ((e.bloque >= bloqueNum &&
-              e.bloque < bloqueNum + eventoActivo.duracion) ||
-              (e.bloque + e.duracion > bloqueNum &&
-                e.bloque + e.duracion <= bloqueNum + eventoActivo.duracion))
+            bloqueNum < e.bloque + e.duracion &&
+            bloqueNum + duracionEvento > e.bloque
         );
 
         if (!haySolapamiento) {
-          return prevEventos.map((e) =>
+          const nuevosEventos = prevEventos.map((e) =>
             e.id === active.id ? { ...e, dia: newDia, bloque: bloqueNum } : e
           );
+
+          // Actualizar en la base de datos
+          const eventoActualizado = nuevosEventos.find(
+            (e) => e.id === active.id
+          );
+
+          if (eventoActualizado) {
+            setTimeout(() => {
+              actualizarEventoEnBD(eventoActualizado);
+            }, 0);
+          }
+
+          return nuevosEventos;
         }
+        AlertaError("¡Ya existe un evento en ese rango de bloques!");
         return prevEventos;
       });
 
       setActiveEvent(null);
     },
-    [activeEvent]
+    [activeEvent, actualizarEventoEnBD]
   );
 
   useEffect(() => {
     if (!isResizing) return;
+
+    let isMounted = true;
+    const controller = new AbortController();
 
     const handleMouseMove = (e) => {
       if (!resizingEventId || !resizeData.current.initialY) return;
@@ -536,7 +599,6 @@ export default function Calendar() {
         Math.round(resizeData.current.initialDuracion + deltaY / 60)
       );
 
-      // Actualizamos la referencia y el DOM
       resizeData.current.tempDuracion = nuevaDuracion;
       if (resizeData.current.elemento) {
         resizeData.current.elemento.style.height = `${
@@ -545,14 +607,131 @@ export default function Calendar() {
       }
     };
 
-    const handleMouseUp = () => {
+    const handleMouseUp = async () => {
+      if (!isMounted) return;
+
       if (resizingEventId && resizeData.current.tempDuracion) {
+        // Encontrar el evento original
+        const eventoOriginal = eventos.find((e) => e.id === resizingEventId);
+        const duracionOriginal = eventoOriginal
+          ? eventoOriginal.duracion
+          : null;
+        const duracionNueva = resizeData.current.tempDuracion;
+        const bloqueActual = eventoOriginal.bloque;
+        const diaActual = eventoOriginal.dia;
+        // Validación robusta de solapamiento para resize
+        const haySolapamiento = eventos.some(
+          (e) =>
+            e.id !== resizingEventId &&
+            e.dia === diaActual &&
+            bloqueActual < e.bloque + e.duracion &&
+            bloqueActual + duracionNueva > e.bloque
+        );
+        if (haySolapamiento) {
+          AlertaError("¡Ya existe un evento en ese rango de bloques!");
+          // Restaurar tamaño anterior SOLO si el valor en el estado ya cambió
+          setEventos((prev) =>
+            prev.map((ev) =>
+              ev.id === resizingEventId && ev.duracion !== duracionOriginal
+                ? { ...ev, duracion: duracionOriginal }
+                : ev
+            )
+          );
+          // También restaurar visualmente el alto del elemento si existe
+          if (resizeData.current.elemento) {
+            resizeData.current.elemento.style.height = `${
+              duracionOriginal * 60 - 4
+            }px`;
+          }
+          setIsResizing(false);
+          setResizingEventId(null);
+          return;
+        }
+
+        // Validar horas de la materia al redimensionar
+        // Buscar el id de la materia del evento original
+        const materiaId = eventoOriginal.materias?.value || eventoOriginal.materia || eventoOriginal.materia_id;
+        // Sumar la duración de todos los eventos de esa materia, excepto el actual
+        const horasMateria = materiaSeleccionada?.horas || 0;
+        const horasUsadasMateria = eventos
+          .filter(
+            (e) =>
+              e.id !== resizingEventId &&
+              ((e.materias && e.materias.value === materiaId) || e.materia === materiaId || e.materia_id === materiaId)
+          )
+          .reduce((acc, e) => acc + (e.duracion || 1), 0);
+        if (horasUsadasMateria + duracionNueva > horasMateria) {
+          AlertaError("¡Las horas semanales de la materia se agotaron!");
+          setEventos((prev) =>
+            prev.map((ev) =>
+              ev.id === resizingEventId && ev.duracion !== duracionOriginal
+                ? { ...ev, duracion: duracionOriginal }
+                : ev
+            )
+          );
+          if (resizeData.current.elemento) {
+            resizeData.current.elemento.style.height = `${duracionOriginal * 60 - 4}px`;
+          }
+          setIsResizing(false);
+          setResizingEventId(null);
+          return;
+        }
+
+        // Crear una copia con la duración actualizada
+        if (eventoOriginal) {
+          const diferencia = duracionNueva - duracionOriginal;
+          const docenteId =
+            eventoOriginal.docente?.value || eventoOriginal.docente_id;
+          const respuesta = await Api.get(`/docente/${docenteId}`);
+          const horasActuales = respuesta.data.horas_dedicacion;
+          const horasRestantes = horasActuales - diferencia;
+
+          // Si las horas quedan en 0 o menos, preguntar antes de continuar
+          if (diferencia > 0 && horasRestantes <= 0) {
+            const confirmacion = await AlertaConfirm(
+              "La cantidad de horas dedicadas del docente se ha excedido",
+              "¿Deseas continuar?",
+              "Continuar"
+            );
+            if (!confirmacion.isConfirmed) {
+              // Restaurar tamaño anterior SOLO si el valor en el estado ya cambió
+              setEventos((prev) =>
+                prev.map((ev) =>
+                  ev.id === resizingEventId && ev.duracion !== duracionOriginal
+                    ? { ...ev, duracion: duracionOriginal }
+                    : ev
+                )
+              );
+              if (resizeData.current.elemento) {
+                resizeData.current.elemento.style.height = `${
+                  duracionOriginal * 60 - 4
+                }px`;
+              }
+              setIsResizing(false);
+              setResizingEventId(null);
+              return;
+            }
+          }
+
+          if (diferencia !== 0 && docenteId) {
+            await Api.put(
+              `/docente_horas/${docenteId}?horas_dedicacion=${-diferencia}`
+            );
+          }
+
+          const eventoConDuracionActualizada = {
+            ...eventoOriginal,
+            duracion: duracionNueva,
+          };
+          setTimeout(() => {
+            actualizarEventoEnBD(eventoConDuracionActualizada);
+          }, 0);
+        }
+
         // Actualizamos el estado con el valor final
         setEventos((prev) =>
           prev.map((ev) =>
-            ev.id === resizingEventId
-              ? { ...ev, duracion: resizeData.current.tempDuracion }
-              : ev
+            ev.id === resizingEventId ? { ...ev, duracion: duracionNueva } : ev
           )
         );
       }
@@ -572,14 +751,20 @@ export default function Calendar() {
       }, 100);
     };
 
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
+    // Agregar event listeners con la opción once
+    document.addEventListener("mousemove", handleMouseMove, {
+      signal: controller.signal,
+    });
+    document.addEventListener("mouseup", handleMouseUp, {
+      once: true,
+      signal: controller.signal,
+    });
 
     return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
+      isMounted = false;
+      controller.abort();
     };
-  }, [isResizing, resizingEventId]); // Dependencias mínimas
+  }, [isResizing, resizingEventId, eventos, actualizarEventoEnBD, materiaSeleccionada]);
 
   const handleResizeStart = useCallback(
     (eventoId, startY, element) => {
@@ -624,16 +809,49 @@ export default function Calendar() {
     const bloqueNum = parseInt(nuevoEvento.bloque.value);
     const duracionNum = parseInt(nuevoEvento.duracion);
 
-    // Evitar solapamientos
+    // Evitar solapamientos (validación robusta)
     const haySolapamiento = eventos.some(
       (e) =>
         e.dia === nuevoEvento.dia.value &&
-        ((e.bloque >= bloqueNum && e.bloque < bloqueNum + duracionNum) ||
-          (e.bloque + e.duracion > bloqueNum &&
-            e.bloque + e.duracion <= bloqueNum + duracionNum))
+        bloqueNum < e.bloque + e.duracion &&
+        bloqueNum + duracionNum > e.bloque
     );
     if (haySolapamiento) {
-      AlertaError("¡Ya existe un evento en ese bloque!");
+      AlertaError("¡Ya existe un evento en ese rango de bloques!");
+      return;
+    }
+    
+    // Calcular la suma de horas ya usadas para la materia
+    const horasUsadasMateria = eventos
+      .filter((e) => e.materias && nuevoEvento.materia && e.materias.value === nuevoEvento.materia.value)
+      .reduce((acc, e) => acc + (e.duracion || 1), 0);
+    const horasMateria = materiaSeleccionada?.horas || 0;
+    console.log(`Horas usadas de la materia: ${nuevoEvento.materia.label} => ${horasUsadasMateria}`);
+    console.log(`Horas usadas con el nuevo evento: ${horasUsadasMateria + duracionNum} de ${horasMateria} horas semanales de la materia`);
+    if (horasUsadasMateria + duracionNum > horasMateria) {
+      AlertaError("¡Las horas semanales de la materia se agotaron!");
+      return;
+    }    
+    
+    if (docenteSeleccionado.horas_dedicacion - duracionNum <= 0) {
+      const respuesta = AlertaConfirm(
+        "La cantidad de horas dedicadas del docente se ha excedido",
+        "¿Deseas continuar?",
+        "Continuar"
+      );
+      if (!(await respuesta).isConfirmed) {
+        return;
+      }
+    }
+
+    // Calcular la cantidad de bloques
+    const cantidadDeBloques = bloques.length;
+
+    if (materiaSeleccionada?.horas < duracionNum) {
+      AlertaError("¡Las horas semanales de la materia se agotaron!");
+      return;
+    } else if (cantidadDeBloques < duracionNum) {
+      AlertaError("¡No hay suficientes bloques!");
       return;
     }
 
@@ -649,17 +867,19 @@ export default function Calendar() {
       bloque_id: parseInt(nuevoEvento.bloque.value),
       duracion: nuevoEvento.duracion,
     };
-    console.log("Payload enviado:", payload);
     try {
       // Enviar datos al backend
-      await Api.post("/eventos", payload).then((response) => {
-        console.log({ state: { message: response.data.message } });
-      });
+      const response = await Api.post("/eventos", payload);
+      await Api.put(
+        `/docente_horas/${payload.docente_id}?horas_dedicacion=${-duracionNum}`
+      );
+
+      const eventoDesdeBackend = response.data.horario.id;
 
       setEventos([
         ...eventos,
         {
-          id: Date.now().toString(),
+          id: eventoDesdeBackend.toString(),
           dia: nuevoEvento.dia.value,
           bloque: Number(nuevoEvento.bloque.value),
           duracion: duracionNum,
@@ -693,7 +913,6 @@ export default function Calendar() {
     });
   };
 
-  
   return (
     <div>
       <form
@@ -767,6 +986,7 @@ export default function Calendar() {
                     ...prev,
                     pnf: option,
                     docente: null,
+                    materia: null,
                   }));
                 }}
               />
@@ -851,6 +1071,7 @@ export default function Calendar() {
                     ...prev,
                     materia: option,
                     docente: null,
+                    duracion: 1,
                   }));
                 }}
                 onValueChange={async (option) => {
@@ -880,7 +1101,21 @@ export default function Calendar() {
                     ) || null
                   );
                   setNuevoEvento((prev) => ({ ...prev, docente: option }));
-                  console.log(docenteSeleccionado);
+                }}
+                styles={{
+                  option: (provided, state) => ({
+                    ...provided,
+                    color:
+                      state.data.horas !== undefined && state.data.horas < 3
+                        ? "#fff"
+                        : "#333",
+                    backgroundColor:
+                      state.data.horas !== undefined && state.data.horas < 3
+                        ? "#dc3545"
+                        : state.isSelected
+                        ? "#2684FF"
+                        : "#fff",
+                  }),
                 }}
               />
               <SelectControl
@@ -922,7 +1157,9 @@ export default function Calendar() {
                   type="number"
                   name="duracion"
                   min={1}
-                  max={bloques.length}
+                  max={
+                    /* materiaSeleccionada?.horas ? materiaSeleccionada.horas : */ 15
+                  }
                   value={nuevoEvento.duracion}
                   onChange={handleInputChange}
                   style={{ width: 140 }}
@@ -973,7 +1210,7 @@ export default function Calendar() {
           className="btn btn-danger mb-3 traslation"
           onClick={exportarPDF}
         >
-          Exportar PDF
+          Generar PDF
         </button>
         <table className="table table-bordered table-striped text-center">
           <thead>
@@ -1008,6 +1245,14 @@ export default function Calendar() {
                       );
                       try {
                         await Api.delete(`/evento/${evento.id}`);
+                        // Sumar la duración a las horas del docente
+                        const docenteId =
+                          evento.docente?.value || evento.docente_id;
+                        if (docenteId) {
+                          await Api.put(
+                            `/docente_horas/${docenteId}?horas_dedicacion=${evento.duracion}`
+                          );
+                        }
                         setEventos((prev) =>
                           prev.filter((e) => e.id !== evento.id)
                         );
@@ -1229,75 +1474,6 @@ export default function Calendar() {
                         />
                       </div>
                     </div>
-                    {/*  <div className="d-flex justify-content-center aling-content-center">
-                      <SelectControl
-                        label="TRAYECTO"
-                        name="trayecto"
-                        className="col-sm-12 col-xs-12 col-xl-10"
-                        value={eventoEditando.trayecto}
-                        options={trayectoOptions}
-                        onChange={(option) => {
-                          setTrayectoSeleccionado(
-                            trayectos.find(
-                              (e) => String(e.id) === String(option?.value)
-                            ) || null
-                          );
-                          setEventoEditando({
-                            ...eventoEditando,
-                            trayecto: option,
-                            texto: `${eventoEditando.sede?.label} - ${eventoEditando.pnf?.label} - ${option.label}`,
-                          });
-                        }}
-                        onValueChange={async (option) => {
-                          if (option) {
-                            try {
-                              const response = await Api.get(
-                                `/horarios/trayectos/${option.value}/trimestres`
-                              );
-                              setTrimestres(response.data);
-                              setTrimestreSeleccionada(response.data[0]);
-                            } catch (error) {
-                              AlertaError("Error al cargar los trimestres");
-                              console.log(error);
-                            }
-                          }
-                        }}
-                      />
-                    </div>
-                    <div className="d-flex justify-content-center aling-content-center">
-                      <SelectControl
-                        label="TRIMESTRE"
-                        name="trimestre"
-                        className="col-sm-12 col-xs-12 col-xl-10"
-                        value={eventoEditando.trimestre}
-                        options={trimestreOptions}
-                        onChange={(option) => {
-                          setTrimestreSeleccionada(
-                            trimestres.find(
-                              (t) => String(t.id) === String(option?.value)
-                            ) || null
-                          );
-                          setEventoEditando({
-                            ...eventoEditando,
-                            trimestre: option,
-                          });
-                        }}
-                        onValueChange={async (option) => {
-                          if (option) {
-                            try {
-                              const response = await Api.get(
-                                `/horarios/trimestres/${option.value}/unidadesCurriculares`
-                              );
-                              setMaterias(response.data);
-                              setMateriaSeleccionada(response.data[0]);
-                            } catch (error) {
-                              AlertaError("Error al cargar las materias");
-                              console.log(error);
-                            }
-                          }
-                        }}
-                      />
-                    </div> */}
                     <div className="d-flex d-flex justify-content-center">
                       <SelectControl
                         label="MATERIA"
@@ -1360,43 +1536,6 @@ export default function Calendar() {
                         }}
                       />
                     </div>
-                    {/* <div className="d-flex justify-content-center aling-content-center">
-                      <SelectControl
-                        label="AULA"
-                        name="aula"
-                        className="col-sm-12 col-xs-12 col-xl-10"
-                        value={eventoEditando.aula}
-                        options={aulaOptions}
-                        onChange={(option) => {
-                          setAulaSeleccionada(
-                            aulas.find(
-                              (e) => String(e.id) === String(option?.value)
-                            ) || null
-                          );
-                          setEventoEditando({
-                            ...eventoEditando,
-                            aula: option,
-                          });
-                        }}
-                      />
-                    </div>
-                    <div className="mb-2 d-flex justify-content-center aling-content-center">
-                      <div className="col-sm-12 col-xs-12 col-xl-10">
-                        <label className="form-label mt-4">DURACIÓN</label>
-                        <input
-                          type="number"
-                          className="form-control"
-                          min={1}
-                          value={eventoEditando.duracion}
-                          onChange={(e) =>
-                            setEventoEditando({
-                              ...eventoEditando,
-                              duracion: Number(e.target.value),
-                            })
-                          }
-                        />
-                      </div>
-                    </div> */}
                     <div className="row justify-content-center">
                       <div className="col-md-5 col-sm-12 mb-2 mb-md-0">
                         <SelectControl

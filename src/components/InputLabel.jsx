@@ -1,4 +1,5 @@
 import { useTogglePassword } from "../funciones";
+import { useEffect } from "react"; // Importar useEffect
 
 export function InputLabel({
   type,
@@ -8,7 +9,15 @@ export function InputLabel({
   formik,
   disabled = false,
   hidden = false,
+  value // Nuevo prop opcional
 }) {
+  // Sincronizar el valor externo con Formik cuando cambie
+  useEffect(() => {
+    if (value !== undefined && value !== formik.values[name]) {
+      formik.setFieldValue(name, value);
+    }
+  }, [value, name, formik]);
+
   return (
     <div hidden={hidden} className="col-sm-6 col-xl-4">
       <label htmlFor={name} className="mt-4">
@@ -31,7 +40,7 @@ export function InputLabel({
           formik.setFieldTouched(name, true, false);
         }}
         onBlur={formik.handleBlur}
-        value={formik.values[name]}
+        value={formik.values[name]} // Siempre usar el valor de Formik
       />
       {formik.touched[name] && formik.errors[name] ? (
         <div className="text-danger">{formik.errors[name]}</div>

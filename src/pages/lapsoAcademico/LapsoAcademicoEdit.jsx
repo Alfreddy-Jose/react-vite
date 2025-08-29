@@ -7,7 +7,7 @@ import { FORM_LABELS } from "../../constants/formLabels";
 import * as Yup from "yup";
 import { useNavigate, useParams } from "react-router-dom";
 import Api, { GetAll, PutAll } from "../../services/Api";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import SelectSearch from "../../components/SelectSearch";
 
 const validationSchema = Yup.object({
@@ -23,8 +23,7 @@ const validationSchema = Yup.object({
       return parseInt(value) <= añoActual;
     })
     .required("Este campo es obligatorio"),
-  tipo_lapso_id: Yup.string()
-    .required("Este campo es obligatorio"),
+  tipo_lapso_id: Yup.string().required("Este campo es obligatorio"),
 });
 
 export function LapsoAcademicoEdit() {
@@ -38,7 +37,7 @@ export function LapsoAcademicoEdit() {
   const onSubmit = async (values, { setErrors }) => {
     try {
       console.log(values);
-      
+
       await PutAll(values, "/lapso", navegation, id, "/lapsos");
     } catch (error) {
       if (error.response && error.response.data.errors) {
@@ -77,7 +76,12 @@ export function LapsoAcademicoEdit() {
     getLapso();
   }, [id]);
   console.log(loading);
-  
+
+  // Funcion para generar el nombre del LAPSO
+  const nombreLapso = useMemo(() => {
+    return `${formik.values.ano}${formik.values.tipo_lapso_id}`;
+  }, [formik.values.ano, formik.values.tipo_lapso_id]);
+
   return (
     <form onSubmit={formik.handleSubmit}>
       <ContainerIput
@@ -87,14 +91,6 @@ export function LapsoAcademicoEdit() {
         }
         input={
           <>
-            {/* Input para nombre de LAPSO */}
-            <InputLabel
-              label={FORM_LABELS.LAPSO_ACADEMICO.NAME}
-              type="text"
-              name="nombre_lapso"
-              placeholder="INGRESE UN NOMBRE"
-              formik={formik}
-            />
             {/* Input para año del LAPSO */}
             <InputLabel
               label={FORM_LABELS.LAPSO_ACADEMICO.YEAR}
@@ -110,6 +106,16 @@ export function LapsoAcademicoEdit() {
               name="tipo_lapso_id"
               formik={formik}
             />
+            {/* Input para nombre de LAPSO */}
+            <InputLabel
+              label={FORM_LABELS.LAPSO_ACADEMICO.NAME}
+              type="text"
+              name="nombre_lapso"
+              placeholder="INGRESE UN NOMBRE"
+              formik={formik}
+              value={nombreLapso}
+              useExternalValue={true}
+            />
           </>
         }
         // Botones para enviar y cancelar
@@ -120,12 +126,6 @@ export function LapsoAcademicoEdit() {
               title="Editar"
               type="submit"
               style="btn-success"
-            />
-            <Buttom
-              text="Cancelar"
-              title="Cancelar"
-              type="reset"
-              style="btn-danger ms-1"
             />
           </>
         }

@@ -11,12 +11,14 @@ import { useFormik } from "formik";
 import { FORM_LABELS } from "../../constants/formLabels";
 import SelectSearch from "../../components/SelectSearch";
 import { Buttom } from "../../components/Buttom";
+import { useAuth } from "../../context/AuthContext";
 
 export function Secciones() {
   const [secciones, setSecciones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [permisos, setPermisos] = useState([]);
   const location = useLocation();
+
 
   // Nueva función para buscar secciones
   const buscarSecciones = async (parametros) => {
@@ -138,9 +140,10 @@ export function Secciones() {
 
 export function SeccionParametros({ buscarSecciones }) {
   const [opciones, setOpciones] = useState({});
+  const { lapsoActual } = useAuth();
 
   const initialValues = {
-    lapso: "",
+    lapso: lapsoActual?.id,
     sede: "",
     pnf: "",
     trayecto: "",
@@ -148,6 +151,7 @@ export function SeccionParametros({ buscarSecciones }) {
   };
 
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues,
     //validationSchema,
     onSubmit: () => {},
@@ -174,7 +178,7 @@ export function SeccionParametros({ buscarSecciones }) {
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", "secciones.pdf");
+      link.setAttribute("download", "secciones_" + lapsoActual.ano + ".pdf");
       document.body.appendChild(link);
       link.click();
       link.remove();

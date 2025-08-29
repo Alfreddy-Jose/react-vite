@@ -24,11 +24,8 @@ function HomePage() {
       >
         <div className="container">
           <h1 className="fw-bold display-4 mb-3">
-            Sistema de Gestión Académica
+            Sistema de Información para la Gestión de Horarios
           </h1>
-          <p className="lead fs-4">
-            Optimiza la planificación de horarios para estudiantes y profesores
-          </p>
         </div>
       </header>
 
@@ -53,7 +50,7 @@ function HomePage() {
             </div>
             <div className="col-lg-6 text-center text-lg-start">
               <h2 className="fw-bold mb-4">
-                Bienvenido al sistema sobre gestión de horarios
+                Bienvenido al Sistema
               </h2>
               <p className="lead mb-4">
                 Nuestra plataforma simplifica la administración académica,

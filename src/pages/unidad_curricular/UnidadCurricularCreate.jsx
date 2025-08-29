@@ -15,8 +15,8 @@ const initialValues = {
   nombre: "",
   descripcion: "",
   unidad_credito: "",
-  hora_acad: "",
-  hora_total_est: "",
+  hora_teorica: "",
+  hora_practica: "",
   periodo: "",
   trimestre_id: "",
 };
@@ -29,10 +29,10 @@ const validationSchema = Yup.object({
   unidad_credito: Yup.string()
     .required("Este campo es obligatorio") // Campo obligatorio
     .matches(/^[0-:-9]*$/, "Solo números"), // Solo números
-  hora_acad: Yup.string()
+  hora_teorica: Yup.string()
     .required("Este campo es obligatorio") // Campo obligatorio
     .matches(/^[0-:-9]*$/, "Solo números"), // Solo números
-  hora_total_est: Yup.string()
+  hora_practica: Yup.string()
     .required("Este campo es obligatorio") // Campo obligatorio
     .matches(/^[0-:-9]*$/, "Solo números"), // Solo números
   periodo: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
@@ -47,6 +47,9 @@ function UnidadCurricularCreate() {
 
   // Funcion para enviar datos al backend
   const onSubmit = async (values, { setErrors }) => {
+
+    values.hora_total_est = parseInt(values.hora_teorica) + parseInt(values.hora_practica);
+
     try {
       await PostAll(values, "/unidad_curricular", navegation);
     } catch (error) {
@@ -58,7 +61,7 @@ function UnidadCurricularCreate() {
         });
         setErrors(error.response.data.errors);
       }
-    }
+    } 
   };
 
   const formik = useFormik({
@@ -105,18 +108,18 @@ function UnidadCurricularCreate() {
               />
               {/* Input para las horas academicas */}
               <InputLabel
-                label={FORM_LABELS.UNIDAD_CURRICULAR.HORA_ACAD}
+                label={FORM_LABELS.UNIDAD_CURRICULAR.HORA_TEORICA}
                 type="text"
-                name="hora_acad"
-                placeholder="HORA ACADEMICAS"
+                name="hora_teorica"
+                placeholder="HORA TEORÍCA"
                 formik={formik}
               />
               {/* Input para el total de horas estimadas*/}
               <InputLabel
-                label={FORM_LABELS.UNIDAD_CURRICULAR.HORA_TOTAL_EST}
+                label={FORM_LABELS.UNIDAD_CURRICULAR.HORA_PRACTICA}
                 type="text"
-                name="hora_total_est"
-                placeholder="HORA TOTAL"
+                name="hora_practica"
+                placeholder="HORA PRACTICA"
                 formik={formik}
               />
               <SelectSearch
@@ -154,10 +157,11 @@ function UnidadCurricularCreate() {
                 text="Guardar"
               />
               <Buttom
-                type="reset"
+                type="button"
                 style="btn-danger ms-1"
                 title="Cancelar"
                 text="Cancelar"
+                onClick={() => formik.resetForm()}
               />
             </>
           }

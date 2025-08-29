@@ -64,7 +64,6 @@
   text-align: center;
   white-space: pre-line;
   user-select: none;
-  cursor: move;
   box-sizing: border-box;
   overflow: hidden;
   transition: height 0.2s ease-out;
@@ -73,17 +72,21 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
 }
 
-
 .evento:hover {
   z-index: 2;
+  cursor: grab;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
+}
+
+.evento:active {
+  cursor: grabbing;
 }
 
 .evento-resizing {
   transition: none !important;
   z-index: 1000;
   opacity: 0.9;
-  box-shadow: 0 0 0 2px rgba(0, 150, 255, 0.6);
+  box-shadow: 0 1px 1px 2px rgba(0, 150, 255, 0.6);
   will-change: height;
 }
 

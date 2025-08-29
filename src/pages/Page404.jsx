@@ -15,7 +15,7 @@ function NotPage() {
           Lo sentimos, la página que estás buscando no existe o ha sido movida.
           Por favor, verifica la URL o navega usando el menú principal.
         </p>
-        <Link to='/' className={styles.btn_kiadmin}>
+        <Link to='/panel' className={styles.btn_kiadmin}>
           <i className="ki ki-home"></i> Volver al inicio
         </Link>
       </div>

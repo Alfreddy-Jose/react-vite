@@ -93,8 +93,9 @@ export function TipoMatriculaCreate() {
             <Buttom
               text="Cancelar"
               title="Cancelar"
-              type="reset"
+              type="button"
               style="btn-danger ms-1"
+              onClick={() => formik.resetForm()}
             />
           </>
         }

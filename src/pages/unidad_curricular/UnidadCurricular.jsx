@@ -54,7 +54,10 @@ function UnidadCurricular() {
               <b>NOMBRE: </b> {row.nombre}
             </p>
             <p>
-              <b>HORAS ACADÉMICAS: </b> {row.hora_acad}
+              <b>HORAS PRÁCTICAS: </b> {row.hora_practica}
+            </p>
+            <p>
+              <b>HORAS TEORICAS: </b> {row.hora_teorica}
             </p>
             <p>
               <b>HORAS TOTAL ESTIMADAS: </b> {row.hora_total_est}
@@ -66,12 +69,12 @@ function UnidadCurricular() {
               <b>PERÍODO: </b>
               {row.periodo}
             </p>
-            <p>
+            <p> 
               <b>TRIMESTRE: </b> {row.trimestre.nombre}
             </p>
-            <p>
-              <b>DESCRIPCIÓN: </b> {row.descripcion}
-            </p>
+              <p>
+                <b>DESCRIPCIÓN: </b> {row.descripcion ? row.descripcion : "SIN DESCRIPCIÓN"}
+              </p>
           </Modal>
         </div>
       ),

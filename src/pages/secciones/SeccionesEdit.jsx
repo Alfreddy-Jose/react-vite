@@ -16,7 +16,7 @@ const validationSchema = Yup.object({
   trayecto_id: Yup.number().required("Este campo es obligatorio"),
   sede_id: Yup.number().required("Este campo es obligatorio"),
   numero_seccion: Yup.number().required("Este campo es obligatorio"),
-  lapso_id: Yup.number().required("Este campo es obligatorio"),
+  //lapso_id: Yup.number().required("Este campo es obligatorio"),
 });
 
 export function SeccionesEdit() {
@@ -50,7 +50,7 @@ export function SeccionesEdit() {
       trayecto_id: seccion?.trayecto_id || "",
       sede_id: seccion?.sede_id || "",
       numero_seccion: seccion?.numero_seccion || "",
-      lapso_id: seccion?.lapso_id || "",
+      //lapso_id: seccion?.lapso_id || "",
     },
     validationSchema,
     onSubmit,
@@ -72,7 +72,7 @@ export function SeccionesEdit() {
   return (
     <form onSubmit={formik.handleSubmit}>
       <ContainerIput
-        title="NUEVA SECCIÓN"
+        title="EDITAR SECCIÓN"
         link={
           <Create
             path="/secciones"
@@ -82,15 +82,6 @@ export function SeccionesEdit() {
         }
         input={
           <>
-            <SelectSearch
-              name="lapso_id"
-              label={FORM_LABELS.SECCION.LAPSO}
-              options={data.lapsos || []}
-              formik={formik}
-              valueKey="id"
-              labelKey="ano"
-            />
-
             <SelectSearch
               name="pnf_id"
               label={FORM_LABELS.SECCION.PNF}
@@ -129,6 +120,7 @@ export function SeccionesEdit() {
               label={FORM_LABELS.SECCION.NRO_SECCION}
               formik={formik}
               type="text"
+              hidden={true}
               placeholder="INGRESE NÚMERO DE SECCIÓN"
             />
           </>

@@ -1,13 +1,14 @@
 import { useAuth } from "../../context/AuthContext";
 import { LogoutButton } from "../Logout";
-import logo from "../../img/logo_pnf.svg";
+import logo from "../../img/PNF.png";
 import { Link } from "react-router-dom";
+import LapsoSelector from "../LapsoSelect";
 
 export function Navbar() {
   const { user } = useAuth();
 
   return (
-    <div className="main-header"> 
+    <div className="main-header">
       <div className="main-header-logo">
         {/* Logo Header */}
         <div className="logo-header" data-background-color="dark">
@@ -39,6 +40,15 @@ export function Navbar() {
           <nav className="navbar navbar-header-left navbar-expand-lg navbar-form nav-search p-0 d-none d-lg-flex"></nav>
 
           <ul className="navbar-nav topbar-nav ms-md-auto align-items-center">
+            {/* Select para lapsos */}
+            <li>
+              <div className="me-3">
+                <label htmlFor="lapso" className="form-label text-center fw-bold mb-0">LAPSO ACADÉMICO</label>
+                <LapsoSelector />
+              </div>
+            </li>
+            {/* End Select */}
+
             <li className="nav-item topbar-user dropdown hidden-caret">
               <a
                 className="dropdown-toggle profile-pic"
@@ -51,7 +61,7 @@ export function Navbar() {
                 </div>
                 <span className="profile-username">
                   <span className="op-7">HOLA, </span>
-                  <span className="fw-bold">{user?.name || ''}</span>
+                  <span className="fw-bold">{user?.name || ""}</span>
                 </span>
               </a>
               <ul className="dropdown-menu dropdown-user animated fadeIn">
@@ -62,29 +72,20 @@ export function Navbar() {
                         <i className="fa fa-user icon-user-bottom"></i>
                       </div>
                       <div className="u-text">
-                        <h4>{user?.name || ''}</h4>
-                        <p className="text-muted">{user?.email || ''}</p>
-                        <Link 
+                        <h4>{user?.name || ""}</h4>
+                        <p className="text-muted">{user?.email || ""}</p>
+                        <Link
                           to={`/usuario/${user?.id}/edit`}
-                          className="btn btn-xs btn-secondary btn-sm">Ver Perfil</Link>
-{/*                         <a
-                          href="#"
                           className="btn btn-xs btn-secondary btn-sm"
                         >
                           Ver Perfil
-                        </a> */}
+                        </Link>
                       </div>
                     </div>
                   </li>
                   <li>
                     <div className="dropdown-divider"></div>
-                      <LogoutButton />
-{/*                       <a
-                        className="dropdown-item"
-                        href="#"
-                      >
-                        Finalizar Sesión
-                      </a> */}
+                    <LogoutButton />
                   </li>
                 </div>
               </ul>

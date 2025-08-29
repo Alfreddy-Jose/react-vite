@@ -103,16 +103,10 @@ export function TipoMatriculaEdit() {
         buttom={
           <>
             <Buttom
-              text="Guardar"
-              title="Guardar"
+              text="Editar"
+              title="Editar"
               type="submit"
               style="btn-success"
-            />
-            <Buttom
-              text="Cancelar"
-              title="Cancelar"
-              type="reset"
-              style="btn-danger ms-1"
             />
           </>
         }

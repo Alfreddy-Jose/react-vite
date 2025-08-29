@@ -48,6 +48,7 @@ import UsuarioEdit from "../pages/usuario/UsuarioEdit";
 import { SeccionesEdit } from "../pages/secciones/SeccionesEdit";
 import DocenteEdit from "../pages/docente/DocenteEdit";
 import HomePage from "../pages/HomePage";
+import TrayectoEdit from "../pages/trayectos/TrayectoEdit";
 
 export function AppRoutes() {
   return (
@@ -213,6 +214,16 @@ export function AppRoutes() {
             <ProtectedRoute>
               <Layout>
                 <TrayectoCreate />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trayecto/:id/edit"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <TrayectoEdit />
               </Layout>
             </ProtectedRoute>
           }

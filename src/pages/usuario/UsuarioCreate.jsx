@@ -132,10 +132,11 @@ export function UsuarioCreate() {
                 text="Guardar"
               />
               <Buttom
-                type="reset"
+                type="button"
                 style="btn-danger ms-1"
                 title="Cancelar"
                 text="Cancelar"
+                onClick={() => formik.resetForm()}
               />
             </>
           }

@@ -5,13 +5,9 @@ import { ContainerIput } from "../../components/ContainerInput";
 import { Create } from "../../components/Link";
 import { InputLabel } from "../../components/InputLabel";
 import { Buttom } from "../../components/Buttom";
-import { PostAll } from "../../services/Api";
-import { useNavigate } from "react-router-dom";
-
-// Iniciando variables
-const initialValues = {
-  nombre: "",
-};
+import Api, { PostAll } from "../../services/Api";
+import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 // Validaciones para cada campo
 const validationSchema = Yup.object({
@@ -20,8 +16,10 @@ const validationSchema = Yup.object({
     .matches(/^[0-9]*$/, "Solo letras permitidas"), // Solo letras
 });
 
-function TrayectoCreate() {
+function TrayectoEdit() {
   const navegation = useNavigate();
+  const { id } = useParams();
+  const [trayecto, setTrayecto] = useState([]);
 
   // Funcion para enviar datos al backend
   const onSubmit = async (values, { setErrors }) => {
@@ -39,8 +37,21 @@ function TrayectoCreate() {
     }
   };
 
+  useEffect(() => {
+    // Trayendo los datos del registro
+    const getTrayecto = async () => {
+      const response = await Api.get(`/trayecto/${id}`);
+      setTrayecto(response.data);
+    };
+
+    getTrayecto();
+  }, [ id ]);
+
   const formik = useFormik({
-    initialValues,
+    enableReinitialize: true,
+    initialValues: {
+      nombre: trayecto?.nombre || "",
+    },
     validationSchema,
     onSubmit,
   });
@@ -49,7 +60,7 @@ function TrayectoCreate() {
     <>
       <form onSubmit={formik.handleSubmit}>
         <ContainerIput
-          title="NUEVO TRAYECTO"
+          title="EDITAR TRAYECTO"
           link={
             <Create
               path="/trayectos"
@@ -59,7 +70,7 @@ function TrayectoCreate() {
           }
           input={
             <>
-              {/* Input para nombre del turno */}
+              {/* Input para nombre del trayecto */}
               <InputLabel
                 label={FORM_LABELS.TURNOS.NAME}
                 type="text"
@@ -74,15 +85,8 @@ function TrayectoCreate() {
               <Buttom
                 type="submit"
                 style="btn-success"
-                title="Guardar"
-                text="Guardar"
-              />
-              <Buttom
-                type="button"
-                style="btn-danger ms-1"
-                title="Cancelar"
-                text="Cancelar"
-              onClick={() => formik.resetForm()}
+                title="Editar"
+                text="Editar"
               />
             </>
           }
@@ -92,4 +96,4 @@ function TrayectoCreate() {
   );
 }
 
-export default TrayectoCreate;
+export default TrayectoEdit;

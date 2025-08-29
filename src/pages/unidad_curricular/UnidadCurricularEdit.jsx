@@ -18,15 +18,15 @@ const validationSchema = Yup.object({
   unidad_credito: Yup.string()
     .required("Este campo es obligatorio") // Campo obligatorio
     .matches(/^[0-:-9]*$/, "Solo números"), // Solo números
-  hora_acad: Yup.string()
+  hora_teorica: Yup.string()
     .required("Este campo es obligatorio") // Campo obligatorio
     .matches(/^[0-:-9]*$/, "Solo números"), // Solo números
-  hora_total_est: Yup.string()
+  hora_practica: Yup.string()
     .required("Este campo es obligatorio") // Campo obligatorio
     .matches(/^[0-:-9]*$/, "Solo números"), // Solo números
   periodo: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
   trimestre_id: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
-  descripcion: Yup.string().required("Este campo es obligatorio"),
+  descripcion: Yup.string().max(255, "Máximo 255 caracteres"),
 });
 
 function UnidadCurricularEdit() {
@@ -38,6 +38,9 @@ function UnidadCurricularEdit() {
 
   // Funcion para enviar datos al backend
   const onSubmit = async (values, { setErrors }) => {
+
+    values.hora_total_est = parseInt(values.hora_teorica) + parseInt(values.hora_practica);
+
     try {
       await PutAll(values, "/unidad_curricular", navegation, id, "/unidad_curricular");
     } catch (error) {
@@ -58,8 +61,8 @@ function UnidadCurricularEdit() {
       nombre: unidadCurricular?.nombre || "",
       descripcion: unidadCurricular?.descripcion || "",
       unidad_credito: unidadCurricular?.unidad_credito || "",
-      hora_acad: unidadCurricular?.hora_acad || "",
-      hora_total_est: unidadCurricular?.hora_total_est || "",
+      hora_teorica: unidadCurricular?.hora_teorica || "",
+      hora_practica: unidadCurricular?.hora_practica || "",
       periodo: unidadCurricular?.periodo || "",
       trimestre_id: unidadCurricular?.trimestre_id || "",
     },
@@ -73,7 +76,7 @@ function UnidadCurricularEdit() {
 
     GetAll(setUnidadCurricular, setLoading, `/unidad_curricular/${id}`);
 
-  }, [id]);
+  }, [id]); 
   console.log(loading);
 
   return (
@@ -108,18 +111,18 @@ function UnidadCurricularEdit() {
               />
               {/* Input para las horas academicas */}
               <InputLabel
-                label={FORM_LABELS.UNIDAD_CURRICULAR.HORA_ACAD}
+                label={FORM_LABELS.UNIDAD_CURRICULAR.HORA_TEORICA}
                 type="text"
-                name="hora_acad"
-                placeholder="HORA ACADEMICAS"
+                name="hora_teorica"
+                placeholder="HORA TEORICA"
                 formik={formik}
               />
               {/* Input para el total de horas estimadas*/}
               <InputLabel
-                label={FORM_LABELS.UNIDAD_CURRICULAR.HORA_TOTAL_EST}
+                label={FORM_LABELS.UNIDAD_CURRICULAR.HORA_PRACTICA}
                 type="text"
-                name="hora_total_est"
-                placeholder="HORA TOTAL"
+                name="hora_practica"
+                placeholder="HORA PRACTICA"
                 formik={formik}
               />
               <SelectSearch
@@ -153,14 +156,8 @@ function UnidadCurricularEdit() {
               <Buttom
                 type="submit"
                 style="btn-success"
-                title="Guardar"
-                text="Guardar"
-              />
-              <Buttom
-                type="reset"
-                style="btn-danger ms-1"
-                title="Cancelar"
-                text="Cancelar"
+                title="Editar"
+                text="Editar"
               />
             </>
           }

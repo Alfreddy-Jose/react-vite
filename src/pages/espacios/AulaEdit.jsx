@@ -52,7 +52,6 @@ export default function AulasEdit() {
       codigo: aula?.codigo || "",
       etapa: aula?.etapa || "",
       nro_aula: aula?.nro_aula || "",
-      nombre_aula: aula?.nombre_aula || "",
       sede_id: aula?.sede_id || ""
     },
     validationSchema,
@@ -116,14 +115,6 @@ export default function AulasEdit() {
                 type="text"
                 name="nro_aula"
                 placeholder="NÚMERO DE AULA"
-                formik={formik}
-              />
-              {/* Input para confirmar la contraseña de usuario */}
-              <InputLabel
-                label={FORM_LABELS.AULA.NAME}
-                type="text"
-                name="nombre_aula"
-                placeholder="NOMBRE DE AULA"
                 formik={formik}
               />
             </>

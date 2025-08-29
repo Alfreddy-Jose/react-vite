@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import logo from "../../img/logo_pnf.svg";
+import logo from "../../img/PNF.png";
 
 export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
   const location = useLocation(); // Hook para obtener la ruta actual
@@ -41,14 +41,6 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                 <Link to="/panel">
                   <i className="fas fa-home"></i>
                   <p>Dashboard</p>
-                </Link>
-              </li>
-              <li
-                className={`nav-item ${isActive("/horario") ? "active" : ""}`}
-              >
-                <Link to="/horario">
-                  <i className="fa-solid fa-calendar"></i>
-                  <p>Horario</p>
                 </Link>
               </li>
 
@@ -311,6 +303,15 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                     </li>
                   </ul>
                 </div>
+              </li>
+
+              <li
+                className={`nav-item ${isActive("/horario") ? "active" : ""}`}
+              >
+                <Link to="/horario">
+                  <i className="fa-solid fa-calendar"></i>
+                  <p>Horario</p>
+                </Link>
               </li>
             </ul>
           </div>

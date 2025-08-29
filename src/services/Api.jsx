@@ -57,13 +57,13 @@ export const GetAll = async (setAll, setLoading, url) => {
     // Manejo de errores
     AlertaError("Error al cargar los datos");
     console.log(error);
-  } finally {
+  } finally { 
     setLoading(false);
   }
 };
 
 // Guardar Todos los registros
-export const PostAll = async (values, url, navegation) => {
+export const PostAll = async (values, url, navegation, lapso = null) => {
   let cerrar = true; // Variable local
 
   // Mostrando loader mientras se procesa
@@ -76,7 +76,7 @@ export const PostAll = async (values, url, navegation) => {
   });
 
   try {
-    await Api.post(url, values).then((response) => {
+    await Api.post(url, {...values, lapso_id: lapso}).then((response) => {
       console.log({ state: { message: response.data.message } });
       navegation(url, { state: { message: response.data.message } });
     });
