@@ -134,6 +134,14 @@ export function SeccionesEdit() {
               type="submit"
               style="btn-success"
             />
+
+            <Buttom
+              text="Cancelar"
+              title="Cancelar"
+              type="button"
+              style="btn-danger ms-1"
+              onClick={() => formik.resetForm()}
+            />
           </>
         }
       />

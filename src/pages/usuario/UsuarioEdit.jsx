@@ -121,6 +121,14 @@ function UsuarioEdit() {
                 title="Editar"
                 text="Editar"
               />
+
+              <Buttom
+                type="button"
+                style="btn-danger"
+                title="Cancelar"
+                text="Cancelar"
+                onClick={() => formik.resetForm()}
+              />
             </>
           }
         />
@@ -227,6 +235,14 @@ export function FormPassword() {
                 style="btn-success"
                 title="Editar"
                 text="Editar"
+              />
+
+              <Buttom
+                type="button"
+                style="btn-danger ms-1"
+                title="Cancelar"
+                text="Cancelar"
+                onClick={() => formik.resetForm()}
               />
             </>
           }

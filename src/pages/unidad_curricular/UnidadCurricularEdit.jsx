@@ -38,11 +38,17 @@ function UnidadCurricularEdit() {
 
   // Funcion para enviar datos al backend
   const onSubmit = async (values, { setErrors }) => {
-
-    values.hora_total_est = parseInt(values.hora_teorica) + parseInt(values.hora_practica);
+    values.hora_total_est =
+      parseInt(values.hora_teorica) + parseInt(values.hora_practica);
 
     try {
-      await PutAll(values, "/unidad_curricular", navegation, id, "/unidad_curricular");
+      await PutAll(
+        values,
+        "/unidad_curricular",
+        navegation,
+        id,
+        "/unidad_curricular"
+      );
     } catch (error) {
       if (error.response && error.response.data.errors) {
         // Transforma los arrays de Laravel a strings para Formik
@@ -57,7 +63,7 @@ function UnidadCurricularEdit() {
 
   const formik = useFormik({
     enableReinitialize: true, // Permite que los valores iniciales se actualicen
-    initialValues : {
+    initialValues: {
       nombre: unidadCurricular?.nombre || "",
       descripcion: unidadCurricular?.descripcion || "",
       unidad_credito: unidadCurricular?.unidad_credito || "",
@@ -75,8 +81,7 @@ function UnidadCurricularEdit() {
     GetAll(setTrimestres, setLoading, "/get_trimestres");
 
     GetAll(setUnidadCurricular, setLoading, `/unidad_curricular/${id}`);
-
-  }, [id]); 
+  }, [id]);
   console.log(loading);
 
   return (
@@ -158,6 +163,14 @@ function UnidadCurricularEdit() {
                 style="btn-success"
                 title="Editar"
                 text="Editar"
+              />
+
+              <Buttom
+                text="Cancelar"
+                title="Cancelar"
+                type="button"
+                style="btn-danger ms-1"
+                onClick={() => formik.resetForm()}
               />
             </>
           }

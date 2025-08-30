@@ -41,6 +41,8 @@ export function Login() {
           { state: { message: response.data.message } },
           { replace: true }
         );
+
+        window.location.reload(); // refresca la página
       }
     } catch (err) {
       // Manejar el error de autenticación
@@ -73,7 +75,7 @@ export function Login() {
         <div className={styles.centrar}>
           <div className={styles.contenedor_login}>
             <form onSubmit={formik.handleSubmit}>
-              <h1>Inicio Sesión</h1>
+              <h1>Iniciar Sesión</h1>
 
               <div className={styles.input_box}>
                 <input
@@ -104,8 +106,7 @@ export function Login() {
                     id="verPassword"
                     className={styles.checkbox}
                     onClick={togglePasswordVisibility}
-                  />
-                  {" "}
+                  />{" "}
                   <span className="text-white">
                     {passwordType === "password"
                       ? "Mostrar Contraseña"

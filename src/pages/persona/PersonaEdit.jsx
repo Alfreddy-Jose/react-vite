@@ -175,7 +175,7 @@ function PersonaEdit() {
               formik={formik}
             />
             {/* Select para grado de la PERSONA */}
-            <SelectSearch 
+            <SelectSearch
               label={FORM_LABELS.PERSONAS.GRADO}
               name="grado_inst"
               formik={formik}
@@ -197,6 +197,14 @@ function PersonaEdit() {
               title="Editar"
               type="submit"
               style="btn-success"
+            />
+
+            <Buttom
+              text="Cancelar"
+              title="Cancelar"
+              type="button"
+              style="btn-danger ms-1"
+              onClick={() => formik.resetForm()}
             />
           </>
         }

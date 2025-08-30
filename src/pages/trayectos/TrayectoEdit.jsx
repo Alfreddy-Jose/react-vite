@@ -45,7 +45,7 @@ function TrayectoEdit() {
     };
 
     getTrayecto();
-  }, [ id ]);
+  }, [id]);
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -87,6 +87,14 @@ function TrayectoEdit() {
                 style="btn-success"
                 title="Editar"
                 text="Editar"
+              />
+
+              <Buttom
+                text="Cancelar"
+                title="Cancelar"
+                type="button"
+                style="btn-danger ms-1"
+                onClick={() => formik.resetForm()}
               />
             </>
           }

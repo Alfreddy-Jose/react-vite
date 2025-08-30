@@ -25,7 +25,7 @@ export function Universidad() {
   const [universidad, setUniversidad] = useState([]);
   const navegation = useNavigate();
   const location = useLocation();
-  const[loading, setLoading] = useState(true); // Estado de carga
+  const [loading, setLoading] = useState(true); // Estado de carga
   const [initialValues, setInitialValues] = useState({
     rif_univ: "",
     nombre_univ: "",
@@ -42,7 +42,13 @@ export function Universidad() {
       }
       // Si ya hay universidad, actualiza el registro
       else {
-        await PutAll(values, "/universidad", navegation, universidad[0].id, "/universidad");
+        await PutAll(
+          values,
+          "/universidad",
+          navegation,
+          universidad[0].id,
+          "/universidad"
+        );
       }
     } catch (error) {
       if (error.response && error.response.data.errors) {
@@ -99,14 +105,18 @@ export function Universidad() {
 
   // Mostrar un mensaje de carga mientras se obtienen los datos
   if (loading) {
-    return <Spinner></Spinner>
+    return <Spinner></Spinner>;
   }
 
   return (
     <form onSubmit={formik.handleSubmit}>
       <ContainerIput
-      /* cambiar title si ya hay universidad */
-        title={universidad.length > 0 ? "EDITAR UNIVERSIDAD" : "REGISTRAR UNIVERSIDAD"}
+        /* cambiar title si ya hay universidad */
+        title={
+          universidad.length > 0
+            ? "EDITAR UNIVERSIDAD"
+            : "REGISTRAR UNIVERSIDAD"
+        }
         input={
           <>
             {/* Input para nombre de LAPSO */}
@@ -146,15 +156,14 @@ export function Universidad() {
         // Botones para enviar y cancelar
         buttom={
           <>
-          {/* cambiar texto a editar si ya hay universidad */}
+            {/* cambiar texto a editar si ya hay universidad */}
             <Buttom
               text={universidad.length > 0 ? "Editar" : "Guardar"}
               title={universidad.length > 0 ? "Editar" : "Guardar"}
               type="submit"
               style="btn btn-success"
             />
-            {/* Si no hay universidad, muestra el botón de cancelar */}
-            {universidad.length === 0 ? (
+
             <Buttom
               text="Cancelar"
               title="Cancelar"
@@ -162,7 +171,6 @@ export function Universidad() {
               style="btn btn-danger ms-1"
               onClick={() => formik.resetForm()}
             />
-            ) : null}
           </>
         }
       />

@@ -54,7 +54,7 @@ export function AppRoutes() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<HomePage /> } />
+        <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
 
         {/* Ruta del Dashboard */}
@@ -304,7 +304,7 @@ export function AppRoutes() {
             </ProtectedRoute>
           }
         />
-          <Route
+        <Route
           path="/seccion/create"
           element={
             <ProtectedRoute>
@@ -324,29 +324,6 @@ export function AppRoutes() {
             </ProtectedRoute>
           }
         />
-        {/* <Route path="/secciones/create" element={<SeccionesCreate />} /> */}
-
-        {/* Rutas de Bloques de horas*/}
-        {/*         <Route
-          path="/bloques"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <Bloques />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/bloques/create"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <BloquesCreate />
-              </Layout>
-            </ProtectedRoute>
-          }
-        /> */}
 
         {/* Rutas de Turnos  */}
         <Route
@@ -556,7 +533,7 @@ export function AppRoutes() {
           element={
             <ProtectedRoute>
               <Layout>
-                <HorarioFull/>
+                <HorarioFull />
               </Layout>
             </ProtectedRoute>
           }

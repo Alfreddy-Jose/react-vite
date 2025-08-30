@@ -6,6 +6,7 @@ export function ContainerTable({
   tabla,
   isLoading = false,
   header_parametros = null,
+  button_pdf = null,
 }) {
   return (
     <div className="row">
@@ -17,7 +18,10 @@ export function ContainerTable({
               <div className="card-title">BUSCAR POR:</div>
             ) : null}
             {header_parametros}
-            <div className="card-title">{`LISTA DE ${title}`}</div>
+
+            {button_pdf}
+            
+            <div className="card-title inline">{`LISTA DE ${title}`}</div>
           </div>
           {isLoading ? <Spinner /> : tabla}
         </div>

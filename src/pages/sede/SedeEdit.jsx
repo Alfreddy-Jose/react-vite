@@ -35,7 +35,7 @@ export function SedeEdit() {
   // Funcion para enviar datos al backend
   const onSubmit = async (values, { setErrors }) => {
     try {
-      await PutAll(values, '/sede', navegation, id, "/sede");
+      await PutAll(values, "/sede", navegation, id, "/sede");
     } catch (error) {
       if (error.response && error.response.data.errors) {
         // Transforma los arrays de Laravel a strings para Formik
@@ -141,6 +141,14 @@ export function SedeEdit() {
                 title="Editar"
                 type="submit"
                 style="btn-success"
+              />
+
+              <Buttom
+                text="Cancelar"
+                title="Cancelar"
+                type="button"
+                style="btn-danger ms-1"
+                onClick={() => formik.resetForm()}
               />
             </>
           }

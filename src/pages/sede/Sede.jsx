@@ -28,6 +28,25 @@ export function Sede() {
     window.history.replaceState({}, "");
   }, [location.state]);
 
+  const descargarPDF = async () => {
+    try {
+      const response = await Api.get("/sedes/pdf", {
+        responseType: "blob",
+        withCredentials: true,
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "sedes.pdf");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      AlertaError("Error al descargar el PDF");
+      console.error(error);
+    }
+  };
+
   const columns = [
     {
       name: "ID",
@@ -107,6 +126,15 @@ export function Sede() {
     <>
       <ContainerTable
         title="SEDES"
+        button_pdf={
+          <button
+            type="button"
+            className="btn btn-danger mb-3"
+            onClick={descargarPDF}
+          >
+            Generar PDF
+          </button>
+        }
         link={
           permisos.includes("sede.crear") ? (
             <Create path="/sede/create" />
@@ -154,7 +182,6 @@ export function ModalAsignarPnfs({ id }) {
         setLoading(false);
       }
       console.log(values);
-      
     },
   });
 
@@ -175,9 +202,8 @@ export function ModalAsignarPnfs({ id }) {
         // Inicializar con IDs de PNFs ya asignados
         formik.setFieldValue(
           "selectedPnfs",
-          allPnfsAsignados.data?.map((pnf) => pnf.id) || [],
+          allPnfsAsignados.data?.map((pnf) => pnf.id) || []
         );
-
       } catch (error) {
         console.error("Error fetching PNF data:", error);
         setError("Error al cargar los PNFs. Intente nuevamente.");

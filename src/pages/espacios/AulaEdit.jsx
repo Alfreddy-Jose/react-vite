@@ -21,7 +21,7 @@ const validationSchema = Yup.object({
   nro_aula: Yup.string()
     .matches(/^[0-:-9]*$/, "Formato incorrecto") // Solo números
     .required("Este campo es obligatorio"), // Campo obligatorio
-  sede_id: Yup.number().required("Este campo es obligatorio")
+  sede_id: Yup.number().required("Este campo es obligatorio"),
 });
 
 export default function AulasEdit() {
@@ -52,7 +52,7 @@ export default function AulasEdit() {
       codigo: aula?.codigo || "",
       etapa: aula?.etapa || "",
       nro_aula: aula?.nro_aula || "",
-      sede_id: aula?.sede_id || ""
+      sede_id: aula?.sede_id || "",
     },
     validationSchema,
     onSubmit,
@@ -126,6 +126,14 @@ export default function AulasEdit() {
                 style="btn-success"
                 title="Editar"
                 text="Editar"
+              />
+
+              <Buttom
+                text="Cancelar"
+                title="Cancelar"
+                type="button"
+                style="btn-danger ms-1"
+                onClick={() => formik.resetForm()}
               />
             </>
           }

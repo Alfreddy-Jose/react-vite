@@ -3,8 +3,8 @@ import { ContainerTable } from "../../components/ContainerTable";
 import { Create } from "../../components/Link";
 import { Tabla } from "../../components/Tabla";
 import { useLocation } from "react-router-dom";
-import { GetAll } from "../../services/Api";
-import Alerta from "../../components/Alert";
+import Api, { GetAll } from "../../services/Api";
+import Alerta, { AlertaError } from "../../components/Alert";
 import Acciones from "../../components/Acciones";
 import { Modal, ButtomModal } from "../../components/Modal";
 
@@ -30,6 +30,26 @@ function UnidadCurricular() {
     // Limpiar el estado de navegacion para no mostrar el mensaje nuevamente
     window.history.replaceState({}, "");
   }, [location.state]);
+
+  // Descargar PDF de unidades curriculares
+  const descargarPDF = async () => {
+    try {
+      const response = await Api.get(
+        "/unidad_curricular/pdf",
+        { responseType: "blob", withCredentials: true, }
+      );
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "unidades_curriculares.pdf");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      AlertaError("Error al descargar el PDF");
+      console.error(error);
+    }
+  };
 
   // Definir las columnas de la tabla
   const columns = [
@@ -105,6 +125,11 @@ function UnidadCurricular() {
       <ContainerTable
         // Titulo para la tabla
         title="UNIDADES CURRICULARES"
+        button_pdf={            
+          <button type="button" className="btn btn-danger mb-3" onClick={descargarPDF}>
+            Generar PDF
+          </button>
+        }
         // Boton para crear nuevos registros
         link={
           permisos.includes("unidad Curricular.crear") ? (

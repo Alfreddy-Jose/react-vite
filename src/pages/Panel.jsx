@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import Alerta from "../components/Alert";
 import { useLocation } from "react-router-dom";
+// import logo_sistema from "../img/logo_sistema.svg"
 
 export function Panel() {
     const { user } = useAuth();
@@ -22,6 +23,14 @@ export function Panel() {
         <div className="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
           <div>
             <h3 className="fw-bold mb-3">Dashboard</h3>
+            {/* div aliniado a la izquierda */}
+{/*             <div className="d-flex justify-content-start">
+              <img src={logo_sistema} alt="Logo del sistema"
+                width="100"
+                height="70"
+              />
+            </div> */}
+            
             <h6 className="op-7 mb-2">
               Bienvendo { user?.name } al sistema sobre creación de horarios
             </h6>

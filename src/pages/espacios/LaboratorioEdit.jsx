@@ -22,7 +22,7 @@ const validationSchema = Yup.object({
     .max(1, "Maximo 1 carácteres") // Máximo 1 carácter
     .required("Este campo es obligatorio"), // Campo obligatorio
   abreviado_lab: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
-  sede_id: Yup.number().required("Este campo es obligatorio")
+  sede_id: Yup.number().required("Este campo es obligatorio"),
 });
 
 export default function LaboratorioEdit() {
@@ -149,6 +149,14 @@ export default function LaboratorioEdit() {
                 style="btn-success"
                 title="Editar"
                 text="Editar"
+              />
+
+              <Buttom
+                text="Cancelar"
+                title="Cancelar"
+                type="button"
+                style="btn-danger ms-1"
+                onClick={() => formik.resetForm()}
               />
             </>
           }

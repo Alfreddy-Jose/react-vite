@@ -47,16 +47,16 @@ function DocenteEdit() {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-    persona_id: docente?.persona_id || "",
-    pnf_id: docente?.pnf?.id || "",
-    categoria: docente?.categoria || "",
-    fecha_inicio: docente?.condicion_contrato?.fecha_inicio || "",
-    fecha_fin: docente?.condicion_contrato?.fecha_fin || "",
-    dedicacion: docente?.condicion_contrato?.dedicacion || "",
-    tipo: docente?.condicion_contrato?.tipo || "",
-    unidad_curricular_id: docente?.unidades_curriculares
-      ? docente.unidades_curriculares.map((item) => item.id)
-      : [],
+      persona_id: docente?.persona_id || "",
+      pnf_id: docente?.pnf?.id || "",
+      categoria: docente?.categoria || "",
+      fecha_inicio: docente?.condicion_contrato?.fecha_inicio || "",
+      fecha_fin: docente?.condicion_contrato?.fecha_fin || "",
+      dedicacion: docente?.condicion_contrato?.dedicacion || "",
+      tipo: docente?.condicion_contrato?.tipo || "",
+      unidad_curricular_id: docente?.unidades_curriculares
+        ? docente.unidades_curriculares.map((item) => item.id)
+        : [],
     },
     validationSchema,
     onSubmit,
@@ -185,6 +185,14 @@ function DocenteEdit() {
               title="Editar"
               type="submit"
               style="btn-success"
+            />
+
+            <Buttom
+              text="Cancelar"
+              title="Cancelar"
+              type="button"
+              style="btn-danger ms-1"
+              onClick={() => formik.resetForm()}
             />
           </>
         }

@@ -21,7 +21,6 @@ const moduleSuffix = {
   matricula: "matricula",
   seccion: "seccion",
   turno: "turno",
-  malla: "malla",
   coordinador: "coordinador",
 };
 
@@ -102,6 +101,15 @@ function RolesEdit() {
       setEnabledModules(initialEnabled);
     }
   }, [rol]);
+
+  // Función para cancelar - restaurar los valores originales
+  const handleCancel = () => {
+    if (rol) {
+      formik.setValues(rol);
+    }
+    formik.setTouched({});
+    formik.setStatus("cancelled");
+  };
 
   return (
     <form onSubmit={formik.handleSubmit}>
@@ -546,6 +554,15 @@ function RolesEdit() {
               title="Editar"
               text="Editar"
             />
+
+            <Buttom
+              type="button"
+              style="btn-danger ms-1"
+              title="Cancelar"
+              text="Cancelar"
+              onClick={() => formik.resetForm()}
+            />
+
           </>
         }
       />
