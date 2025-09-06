@@ -23,7 +23,7 @@ export function AuthProvider({ children }) {
   // Función para cargar los lapsos disponibles
   const fetchLapsos = async () => {
     try {
-      const response = await Api.get("/lapsos");
+      const response = await Api.get("/lapsos/activos");
       setLapsos(response.data);
       if (!lapsoActual && response.data.length > 0) {
         setLapsoActual(response.data[0]);
@@ -34,7 +34,7 @@ export function AuthProvider({ children }) {
   };
   const refreshLapsos = async () => {
     try {
-      const response = await Api.get("/lapsos");
+      const response = await Api.get("/lapsos/activos");
       setLapsos(response.data);
     } catch (err) {
       console.error("Error al obtener los lapsos académicos:", err);
@@ -80,6 +80,9 @@ export function AuthProvider({ children }) {
     // Almcenando token del usuario en el localStorage
     localStorage.setItem("token", userData.token);
     localStorage.setItem("permissions", JSON.stringify(userData.permissions));
+
+    // Configurar el token en las cabeceras de las peticiones API
+    Api.defaults.headers.common["Authorization"] = `Bearer ${userData.token}`;
     // Cargar lapsos después de iniciar sesión
     fetchLapsos();
   };
@@ -92,7 +95,15 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, signIn, signOut, lapsoActual, setLapsoActual, lapsos, refreshLapsos }}
+      value={{
+        user,
+        signIn,
+        signOut,
+        lapsoActual,
+        setLapsoActual,
+        lapsos,
+        refreshLapsos,
+      }}
     >
       {children}
     </AuthContext.Provider>

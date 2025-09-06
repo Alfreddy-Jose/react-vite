@@ -15,7 +15,6 @@ const initialValues = {
   matricula_id: "",
   trayecto_id: "",
   sede_id: "",
-  //lapso_id: "",
 };
 
 const validationSchema = Yup.object({
@@ -23,7 +22,6 @@ const validationSchema = Yup.object({
   pnf_id: Yup.number().required("Este campo es obligatorio"),
   trayecto_id: Yup.number().required("Este campo es obligatorio"),
   sede_id: Yup.number().required("Este campo es obligatorio"),
-  //lapso_id: Yup.number().required("Este campo es obligatorio"),
 });
 
 export function SeccionesCreate() {
@@ -72,15 +70,6 @@ export function SeccionesCreate() {
         }
         input={
           <>
-{/*             <SelectSearch
-              name="lapso_id"
-              label={FORM_LABELS.SECCION.LAPSO}
-              options={data.lapsos || []}
-              formik={formik}
-              valueKey="id"
-              labelKey="ano"
-            /> */}
-
             <SelectSearch
               name="pnf_id"
               label={FORM_LABELS.SECCION.PNF}

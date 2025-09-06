@@ -2,12 +2,13 @@ import { Create } from "../../components/Link";
 import { ContainerTable } from "../../components/ContainerTable";
 import { Tabla } from "../../components/Tabla";
 import { useEffect } from "react";
-import { GetAll } from "../../services/Api";
-import Alerta from "../../components/Alert";
+import Api, { GetAll } from "../../services/Api";
+import Alerta, { AlertaError } from "../../components/Alert";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import Modal, { ButtomModal } from "../../components/Modal";
 import Acciones from "../../components/Acciones";
+import { Buttom } from "../../components/Buttom";
 
 export default function Laboratorios() {
   const [loading, setLoading] = useState(true);
@@ -30,6 +31,25 @@ export default function Laboratorios() {
     // Limpiar el estado de navegacion para no mostrar el mensaje nuevamente
     window.history.replaceState({}, "");
   }, [location.state]);
+
+      const descargarPDF = async () => {
+        try {
+          const response = await Api.get("/laboratorio/pdf", {
+            responseType: "blob",
+            withCredentials: true,
+          });
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", "laboratorio.pdf");
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+        } catch (error) {
+          AlertaError("Error al descargar el PDF");
+          console.error(error);
+        }
+      };
 
   const columns = [
     { name: "ID", selector: (row, index) => index + 1, sortable: true },
@@ -90,6 +110,18 @@ export default function Laboratorios() {
       <ContainerTable
         // Titulo para la tabla
         title="LABORATORIO"
+
+        button_pdf={
+          permisos.includes("laboratorio.pdf") ?
+          (<Buttom 
+            type="button"
+            style="btn btn-danger mb-3"
+            onClick={descargarPDF}
+            title="Generar PDF"
+            text="Generar PDF"
+          />) : null
+        }
+
         // Boton para crear nuevos registros
         link={
           permisos.includes("laboratorio.crear") ? (

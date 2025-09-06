@@ -4,22 +4,32 @@ import { Create } from "../../components/Link";
 import { Tabla } from "../../components/Tabla";
 import { useLocation } from "react-router-dom";
 import Api, { GetAll } from "../../services/Api";
-import Alerta, { AlertaError } from "../../components/Alert";
+import Alerta, {
+  AlertaConfirm,
+  AlertaError,
+  AlertaLoading,
+  AlertaSuccess,
+} from "../../components/Alert";
 import Acciones from "../../components/Acciones";
+import { ButtomModal, Modal } from "../../components/Modal";
+import Swal from "sweetalert2";
+import { useAuth } from "../../context/AuthContext";
+import { Buttom } from "../../components/Buttom";
 
 export function LapsoAcademico() {
   const [loading, setLoading] = useState(true);
   const [lapsos, setLapsos] = useState([]);
   const [permisos, setPermisos] = useState([]);
   const location = useLocation();
+  const { refreshLapsos } = useAuth();
 
   useEffect(() => {
     // Leer permisos del localStorage
     const permisosLS = JSON.parse(localStorage.getItem("permissions")) || [];
     setPermisos(permisosLS);
 
-    // Mostrar la lista de PNF
-    GetAll(setLapsos, setLoading, "/lapsos");
+    cargarLapsos();
+
 
     // Motrar Alerta al registrar un nuevo PNF
     if (location.state?.message) {
@@ -29,6 +39,66 @@ export function LapsoAcademico() {
     // Limpiar el estado de navegacion para no mostrar el mensaje nuevamente
     window.history.replaceState({}, "");
   }, [location.state]);
+
+  // Función para cargar los lapsos
+  const cargarLapsos = () => {
+    GetAll(setLapsos, setLoading, "/lapsos");
+  };
+
+  // Función para cambiar el estado de un lapso
+  const toggleEstadoLapso = async (id, statusActual) => {
+    try {
+      // Mostrar confirmación
+      const confirmacion = await AlertaConfirm(
+        `¿Estás seguro de ${
+          statusActual ? "desactivar" : "activar"
+        } este lapso académico?`,
+        "Confirmar cambio de estado",
+        statusActual ? "Sí, desactivar" : "Sí, activar"
+      );
+
+      if (!confirmacion.isConfirmed) {
+        return;
+      }
+
+      // Mostrar loading
+      AlertaLoading("Cambiando estado...");
+
+      const response = await Api.put(`/lapsos/${id}/estado`);
+
+      // Cerrar loading
+      Swal.close();
+
+      if (response.data.success) {
+        // Recargar todos los lapsos para reflejar el cambio global (solo uno activo)
+        cargarLapsos(); 
+        refreshLapsos();
+
+        AlertaSuccess(
+          `Lapso ${
+            response.data.data.status ? "activado" : "desactivado"
+          } correctamente`,
+          "¡Operación exitosa!"
+        );
+      } else {
+        AlertaError("Error al cambiar el estado", "Error");
+        // Recargar para asegurar consistencia
+        cargarLapsos();
+      }
+    } catch (error) {
+      console.error("Error al cambiar el estado:", error);
+      Swal.close();
+
+      if (error.response?.data?.message) {
+        AlertaError(error.response.data.message, "Error");
+      } else {
+        AlertaError("Error al cambiar el estado del lapso", "Error");
+      }
+
+      // Recargar para asegurar consistencia
+      cargarLapsos();
+    }
+  };
 
   const descargarPDF = async () => {
     try {
@@ -60,14 +130,65 @@ export function LapsoAcademico() {
       selector: (row) => row.nombre_lapso,
     },
     {
-      name: "AÑO",
-      selector: (row) => row.ano,
+      name: "FECHA INICIO",
+      selector: (row) => new Date(row.fecha_inicio).toLocaleDateString("es-ES"),
       sortable: true,
     },
     {
-      name: "TIPO DE LAPSO",
-      selector: (row) => row.tipolapso.nombre,
+      name: "FECHA FIN",
+      selector: (row) => new Date(row.fecha_fin).toLocaleDateString("es-ES"),
       sortable: true,
+    },
+    {
+      name: "ESTADO",
+      cell: (row) => (
+        <div className="form-check form-switch">
+          <input
+            className="form-check-input"
+            type="checkbox"
+            role="switch"
+            id={`estado-lapso-${row.id}`}
+            checked={row.status === true } // Esto debe ser un booleano
+            onChange={() => toggleEstadoLapso(row.id, row.status)}
+            //disabled={!permisos.includes("lapso.editar")}
+          />
+          <label
+            className="form-check-label"
+            htmlFor={`estado-lapso-${row.id}`}
+          >
+            {row.status == true ? "ACTIVO" : "INACTIVO"}
+          </label>
+        </div>
+      ),
+      width: "150px",
+    },
+    {
+      name: "+INFO",
+      cell: (row) => (
+        <div>
+          <ButtomModal id={row.id} />
+
+          <Modal titleModal={`+INFO ${row.nombre_lapso}`} id={row.id}>
+            <p>
+              <b>AÑO: </b> {row.ano}
+            </p>
+            <p>
+              <b>TIPO DE LAPSO: </b> {row.tipolapso?.nombre || "No disponible"}
+            </p>
+            <p>
+              <b>FECHA DE INICIO: </b>{" "}
+              {new Date(row.fecha_inicio).toLocaleDateString("es-ES")}
+            </p>
+            <p>
+              <b>FECHA DE FINALIZACIÓN: </b>{" "}
+              {new Date(row.fecha_fin).toLocaleDateString("es-ES")}
+            </p>
+            <p>
+              <b>ESTADO: </b> {row.status == true ? "ACTIVO" : "INACTIVO"}
+            </p>
+          </Modal>
+        </div>
+      ),
     },
     // Mostrar columna solo si tiene al menos uno de los permisos
     ...(permisos.includes("lapso.editar") || permisos.includes("lapso.eliminar")
@@ -93,15 +214,16 @@ export function LapsoAcademico() {
       {/* Contenedor para la tablas */}
       <ContainerTable
         // Titulo para la tabla
-        title="LAPSO ACADEMICO"
+        title="LAPSO ACADÉMICO"
         button_pdf={
-          <button
-            type="button"
-            className="btn btn-danger mb-3"
+          permisos.includes("lapso.pdf") ?
+          (<Buttom 
+            type="button" 
+            style="btn btn-danger mb-3" 
             onClick={descargarPDF}
-          >
-            Generar PDF
-          </button>
+            title="Generar PDF"
+            text="Generar PDF"
+          />) : null
         }
         // Boton para crear nuevos registros
         link={

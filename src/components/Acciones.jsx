@@ -19,6 +19,11 @@ export default function Acciones({ url, urlDelete, navegar, editar = null, elimi
         cancelButtonColor: "#d33",
         confirmButtonText: "Si, realizar",
         cancelButtonText: "No, cancelar",
+        customClass: {
+        confirmButton: "btn btn-primary me-2",
+        cancelButton: "btn btn-secondary",
+        popup: 'custom-swal-popup',
+      },
       });
 
       if (result.isConfirmed) {

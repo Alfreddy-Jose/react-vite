@@ -15,6 +15,8 @@ const initialValues = {
   nombre_lapso: "",
   ano: "",
   tipo_lapso_id: "",
+  fecha_inicio: "",
+  fecha_fin: "",
 };
 
 const validationSchema = Yup.object({
@@ -31,6 +33,9 @@ const validationSchema = Yup.object({
     })
     .required("Este campo es obligatorio"),
   tipo_lapso_id: Yup.string().required("Este campo es obligatorio"),
+  fecha_inicio: Yup.date().required("Este campo es obligatorio"),
+  fecha_fin: Yup.date().required("Este campo es obligatorio"),
+
 });
 
 export function LapsoAcademicoCreate() {
@@ -107,6 +112,20 @@ export function LapsoAcademicoCreate() {
               formik={formik}
               value={nombreLapso}
               useExternalValue={true}
+            />
+
+            <InputLabel 
+              label={FORM_LABELS.LAPSO_ACADEMICO.START_DATE}
+              type='date'
+              name="fecha_inicio"
+              formik={formik}
+            />
+
+            <InputLabel 
+              label={FORM_LABELS.LAPSO_ACADEMICO.END_DATE}
+              type='date'
+              name="fecha_fin"
+              formik={formik}
             />
           </>
         }

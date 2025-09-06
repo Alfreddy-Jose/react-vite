@@ -110,3 +110,34 @@
 .landing-footer a:hover {
     text-decoration: underline;
 }
+
+.div_img {
+    width: 500px;
+    height: 300;
+    background-size: 100% 100%;
+    border-radius: 7px;
+    animation: animate 10s linear infinite;
+    box-shadow: 
+        0px 20px 20px 10px rgb(0, 0, 0);
+}
+@keyframes animate {
+    0% {
+        background-image: url(../img/universitarios.jpg);
+    }
+    
+    25% {
+        background-image: url(../img/icons_warning.png);
+    }
+
+    50% {
+        background-image: url(../img/logo_sistema.svg);
+    }
+
+    75% {
+        background-image: url(../img/404.svg);
+    }
+
+    100% {
+        background-image: url(../img/PNF.svg);
+    }
+}

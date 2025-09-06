@@ -12,14 +12,13 @@ const LapsoSelector = () => {
   return (
     <select
       id="lapso"
-      className="form-select"
+      className="selectLapso"
       aria-label="Selección de lapso académico"
       value={lapsoActual?.id || ""}
       onChange={handleChange}
-      disabled={lapsos.length === 0}
     >
       <option value="" selected disabled className="text-center">
-        {lapsos.length === 0 ? "CARGANDO..." : "SELECCIONE UN LAPSO"}
+        {lapsos.length === 0 ? "NO HAY LAPSOS" : "SELECCIONE UN LAPSO"}
       </option>
       {lapsos.map((lapso) => (
         <option key={lapso.id} value={lapso.id} className="text-center">

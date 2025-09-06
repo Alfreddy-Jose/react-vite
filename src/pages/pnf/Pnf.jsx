@@ -7,7 +7,7 @@ import Alerta, { AlertaError } from "../../components/Alert";
 import { Modal, ButtomModal } from "../../components/Modal";
 import { Tabla } from "../../components/Tabla";
 import Acciones from "../../components/Acciones";
-
+import { Buttom } from "../../components/Buttom";
 
 export function Pnf() {
   const [pnf, setPnf] = useState([]);
@@ -32,24 +32,24 @@ export function Pnf() {
     window.history.replaceState({}, "");
   }, [location.state]);
 
-    const descargarPDF = async () => {
-      try {
-        const response = await Api.get(
-          "/pnf/pdf",
-          { responseType: "blob", withCredentials: true, }
-        );
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", "pnfs.pdf");
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-      } catch (error) {
-        AlertaError("Error al descargar el PDF");
-        console.error(error);
-      }
-    };
+  const descargarPDF = async () => {
+    try {
+      const response = await Api.get("/pnf/pdf", {
+        responseType: "blob",
+        withCredentials: true,
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "pnfs.pdf");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      AlertaError("Error al descargar el PDF");
+      console.error(error);
+    }
+  };
 
   const columns = [
     {
@@ -116,18 +116,19 @@ export function Pnf() {
       <ContainerTable
         // Titulo para la tabla PNF
         title="PNF"
-        button_pdf={            
-          <button type="button" className="btn btn-danger mb-3" onClick={descargarPDF}>
-            Generar PDF
-          </button>
+        button_pdf={
+          permisos.includes("pnf.pdf") ? (
+          <Buttom
+            type="button"
+            style="btn btn-danger mb-3"
+            onClick={descargarPDF}
+            title="Generar PDF"
+            text="Generar PDF"
+          />) : null
         }
         // Boton para crear nuevos registros
         link={
-          permisos.includes("pnf.crear") ? (
-            <Create
-              path="/pnf/create"
-            />
-          ) : null
+          permisos.includes("pnf.crear") ? <Create path="/pnf/create" /> : null
         }
         isLoading={loading}
         // Tabla

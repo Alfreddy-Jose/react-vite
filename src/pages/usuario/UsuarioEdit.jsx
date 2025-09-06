@@ -124,7 +124,7 @@ function UsuarioEdit() {
 
               <Buttom
                 type="button"
-                style="btn-danger"
+                style="btn-danger ms-1"
                 title="Cancelar"
                 text="Cancelar"
                 onClick={() => formik.resetForm()}

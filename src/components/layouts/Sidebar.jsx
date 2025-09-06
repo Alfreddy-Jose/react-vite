@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import logo from "../../img/PNF.png";
+import logo from "../../img/PNF.svg";
 
 export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
   const location = useLocation(); // Hook para obtener la ruta actual
@@ -182,16 +182,6 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                   </Link>
                 ) : null}
               </li>
-              {/* 
-              <li className="nav-item">
-                {permisos.includes("malla.ver") ? (
-                  <a href="#">
-                    <i className="fas fa-project-diagram"></i>
-                    <p>Malla del PNF</p>
-                  </a>
-                ) : null}
-              </li>
- */}
               <li className="nav-item">
                 {permisos.includes("gestionar persona") ? (
                   <a data-bs-toggle="collapse" href="#persona">

@@ -10,6 +10,7 @@ import Modal, { ButtomModal } from "../../components/Modal";
 import { CardCheckbox } from "../../components/CardCheckbox";
 import { useFormik } from "formik";
 import Spinner from "../../components/Spinner";
+import { Buttom } from "../../components/Buttom";
 
 export function Sede() {
   const [sedes, setSedes] = useState([]);
@@ -127,13 +128,14 @@ export function Sede() {
       <ContainerTable
         title="SEDES"
         button_pdf={
-          <button
+          permisos.includes("sede.pdf") ?
+          (<Buttom
             type="button"
-            className="btn btn-danger mb-3"
+            style="btn btn-danger mb-3"
             onClick={descargarPDF}
-          >
-            Generar PDF
-          </button>
+            title="Generar PDF"
+            text="Generar PDF"
+          />) : null
         }
         link={
           permisos.includes("sede.crear") ? (

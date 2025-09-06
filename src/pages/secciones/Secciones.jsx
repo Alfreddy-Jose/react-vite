@@ -119,7 +119,7 @@ export function Secciones() {
       {/* Contenedor para la tablas */}
       <ContainerTable
         header_parametros={
-          <SeccionParametros buscarSecciones={buscarSecciones} />
+          <SeccionParametros buscarSecciones={buscarSecciones} permisos={permisos } />
         }
         // Titulo para la tabla
         title="SECCIONES"
@@ -138,7 +138,7 @@ export function Secciones() {
   );
 }
 
-export function SeccionParametros({ buscarSecciones }) {
+export function SeccionParametros({ buscarSecciones, permisos }) {
   const [opciones, setOpciones] = useState({});
   const { lapsoActual } = useAuth();
 
@@ -153,7 +153,6 @@ export function SeccionParametros({ buscarSecciones }) {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues,
-    //validationSchema,
     onSubmit: () => {},
   });
 
@@ -252,13 +251,14 @@ export function SeccionParametros({ buscarSecciones }) {
                 onClick={() => formik.resetForm()}
                 style="btn-secondary me-2"
               />
-              <Buttom
+              { permisos.includes("seccion.pdf") ?
+              (<Buttom
                 type="button"
                 text="Generar PDF"
                 title="PDF"
                 style="btn-danger me-2"
                 onClick={handleGenerarPDF}
-              />
+              />) : null }
             </div>
           </div>
         </form>

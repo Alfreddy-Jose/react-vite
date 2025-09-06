@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { ContainerTable } from "../../components/ContainerTable";
 import { Create } from "../../components/Link";
 import { useLocation } from "react-router-dom";
-import { GetAll } from "../../services/Api";
-import Alerta from "../../components/Alert";
+import Api, { GetAll } from "../../services/Api";
+import Alerta, { AlertaError } from "../../components/Alert";
 import { Tabla } from "../../components/Tabla";
 import Acciones from "../../components/Acciones";
+import { Buttom } from "../../components/Buttom";
 
 export function TipoMatricula() {
   const [loading, setLoading] = useState(true);
@@ -29,6 +30,25 @@ export function TipoMatricula() {
     // Limpiar el estado de navegacion para no mostrar el mensaje nuevamente
     window.history.replaceState({}, "");
   }, [location.state]);
+
+  const descargarPDF = async () => {
+    try {
+      const response = await Api.get("/matricula/pdf", {
+        responseType: "blob",
+        withCredentials: true,
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "tipoMatricula.pdf");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      AlertaError("Error al descargar el PDF");
+      console.error(error);
+    }
+  };
 
   // Definir las columnas de la tabla
   const columns = [
@@ -72,6 +92,17 @@ export function TipoMatricula() {
       <ContainerTable
         // Titulo para la tabla
         title="TIPO MATRICULA"
+
+        button_pdf={
+          permisos.includes("Tipo Matricula.pdf") ?
+          (<Buttom
+            type="button"
+            style="btn btn-danger mb-3"
+            onClick={descargarPDF}
+            title="Generar PDF"
+            text="Generar PDF"
+          />) : null
+        }
         // Boton para crear nuevos registros
         link={
           permisos.includes("Tipo Matricula.crear") ? (

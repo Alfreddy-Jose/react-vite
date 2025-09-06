@@ -1,6 +1,6 @@
 import { useAuth } from "../../context/AuthContext";
 import { LogoutButton } from "../Logout";
-import logo from "../../img/PNF.png";
+import logo from "../../img/PNF.svg";
 import { Link } from "react-router-dom";
 import LapsoSelector from "../LapsoSelect";
 

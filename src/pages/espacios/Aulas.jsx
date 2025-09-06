@@ -3,10 +3,11 @@ import { ContainerTable } from "../../components/ContainerTable";
 import { Create } from "../../components/Link";
 import { Tabla } from "../../components/Tabla";
 import { useEffect, useState } from "react";
-import { GetAll } from "../../services/Api";
-import Alerta from "../../components/Alert";
+import Api, { GetAll } from "../../services/Api";
+import Alerta, { AlertaError } from "../../components/Alert";
 import Acciones from "../../components/Acciones";
 import { Modal, ButtomModal } from "../../components/Modal";
+import { Buttom } from "../../components/Buttom";
 
 export default function Aulas() {
   const [loading, setLoading] = useState(true);
@@ -29,6 +30,25 @@ export default function Aulas() {
     // Limpiar el estado de navegacion para no mostrar el mensaje nuevamente
     window.history.replaceState({}, "");
   }, [location.state]);
+
+    const descargarPDF = async () => {
+      try {
+        const response = await Api.get("/aula/pdf", {
+          responseType: "blob",
+          withCredentials: true,
+        });
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "aula.pdf");
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      } catch (error) {
+        AlertaError("Error al descargar el PDF");
+        console.error(error);
+      }
+    };
 
   // Definir las columnas de la tabla
   const columns = [
@@ -86,6 +106,18 @@ export default function Aulas() {
       <ContainerTable
         // Titulo para la tabla
         title="AULAS"
+        // Boton para generar PDF
+
+        button_pdf={
+          permisos.includes("aula.pdf") ?
+          (<Buttom
+            type="button"
+            style="btn btn-danger mb-3"
+            onClick={descargarPDF}
+            title="Generar PDF"
+            text="Generar PDF"
+          />) : null
+        }
         // Boton para crear nuevos registros
         link={
           permisos.includes("aula.crear") ? (

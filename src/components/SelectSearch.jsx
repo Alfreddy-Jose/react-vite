@@ -19,21 +19,22 @@ function SelectSearch({
     ...option,
   }));
 
-  // Obtener el valor seleccionado actual
-/*     const selectedOption = selectOptions.find(
-    (opt) => opt.value === formik.values[name]
-  ) || null; */
-
-  // Manejo de valores para modo simple/múltiple
+  // Manejo seguro de valores para modo simple/múltiple
   const getSelectedValues = () => {
+    const formikValue = formik.values[name];
+    
     if (isMulti) {
+      // Para multi-select: asegurar que formikValue sea un array
+      if (!Array.isArray(formikValue)) {
+        return [];
+      }
       return selectOptions.filter((opt) =>
-        formik.values[name]?.includes(opt.value)
+        formikValue.includes(opt.value)
       );
+    } else {
+      // Para single-select
+      return selectOptions.find((opt) => opt.value == formikValue) || null;
     }
-    return (
-      selectOptions.find((opt) => opt.value === formik.values[name]) || null
-    );
   };
 
   const handleChange = (selected) => {

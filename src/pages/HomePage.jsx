@@ -47,6 +47,7 @@ function HomePage() {
                   }}
                 />
               </div>
+
             </div>
             <div className="col-lg-6 text-center text-lg-start">
               <h2 className="fw-bold mb-4">

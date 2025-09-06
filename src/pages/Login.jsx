@@ -1,6 +1,6 @@
 import { useFormik } from "formik";
 import styles from "../styles/login.module.css";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation /*, useNavigate  */} from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Api from "../services/Api";
 import { AlertaError } from "../components/Alert";
@@ -11,12 +11,11 @@ import Swal from "sweetalert2";
 export function Login() {
   const { signIn } = useAuth();
   const location = useLocation();
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   const { passwordType, togglePasswordVisibility } = useTogglePassword();
   const from = location.state?.from?.pathname || "/panel";
 
   const onSubmit = async (values) => {
-    let cerrar = true;
     try {
       // obtener token Csrf
       await getCsrfToken();
@@ -35,28 +34,25 @@ export function Login() {
 
       // Si la autenticación es exitosa, guardar el usuario y redirigir
       if (response.status === 200) {
-        signIn(response.data); // Guardar el usuario en el contexto y en localStorage
-        navigate(
-          from,
-          { state: { message: response.data.message } },
-          { replace: true }
-        );
-
-        window.location.reload(); // refresca la página
+        signIn(response.data);
+        Swal.close();
+        
+        // Usar navigate en lugar de window.location.replace
+/*         navigate(from, { 
+          replace: true,
+          state: { message: response.data.message } 
+        }); */
+        window.location.replace(from);
       }
     } catch (err) {
+      Swal.close();
+      
       // Manejar el error de autenticación
       if (err.response && err.response.status === 401) {
         AlertaError("Credenciales incorrectas");
       } else {
         console.error("Error inesperado:", err);
         AlertaError("Ocurrió un error inesperado. Inténtalo de nuevo.");
-      }
-      cerrar = false; // Cambia a false si hay error
-    } finally {
-      // cerrar loader en caso de exito
-      if (cerrar) {
-        Swal.close();
       }
     }
   };
@@ -74,7 +70,12 @@ export function Login() {
       <div className={styles.img}>
         <div className={styles.centrar}>
           <div className={styles.contenedor_login}>
-            <form onSubmit={formik.handleSubmit}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                formik.handleSubmit(e);
+              }}
+            >
               <h1>Iniciar Sesión</h1>
 
               <div className={styles.input_box}>

@@ -7,6 +7,7 @@ import Api, { GetAll } from "../../services/Api";
 import Alerta, { AlertaError } from "../../components/Alert";
 import Acciones from "../../components/Acciones";
 import { Modal, ButtomModal } from "../../components/Modal";
+import { Buttom } from "../../components/Buttom";
 
 function UnidadCurricular() {
   const [loading, setLoading] = useState(true);
@@ -34,10 +35,10 @@ function UnidadCurricular() {
   // Descargar PDF de unidades curriculares
   const descargarPDF = async () => {
     try {
-      const response = await Api.get(
-        "/unidad_curricular/pdf",
-        { responseType: "blob", withCredentials: true, }
-      );
+      const response = await Api.get("/unidad_curricular/pdf", {
+        responseType: "blob",
+        withCredentials: true,
+      });
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
@@ -89,12 +90,19 @@ function UnidadCurricular() {
               <b>PERÍODO: </b>
               {row.periodo}
             </p>
-            <p> 
-              <b>TRIMESTRE: </b> {row.trimestre.nombre}
-            </p>
+            {/* mostrar trimestres si es uno o mas */}
+            {row.trimestres && (
               <p>
-                <b>DESCRIPCIÓN: </b> {row.descripcion ? row.descripcion : "SIN DESCRIPCIÓN"}
+                <b>TRIMESTRES: </b>
+                {row.trimestres.map((trimestre) => (
+                  <span key={trimestre.id}>{trimestre.nombre}, </span>
+                ))}
               </p>
+            )}
+            <p>
+              <b>DESCRIPCIÓN: </b>{" "}
+              {row.descripcion ? row.descripcion : "SIN DESCRIPCIÓN"}
+            </p>
           </Modal>
         </div>
       ),
@@ -125,10 +133,15 @@ function UnidadCurricular() {
       <ContainerTable
         // Titulo para la tabla
         title="UNIDADES CURRICULARES"
-        button_pdf={            
-          <button type="button" className="btn btn-danger mb-3" onClick={descargarPDF}>
-            Generar PDF
-          </button>
+        button_pdf={
+          permisos.includes("unidad.pdf") ?
+          (<Buttom
+            type="button"
+            style="btn btn-danger mb-3"
+            onClick={descargarPDF}
+            title="Generar PDF"
+            text="Generar PDF"
+          />) : null
         }
         // Boton para crear nuevos registros
         link={

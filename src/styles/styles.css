@@ -100,3 +100,43 @@
 svg[data-prefix="fas"] {
     flex-shrink: 0;
 }
+
+/* Estilo para el select */
+.selectLapso,
+::picker(select) {
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+/* Estilos para las aleras de Swallalert2 */
+.custom-swal-popup {
+    border-radius: 12px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+    border: 1px solid #dee2e6 !important;
+}
+
+/* Animaciones */
+@keyframes slideInFromTop {
+    0% {
+        transform: translateY(-100px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.swal2-show {
+    animation: slideInFromTop 0.3s ease-out !important;
+}
+

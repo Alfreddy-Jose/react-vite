@@ -15,6 +15,7 @@ import Alerta, { AlertaConfirm, AlertaError } from "../../components/Alert";
 import Api from "../../services/Api";
 import SelectControl from "../../components/SelectDependiente";
 import { ContainerIput } from "../../components/ContainerInput";
+import { Link } from "react-router-dom";
 
 function Evento({ evento, onResizeStart, isResizing, onEditar, onEliminar }) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
@@ -557,6 +558,7 @@ export default function Calendar() {
             bloqueNum + duracionEvento > e.bloque
         );
 
+
         if (!haySolapamiento) {
           const nuevosEventos = prevEventos.map((e) =>
             e.id === active.id ? { ...e, dia: newDia, bloque: bloqueNum } : e
@@ -648,16 +650,19 @@ export default function Calendar() {
           return;
         }
 
-        // Validar horas de la materia al redimensionar
-        // Buscar el id de la materia del evento original
-        const materiaId = eventoOriginal.materias?.value || eventoOriginal.materia || eventoOriginal.materia_id;
-        // Sumar la duración de todos los eventos de esa materia, excepto el actual
+        const materiaId =
+          eventoOriginal.materias?.value ||
+          eventoOriginal.materia ||
+          eventoOriginal.materia_id;
+
         const horasMateria = materiaSeleccionada?.horas || 0;
         const horasUsadasMateria = eventos
           .filter(
             (e) =>
               e.id !== resizingEventId &&
-              ((e.materias && e.materias.value === materiaId) || e.materia === materiaId || e.materia_id === materiaId)
+              ((e.materias && e.materias.value === materiaId) ||
+                e.materia === materiaId ||
+                e.materia_id === materiaId)
           )
           .reduce((acc, e) => acc + (e.duracion || 1), 0);
         if (horasUsadasMateria + duracionNueva > horasMateria) {
@@ -670,7 +675,9 @@ export default function Calendar() {
             )
           );
           if (resizeData.current.elemento) {
-            resizeData.current.elemento.style.height = `${duracionOriginal * 60 - 4}px`;
+            resizeData.current.elemento.style.height = `${
+              duracionOriginal * 60 - 4
+            }px`;
           }
           setIsResizing(false);
           setResizingEventId(null);
@@ -764,7 +771,13 @@ export default function Calendar() {
       isMounted = false;
       controller.abort();
     };
-  }, [isResizing, resizingEventId, eventos, actualizarEventoEnBD, materiaSeleccionada]);
+  }, [
+    isResizing,
+    resizingEventId,
+    eventos,
+    actualizarEventoEnBD,
+    materiaSeleccionada,
+  ]);
 
   const handleResizeStart = useCallback(
     (eventoId, startY, element) => {
@@ -820,18 +833,41 @@ export default function Calendar() {
       AlertaError("¡Ya existe un evento en ese rango de bloques!");
       return;
     }
+    console.log("Docente seleccionado " + docenteSeleccionado.id);
+    console.log(" Materia seleccionada " + nuevoEvento.materia);
+    console.log("Horas de la materia seleccionada " + materiaSeleccionada?.horas);
+    console.log("Duracion " + duracionNum);
+    console.log("Docente seleccionado " + nuevoEvento?.docente.value);
+    
+    console.log(materiaSeleccionada?.horas);
+    console.log(eventos.materias === nuevoEvento.materia.value);
+    console.log(nuevoEvento.materia.value);
+    console.log(eventos.materias);
+    
     
     // Calcular la suma de horas ya usadas para la materia
     const horasUsadasMateria = eventos
-      .filter((e) => e.materias && nuevoEvento.materia && e.materias.value === nuevoEvento.materia.value)
+      .filter(
+        (e) =>
+          e.materias &&
+          nuevoEvento.materia &&
+          e.materias.value === nuevoEvento.materia.value
+      )
       .reduce((acc, e) => acc + (e.duracion || 1), 0);
     const horasMateria = materiaSeleccionada?.horas || 0;
-    console.log(`Horas usadas de la materia: ${nuevoEvento.materia.label} => ${horasUsadasMateria}`);
-    console.log(`Horas usadas con el nuevo evento: ${horasUsadasMateria + duracionNum} de ${horasMateria} horas semanales de la materia`);
+    console.log(
+      `Horas usadas de la materia: ${nuevoEvento.materia.label} => ${horasUsadasMateria}`
+    );
+    console.log(
+      `Horas usadas con el nuevo evento: ${
+        horasUsadasMateria + duracionNum
+      } de ${horasMateria} horas semanales de la materia`
+    );
     if (horasUsadasMateria + duracionNum > horasMateria) {
       AlertaError("¡Las horas semanales de la materia se agotaron!");
       return;
-    }    
+    }
+    console.log("Las horas dedicadas del docente son "+docenteSeleccionado.horas_dedicacion);
     
     if (docenteSeleccionado.horas_dedicacion - duracionNum <= 0) {
       const respuesta = AlertaConfirm(
@@ -867,6 +903,8 @@ export default function Calendar() {
       bloque_id: parseInt(nuevoEvento.bloque.value),
       duracion: nuevoEvento.duracion,
     };
+    console.log(payload.docente_id);
+
     try {
       // Enviar datos al backend
       const response = await Api.post("/eventos", payload);
@@ -874,7 +912,13 @@ export default function Calendar() {
         `/docente_horas/${payload.docente_id}?horas_dedicacion=${-duracionNum}`
       );
 
-      const eventoDesdeBackend = response.data.horario.id;
+      let eventoDesdeBackend = null;
+      if (response.data && response.data.clase && response.data.clase.id) {
+        eventoDesdeBackend = response.data.clase.id;
+      } else {
+        AlertaError("La respuesta del backend no contiene el id del evento. Verifica la estructura de la respuesta.");
+        return;
+      }
 
       setEventos([
         ...eventos,
@@ -896,6 +940,12 @@ export default function Calendar() {
       ]);
     } catch (error) {
       AlertaError("Error al guardar el evento" + " " + error);
+      //mostrar error detallado en consola
+      console.log(
+        "Error detalles:",
+        error.response ? error.response.data : error.message
+      );
+      console.log(error);
     }
 
     setNuevoEvento({
@@ -903,12 +953,11 @@ export default function Calendar() {
       pnf: null,
       trayecto: null,
       trimestre: null,
-      materia: null,
       aula: null,
       dia: null,
       bloque: null,
       docente: null,
-      texto: null,
+      materia: null,
       duracion: 1,
     });
   };
@@ -953,7 +1002,7 @@ export default function Calendar() {
                     } catch (error) {
                       AlertaError("Error al cargar las aulas");
                       console.log(error);
-                    }
+                    }                    
                   }
                 }}
                 onValueChange={async (option) => {
@@ -1101,6 +1150,10 @@ export default function Calendar() {
                     ) || null
                   );
                   setNuevoEvento((prev) => ({ ...prev, docente: option }));
+                  console.log(docenteSeleccionado.id);
+                  console.log(nuevoEvento?.docente.value);
+                  
+                  
                 }}
                 styles={{
                   option: (provided, state) => ({
@@ -1129,6 +1182,7 @@ export default function Calendar() {
                       null
                   );
                   setNuevoEvento((prev) => ({ ...prev, aula: option }));
+                  console.log(aulaSeleccionada);
                 }}
               />
               <SelectControl
@@ -1158,7 +1212,7 @@ export default function Calendar() {
                   name="duracion"
                   min={1}
                   max={
-                    /* materiaSeleccionada?.horas ? materiaSeleccionada.horas : */ 15
+                    materiaSeleccionada?.horas ? materiaSeleccionada.horas : 15
                   }
                   value={nuevoEvento.duracion}
                   onChange={handleInputChange}
@@ -1224,6 +1278,18 @@ export default function Calendar() {
             </tr>
           </thead>
           <tbody>
+            {/* verificar si existen bloques sino mostrar un mensaje que lo diga */}
+            {bloques.length === 0 && (
+              <tr>
+                <td colSpan={dias.length + 1}>
+                  No hay bloques disponibles. Por favor,&nbsp;&nbsp;
+                  <Link to="/turnos">
+                    <i className="fas fa-history"></i>
+                    <p className="d-inline"> Agregar Turnos.</p>
+                  </Link>
+                </td>
+              </tr>
+            )}
             {bloques.map((bloque) => (
               <tr key={bloque.id} style={{ height: "60px" }}>
                 <td>{bloque.rango}</td>
