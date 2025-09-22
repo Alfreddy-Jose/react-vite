@@ -53,7 +53,7 @@ export default function Aulas() {
   // Definir las columnas de la tabla
   const columns = [
     { name: "ID", selector: (row, index) => index + 1, sortable: true },
-    { name: "CODIGO", selector: (row) => row.codigo, sortable: true },
+    { name: "CÓDIGO", selector: (row) => row.codigo, sortable: true },
     { name: "NOMBRE", selector: (row) => row.nombre_aula, sortable: true },
     {
       name: "+INFO",
@@ -63,7 +63,7 @@ export default function Aulas() {
 
           <Modal titleModal={`+INFO ${row.nombre_aula}`} id={row.id}>
             <p>
-              <b>CODIGO: </b> {row.codigo}
+              <b>CÓDIGO: </b> {row.codigo}
             </p>
             <p>
               <b>NOMBRE: </b> {row.nombre_aula}

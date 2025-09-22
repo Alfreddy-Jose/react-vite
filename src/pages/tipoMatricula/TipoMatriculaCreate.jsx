@@ -51,7 +51,7 @@ export function TipoMatriculaCreate() {
   return (
     <form onSubmit={formik.handleSubmit}>
       <ContainerIput
-        title="NUEVO TIPO DE MATRICULA"
+        title="NUEVO TIPO DE MATRÍCULA"
         link={
           <Create
             path="/matricula"
@@ -76,7 +76,7 @@ export function TipoMatriculaCreate() {
               label={FORM_LABELS.TIPO_MATRICULA.NAME}
               type="text"
               name="nombre"
-              placeholder="NOMBRE MATRICULA"
+              placeholder="NOMBRE MATRÍCULA"
               formik={formik}
             />
           </>

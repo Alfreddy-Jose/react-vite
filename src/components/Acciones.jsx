@@ -3,7 +3,7 @@ import Swal from "sweetalert2";
 import Api from "../services/Api";
 import { AlertaError } from "./Alert";
 
-export default function Acciones({ url, urlDelete, navegar, editar = null, eliminar = null }) {
+export default function Acciones({ url, urlDelete, navegar, editar = null, eliminar = null}) {
   const navegation = useNavigate();
   // Leer permisos del localStorage
   const permisos = JSON.parse(localStorage.getItem("permissions")) || [];
@@ -11,7 +11,7 @@ export default function Acciones({ url, urlDelete, navegar, editar = null, elimi
   const AlertDelete = async () => {
     try {
       const result = await Swal.fire({
-        title: "¿Estas seguro?",
+        title: "¿Estás seguro?",
         text: "Quieres realizar la acción solicitada",
         icon: "question",
         showCancelButton: true,
@@ -48,12 +48,12 @@ export default function Acciones({ url, urlDelete, navegar, editar = null, elimi
 
   return (
     <div className="d-flex justify-content-center aling-content-center">
-      {permisos.includes(editar) ? (
+      {/* {permisos.includes(editar) ? ( */}
         <Link className="btn traslation btn-primary" to={url} title="Editar">
           <i className="far fa-edit"></i>
         </Link>
-      ) : null}
-      {permisos.includes(eliminar) ? (
+      {/* ) : null} */}
+      {/* {permisos.includes(eliminar) ? ( */}
         <button
           title="Eliminar"
           className="btn traslation btn-danger ms-1"
@@ -61,7 +61,7 @@ export default function Acciones({ url, urlDelete, navegar, editar = null, elimi
         >
           <i className="far fa-trash-alt"></i>
         </button>
-      ) : null}
+      {/* ) : null} */}
     </div>
   );
 }

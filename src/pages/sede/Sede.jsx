@@ -82,7 +82,8 @@ export function Sede() {
               <b>DIRECCIÓN: </b> {row.direccion}
             </p>
             <p>
-              <b>MUNICIPIO: </b> {row.municipio}
+              {/* Mostrar municipio en mayúsculas */}
+              <b>MUNICIPIO: </b> { row.municipio.municipio.toUpperCase()}
             </p>
           </Modal>
         </div>

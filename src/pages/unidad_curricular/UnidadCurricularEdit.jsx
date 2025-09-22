@@ -10,6 +10,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import SelectSearch from "../../components/SelectSearch";
 import Spinner from "../../components/Spinner";
+import { TextAreaLabel } from "../../components/TextAreaLabel";
 
 // Iniciando variables
 const initialValues = {
@@ -348,7 +349,7 @@ function UnidadCurricularEdit() {
               <SelectSearch
                 name="trimestre_id"
                 options={trimestres}
-                label="TRIMESTRE"
+                label={FORM_LABELS.UNIDAD_CURRICULAR.TRIMESTRE_ID}
                 formik={formik}
                 isMulti={isTrimestreMulti}
                 disabled={
@@ -368,13 +369,13 @@ function UnidadCurricularEdit() {
                     : "SELECCIONE UN TRIMESTRE"
                 }
               />
-              <InputLabel
+              <TextAreaLabel
                 label={FORM_LABELS.UNIDAD_CURRICULAR.DESCRIPCION}
-                type="text"
                 name="descripcion"
-                placeholder="DESCRIPCIÓN"
+                placeholder="UNIDAD CURRICULAR SOBRE ..."
                 formik={formik}
-              />
+                rows={3}
+              />  
             </>
           }
           buttom={

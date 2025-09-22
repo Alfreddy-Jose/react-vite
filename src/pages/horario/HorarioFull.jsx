@@ -195,21 +195,50 @@ function Celda({
   );
 }
 
-export default function Calendar() {
+export default function Calendar(props) {
   const [bloques, setBloques] = useState([]);
   const [eventoEditando, setEventoEditando] = useState(null);
   const [mostrarModal, setMostrarModal] = useState(false);
+  const { horarioId } = props;
+  const [todosLosEventos, setTodosLosEventos] = useState([]);
+  const [eventos, setEventos] = useState([]);
 
-  useEffect(() => {
-    obtenerBloques();
-    cargarHorarios();
-  }, []);
+  // cargar todas las clases
+  const todasLasClases = async () => {
+    try {
+      const response = await Api.get(`/clases`);
+      const eventoTodos = response.data;
+      // Formatear clases para usar luego
+      const clasesFormateados = eventoTodos.map((clase) => ({
+        id: clase.id.toString(),
+        dia: clase.dia,
+        bloque: clase.bloque_id,
+        duracion: clase.duracion,
+        materias: {
+          value: clase.unidad_curricular_id,
+          label: clase.unidad_curricular.nombre,
+        },
+        aula: { value: clase.espacio_id, label: clase.espacio.nombre_aula },
+        docente: {
+          value: clase.docente_id,
+          label:
+            clase.docente.persona.nombre + " " + clase.docente.persona.apellido,
+        },
+      }));
+      setTodosLosEventos(clasesFormateados);
+    } catch (error) {
+      AlertaError("Error al cargar todas las Clases en general " + " " + error);
+      console.error(error);
+    }
+  };
 
   // Al cargar el componente
-  const cargarHorarios = async () => {
+  const cargarClases = async () => {
     try {
-      const response = await Api.get("/eventos");
-      const eventosFormateados = response.data.map((evento) => ({
+      const response = await Api.get(`/horarios/${horarioId}/clases`);
+      const evento = response.data;
+
+      const eventosFormateados = evento.map((evento) => ({
         id: evento.id.toString(),
         dia: evento.dia,
         bloque: evento.bloque_id,
@@ -245,6 +274,14 @@ export default function Calendar() {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    if (horarioId) {
+      obtenerBloques();
+      cargarClases();
+      todasLasClases();
+    }
+  }, [horarioId]);
 
   const exportarPDF = async () => {
     try {
@@ -433,7 +470,7 @@ export default function Calendar() {
         duracion: eventoActualizado.duracion,
       };
 
-      const response = await Api.put(`/evento/${eventoId}`, payload);
+      const response = await Api.put(`/clase/${eventoId}`, payload);
     } catch (error) {
       if (error.response) {
         console.error(
@@ -452,8 +489,6 @@ export default function Calendar() {
       }
     }
   }, []);
-
-  const [eventos, setEventos] = useState([]);
 
   // Adaptar datos para react-select
   const sedesOptions = sedes.map((s) => ({
@@ -557,7 +592,6 @@ export default function Calendar() {
             bloqueNum < e.bloque + e.duracion &&
             bloqueNum + duracionEvento > e.bloque
         );
-
 
         if (!haySolapamiento) {
           const nuevosEventos = prevEventos.map((e) =>
@@ -830,29 +864,80 @@ export default function Calendar() {
         bloqueNum + duracionNum > e.bloque
     );
     if (haySolapamiento) {
-      AlertaError("¡Ya existe un evento en ese rango de bloques!");
+      AlertaError("¡Ya existe una clase en ese rango de bloques!");
       return;
     }
+
+    // evitar solapamiento de docentes
+    const haySolaplamientoDocente = todosLosEventos.some(
+      (e) =>
+        e.docente.value === nuevoEvento.docente.value &&
+        e.dia === nuevoEvento.dia.value &&
+        bloqueNum < e.bloque + e.duracion &&
+        bloqueNum + duracionNum > e.bloque
+    );
+    if (haySolaplamientoDocente) {
+      AlertaError(
+        "¡El docente ya tiene una clase en ese rango de bloques en otro horario!"
+      );
+      return;
+    }
+
+    //evitar solapamiento de aulas
+    const haySolapamientoAula = todosLosEventos.some(
+      (e) =>
+        e.aula.value === nuevoEvento.aula.value &&
+        e.dia === nuevoEvento.dia.value &&
+        bloqueNum < e.bloque + e.duracion &&
+        bloqueNum + duracionNum > e.bloque
+    );
+    if (haySolapamientoAula) {
+      AlertaError(
+        "¡El aula ya tiene una clase en ese rango de bloques en otro horario!"
+      );
+      return;
+    }
+
     console.log("Docente seleccionado " + docenteSeleccionado.id);
-    console.log(" Materia seleccionada " + nuevoEvento.materia);
-    console.log("Horas de la materia seleccionada " + materiaSeleccionada?.horas);
+    console.log("Materia seleccionada " + nuevoEvento.materia);
+    console.log(
+      "Horas de la materia seleccionada " + materiaSeleccionada?.horas
+    );
     console.log("Duracion " + duracionNum);
     console.log("Docente seleccionado " + nuevoEvento?.docente.value);
-    
+
     console.log(materiaSeleccionada?.horas);
-    console.log(eventos.materias === nuevoEvento.materia.value);
+    const hyCoincidencia = eventos.some(
+      (e) => e.materias?.value === nuevoEvento.materia.value
+    );
+    console.log(hyCoincidencia);
+
+
     console.log(nuevoEvento.materia.value);
-    console.log(eventos.materias);
-    
-    
+
     // Calcular la suma de horas ya usadas para la materia
+    console.log("Filtrando eventos...");
+    console.log(
+      "Valor de nuevoEvento.materia.value:",
+      nuevoEvento.materia.value
+    );
+    console.log("Valores de e.materias?.value en eventos:");
+    eventos.forEach((e) => {
+      console.log(e.materias?.value);
+    });
+    console.log("Valores de e.duracion en eventos:");
+    eventos.forEach((e) => {
+      console.log(e.duracion);
+    });
+    console.log("valor de materiaSeleccionada?.horas:", materiaSeleccionada?.horas);
+    
     const horasUsadasMateria = eventos
-      .filter(
-        (e) =>
-          e.materias &&
-          nuevoEvento.materia &&
-          e.materias.value === nuevoEvento.materia.value
-      )
+      .filter((e) => {
+        e.materias?.value &&
+          nuevoEvento.materia.value &&
+          e.materias?.value === nuevoEvento.materia.value;
+        return e.materias?.value === nuevoEvento.materia.value;
+      })
       .reduce((acc, e) => acc + (e.duracion || 1), 0);
     const horasMateria = materiaSeleccionada?.horas || 0;
     console.log(
@@ -867,9 +952,16 @@ export default function Calendar() {
       AlertaError("¡Las horas semanales de la materia se agotaron!");
       return;
     }
-    console.log("Las horas dedicadas del docente son "+docenteSeleccionado.horas_dedicacion);
-    
-    if (docenteSeleccionado.horas_dedicacion - duracionNum <= 0) {
+    console.log(
+      "Las horas dedicadas del docente son " +
+        docenteSeleccionado.horas_dedicacion
+    );
+    console.log(
+      "Horas del docente antes de agregar el evento " +
+        docenteSeleccionado.horas_dedicacion
+    );
+
+    if (docenteSeleccionado.horas_dedicacion - duracionNum < 0) {
       const respuesta = AlertaConfirm(
         "La cantidad de horas dedicadas del docente se ha excedido",
         "¿Deseas continuar?",
@@ -892,6 +984,7 @@ export default function Calendar() {
     }
 
     const payload = {
+      horario_id: horarioId,
       sede_id: parseInt(nuevoEvento.sede.value),
       pnf_id: parseInt(nuevoEvento.pnf.value),
       trayecto_id: parseInt(nuevoEvento.trayecto.value),
@@ -903,11 +996,11 @@ export default function Calendar() {
       bloque_id: parseInt(nuevoEvento.bloque.value),
       duracion: nuevoEvento.duracion,
     };
-    console.log(payload.docente_id);
+    console.log("Datos ENVIADOS: " + payload);
 
     try {
       // Enviar datos al backend
-      const response = await Api.post("/eventos", payload);
+      const response = await Api.post(`/clases`, payload);
       await Api.put(
         `/docente_horas/${payload.docente_id}?horas_dedicacion=${-duracionNum}`
       );
@@ -916,7 +1009,9 @@ export default function Calendar() {
       if (response.data && response.data.clase && response.data.clase.id) {
         eventoDesdeBackend = response.data.clase.id;
       } else {
-        AlertaError("La respuesta del backend no contiene el id del evento. Verifica la estructura de la respuesta.");
+        AlertaError(
+          "La respuesta del backend no contiene el id del evento. Verifica la estructura de la respuesta."
+        );
         return;
       }
 
@@ -927,7 +1022,7 @@ export default function Calendar() {
           dia: nuevoEvento.dia.value,
           bloque: Number(nuevoEvento.bloque.value),
           duracion: duracionNum,
-          materia: nuevoEvento.materia.value,
+          materias: nuevoEvento.materia,
           aula: nuevoEvento.aula.value,
           sede: nuevoEvento.sede,
           pnf: nuevoEvento.pnf,
@@ -939,13 +1034,16 @@ export default function Calendar() {
         },
       ]);
     } catch (error) {
-      AlertaError("Error al guardar el evento" + " " + error);
+      AlertaError(
+        "Error al guardar la clase" + " " + error.response.data.message
+      );
       //mostrar error detallado en consola
       console.log(
         "Error detalles:",
         error.response ? error.response.data : error.message
       );
       console.log(error);
+      return;
     }
 
     setNuevoEvento({
@@ -1002,7 +1100,7 @@ export default function Calendar() {
                     } catch (error) {
                       AlertaError("Error al cargar las aulas");
                       console.log(error);
-                    }                    
+                    }
                   }
                 }}
                 onValueChange={async (option) => {
@@ -1106,7 +1204,7 @@ export default function Calendar() {
                 }}
               />
               <SelectControl
-                label="MATERIA"
+                label="UNIDAD CURRICULAR"
                 name="materias"
                 value={nuevoEvento.materia}
                 options={materiasOptions}
@@ -1149,11 +1247,11 @@ export default function Calendar() {
                       (e) => String(e.id) === String(option?.value)
                     ) || null
                   );
+                  console.log(
+                    "Horas del docente seleccionado: " +
+                      docenteSeleccionado.horas
+                  );
                   setNuevoEvento((prev) => ({ ...prev, docente: option }));
-                  console.log(docenteSeleccionado.id);
-                  console.log(nuevoEvento?.docente.value);
-                  
-                  
                 }}
                 styles={{
                   option: (provided, state) => ({
@@ -1182,7 +1280,6 @@ export default function Calendar() {
                       null
                   );
                   setNuevoEvento((prev) => ({ ...prev, aula: option }));
-                  console.log(aulaSeleccionada);
                 }}
               />
               <SelectControl
@@ -1309,8 +1406,14 @@ export default function Calendar() {
                       setEventos((prev) =>
                         prev.filter((e) => e.id !== evento.id)
                       );
+                      console.log("Eliminando evento con ID:", evento.id);
+
                       try {
-                        await Api.delete(`/evento/${evento.id}`);
+                        const response = await Api.delete(
+                          `/clase/${evento.id}`
+                        );
+                        console.log("Respuesta de eliminación:", response.data);
+
                         // Sumar la duración a las horas del docente
                         const docenteId =
                           evento.docente?.value || evento.docente_id;

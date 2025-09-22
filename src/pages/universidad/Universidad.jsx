@@ -9,6 +9,7 @@ import Api, { PostAll, PutAll } from "../../services/Api";
 import { useLocation, useNavigate } from "react-router-dom";
 import Alerta from "../../components/Alert";
 import Spinner from "../../components/Spinner";
+import { TextAreaLabel } from "../../components/TextAreaLabel";
 
 const validationSchema = Yup.object({
   rif_univ: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
@@ -119,7 +120,7 @@ export function Universidad() {
         }
         input={
           <>
-            {/* Input para nombre de LAPSO */}
+            {/* Input para rif de universidad */}
             <InputLabel
               label={FORM_LABELS.UNIVERSIDAD.RIF}
               type="text"
@@ -127,7 +128,7 @@ export function Universidad() {
               placeholder="RIF"
               formik={formik}
             />
-            {/* Input para año del LAPSO */}
+            {/* Input para nombre de universidad */}
             <InputLabel
               label={FORM_LABELS.UNIVERSIDAD.NAME}
               type="text"
@@ -135,7 +136,7 @@ export function Universidad() {
               placeholder="INGRESE UN NOMBRE"
               formik={formik}
             />
-            {/* Input para PNF abreviado */}
+            {/* Input para nombre abreviado de universidad */}
             <InputLabel
               label={FORM_LABELS.UNIVERSIDAD.NAME_ABRE}
               type="text"
@@ -143,13 +144,13 @@ export function Universidad() {
               placeholder="NOMBRE ABREVIADO"
               formik={formik}
             />
-            {/* Input para PNF abreviado */}
-            <InputLabel
-              label={FORM_LABELS.UNIVERSIDAD.ADRRE}
-              type="text"
+            {/* Input para direccion */}
+            <TextAreaLabel
               name="direccion"
-              placeholder="DIRECCIÓN"
+              placeholder="SANTA TERESA DE JESUS, AV. PRINCIPAL, CALLE 1, CASA 23"
+              label={FORM_LABELS.UNIVERSIDAD.ADRRE}
               formik={formik}
+              rows={3}
             />
           </>
         }

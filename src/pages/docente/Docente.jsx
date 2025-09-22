@@ -52,16 +52,16 @@ const columns = [
             <b>MUNICIPIO: </b> {row.persona.municipio}
           </p>
           <p>
-            <b>TELEFONO: </b> {row.persona.telefono}
+            <b>TELÉFONO: </b> {row.persona.telefono}
           </p>
           <p>
-            <b>EMAIL: </b> {row.persona.email}
+            <b>CORREO: </b> {row.persona.email}
           </p>
           <p>
             <b>TIPO PERSONA:</b> {row.persona.tipo_persona}
           </p>
           <p>
-            <b>GRADO INTITUCIONAL:</b> {row.persona.grado_inst}
+            <b>GRADO INSTITUCIONAL:</b> {row.persona.grado_inst}
           </p>
           <p>
             <b>CATEGORÍA:</b> {row.categoria}

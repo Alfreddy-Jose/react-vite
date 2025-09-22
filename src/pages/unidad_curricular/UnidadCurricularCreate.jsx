@@ -9,6 +9,7 @@ import Api, { PostAll } from "../../services/Api";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import SelectSearch from "../../components/SelectSearch";
+import { TextAreaLabel } from "../../components/TextAreaLabel";
 
 // Iniciando variables
 const initialValues = {
@@ -211,7 +212,7 @@ function UnidadCurricularCreate() {
                 label={FORM_LABELS.UNIDAD_CURRICULAR.UNIDAD_CREDITO}
                 type="text"
                 name="unidad_credito"
-                placeholder="UNIDAD CREDITO"
+                placeholder="UNIDAD CRÉDITO"
                 formik={formik}
               />
               {/* Input para las horas academicas */}
@@ -227,7 +228,7 @@ function UnidadCurricularCreate() {
                 label={FORM_LABELS.UNIDAD_CURRICULAR.HORA_PRACTICA}
                 type="text"
                 name="hora_practica"
-                placeholder="HORA PRACTICA"
+                placeholder="HORA PRÁCTICA"
                 formik={formik}
               />
               <SelectSearch
@@ -249,7 +250,7 @@ function UnidadCurricularCreate() {
               <SelectSearch
                 name="trimestre_id"
                 options={trimestres}
-                label="TRIMESTRE"
+                label={FORM_LABELS.UNIDAD_CURRICULAR.TRIMESTRE_ID}
                 formik={formik}
                 isMulti={isTrimestreMulti}
                 disabled={
@@ -270,13 +271,13 @@ function UnidadCurricularCreate() {
                 }
               />
               {/* Campo de descripcion  */}
-              <InputLabel
+              <TextAreaLabel
                 label={FORM_LABELS.UNIDAD_CURRICULAR.DESCRIPCION}
-                type="text"
                 name="descripcion"
-                placeholder="DESCRIPCIÓN"
+                placeholder="UNIDAD CURRICULAR SOBRE ..."
                 formik={formik}
-              />
+                rows={3}
+              />              
             </>
           }
           buttom={

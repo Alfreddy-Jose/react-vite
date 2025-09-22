@@ -1,0 +1,103 @@
+/* contenedor */
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 8px 4px;
+  justify-content: center;
+  position: relative;
+}
+
+/* cada paso (círculo + etiqueta) */
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90px;
+  min-width: 70px;
+  position: relative;
+}
+
+/* círculo numerado */
+.step-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #d0d0d0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  font-weight: 600;
+  font-size: 14px;
+  color: #555;
+  transition: all 0.3s ease; /* animación suave */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* etiqueta debajo del círculo */
+.step-label {
+  margin-top: 8px;
+  font-size: 13px;
+  text-align: center;
+  color: #555;
+  transition: color 0.3s ease;
+}
+
+/* línea entre pasos */
+.step-connector {
+  flex: 1;
+  height: 3px;
+  background: #e0e0e0;
+  margin: 0 8px;
+  border-radius: 2px;
+  transition: background 0.3s ease;
+}
+
+/* estado completado (línea y círculo) */
+.step-connector.completed {
+  background: #0d6efd;
+}
+
+.step-circle.completed {
+  background: #0d6efd;
+  border-color: #0d6efd;
+  color: #fff;
+  transform: scale(1.05); /* pequeño zoom al completado */
+}
+
+.step-label.completed {
+  color: #0d6efd;
+}
+
+/* estado activo (el paso donde está el usuario) */
+.step-circle.active {
+  background: #198754;
+  border-color: #198754;
+  color: #fff;
+  box-shadow: 0 6px 12px rgba(25, 135, 84, 0.3);
+  transform: scale(1.15); /* zoom más fuerte en el actual */
+}
+
+.step-label.active {
+  color: #198754;
+  font-weight: bold;
+}
+
+/* Hover sutil (aunque no sean clicables, da sensación de UI viva) */
+.step-circle:hover {
+  transform: scale(1.08);
+  transition: transform 0.2s ease;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .step {
+    width: 56px;
+    min-width: 56px;
+  }
+  .step-label {
+    display: none;
+  }
+}

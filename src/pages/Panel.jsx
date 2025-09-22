@@ -32,7 +32,7 @@ export function Panel() {
             </div> */}
             
             <h6 className="op-7 mb-2">
-              Bienvendo { user?.name } al sistema sobre creación de horarios
+              Bienvenido { user?.name } al sistema sobre creación de horarios
             </h6>
           </div>
         </div>

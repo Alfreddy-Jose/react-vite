@@ -78,7 +78,7 @@ function UnidadCurricular() {
               <b>HORAS PRÁCTICAS: </b> {row.hora_practica}
             </p>
             <p>
-              <b>HORAS TEORICAS: </b> {row.hora_teorica}
+              <b>HORAS TEÓRICAS: </b> {row.hora_teorica}
             </p>
             <p>
               <b>HORAS TOTAL ESTIMADAS: </b> {row.hora_total_est}

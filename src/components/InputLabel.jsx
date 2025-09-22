@@ -26,7 +26,7 @@ export function InputLabel({
       <input
         className={`form-control ${
           formik.touched[name] && formik.errors[name] ? "border-danger" : ""
-        }`}
+        }`} 
         type={type}
         name={name}
         id={name}

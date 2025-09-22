@@ -87,7 +87,7 @@ export function UsuarioCreate() {
                 label={FORM_LABELS.USER.EMAIL}
                 type="email"
                 name="email"
-                placeholder="INGRESE UN EMAIL"
+                placeholder="INGRESE UN CORREO"
                 onBlur={formik.handleBlur}
                 value={formik.values.codigo}
                 formik={formik}

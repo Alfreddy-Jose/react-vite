@@ -58,7 +58,7 @@ export function Pnf() {
       sortable: false,
     },
     {
-      name: "CODIGO",
+      name: "CÓDIGO",
       selector: (row) => row.codigo,
     },
     {
@@ -75,7 +75,7 @@ export function Pnf() {
 
           <Modal titleModal={`+INFO ${row.abreviado}`} id={row.id}>
             <p>
-              <b>CODIGO: </b> {row.codigo}
+              <b>CÓDIGO: </b> {row.codigo}
             </p>
             <p>
               <b>NOMBRE: </b> {row.nombre}

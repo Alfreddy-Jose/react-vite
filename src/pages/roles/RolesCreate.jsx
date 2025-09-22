@@ -267,7 +267,7 @@ function RolesCreate() {
               />
 
               <CardCheckbox
-                title="LAPSO ACADEMICO"
+                title="LAPSO ACADÉMICO"
                 checkbox={
                   <>
                     <Checkbox
@@ -363,7 +363,7 @@ function RolesCreate() {
               />
 
               <CardCheckbox
-                title="TIPO MATRICULA"
+                title="TIPO MATRÍCULA"
                 checkbox={
                   <>
                     <Checkbox

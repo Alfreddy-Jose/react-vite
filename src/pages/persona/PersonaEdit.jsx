@@ -10,6 +10,7 @@ import { InputLabel } from "../../components/InputLabel";
 import { Buttom } from "../../components/Buttom";
 import Swal from "sweetalert2";
 import SelectSearch from "../../components/SelectSearch";
+import { TextAreaLabel } from "../../components/TextAreaLabel";
 
 // Validando campos
 const validationSchema = Yup.object({
@@ -130,23 +131,6 @@ function PersonaEdit() {
               placeholder="INGRESE UN APELLIDO"
               formik={formik}
             />
-            {/* Input para direccion de PERSONA */}
-            <InputLabel
-              label={FORM_LABELS.PERSONAS.ADRRE}
-              type="text"
-              name="direccion"
-              placeholder="DIRECCIÓN"
-              formik={formik}
-            />
-            {/* Input para municipio de PERSONA */}
-            <InputLabel
-              label={FORM_LABELS.PERSONAS.MUNICIPIO}
-              type="text"
-              name="municipio"
-              placeholder="MUNICIPIO"
-              formik={formik}
-            />
-
             {/* Input para telefono de PERSONA */}
             <InputLabel
               label={FORM_LABELS.PERSONAS.TELEFONO}
@@ -186,6 +170,22 @@ function PersonaEdit() {
                 { id: "TECNICO SUPERIOR", nombre: "TECNICO SUPERIOR" },
                 { id: "BACHILLER", nombre: "BACHILLER" },
               ]}
+            />
+            {/* Input para municipio de PERSONA */}
+            <InputLabel
+              label={FORM_LABELS.PERSONAS.MUNICIPIO}
+              type="text"
+              name="municipio"
+              placeholder="MUNICIPIO"
+              formik={formik}
+            />
+            {/* Input para direccion de PERSONA */}
+            <TextAreaLabel
+              label={FORM_LABELS.PERSONAS.ADRRE}
+              name={"direccion"}
+              placeholder="SAN JUAN DE LOS MORROS, CALLE 1 CASA 2"
+              formik={formik}
+              rows={3}
             />
           </>
         }

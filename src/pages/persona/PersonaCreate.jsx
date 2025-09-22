@@ -8,6 +8,7 @@ import { ContainerIput } from "../../components/ContainerInput";
 import { Create } from "../../components/Link";
 import { Buttom } from "../../components/Buttom";
 import SelectSearch from "../../components/SelectSearch";
+import { TextAreaLabel } from "../../components/TextAreaLabel";
 
 const initialValues = {
   cedula_persona: "",
@@ -90,7 +91,7 @@ function PersonaCreate() {
               label={FORM_LABELS.PERSONAS.CEDULA}
               type="text"
               name="cedula_persona"
-              placeholder="INGRESE CEDULA"
+              placeholder="INGRESE CÉDULA"
               formik={formik}
             />
             {/* Input para nombre de PERSONA */}
@@ -107,22 +108,6 @@ function PersonaCreate() {
               type="text"
               name="apellido"
               placeholder="INGRESE UN APELLIDO"
-              formik={formik}
-            />
-            {/* Input para direccion de PERSONA */}
-            <InputLabel
-              label={FORM_LABELS.PERSONAS.ADRRE}
-              type="text"
-              name="direccion"
-              placeholder="DIRECCIÓN"
-              formik={formik}
-            />
-            {/* Input para municipio de PERSONA */}
-            <InputLabel
-              label={FORM_LABELS.PERSONAS.MUNICIPIO}
-              type="text"
-              name="municipio"
-              placeholder="MUNICIPIO"
               formik={formik}
             />
 
@@ -165,6 +150,22 @@ function PersonaCreate() {
                 { id: "TECNICO SUPERIOR", nombre: "TECNICO SUPERIOR" },
                 { id: "BACHILLER", nombre: "BACHILLER" },
               ]}
+            />
+            {/* Input para municipio de PERSONA */}
+            <InputLabel
+              label={FORM_LABELS.PERSONAS.MUNICIPIO}
+              type="text"
+              name="municipio"
+              placeholder="MUNICIPIO"
+              formik={formik}
+            />
+            {/* Input para direccion de PERSONA */}
+            <TextAreaLabel
+              name="direccion"
+              label={FORM_LABELS.PERSONAS.ADRRE}
+              placeholder="SAN JUAN DE LOS MORROS, CALLE 1 CASA 2"
+              formik={formik}
+              rows={3}
             />
           </>
         }

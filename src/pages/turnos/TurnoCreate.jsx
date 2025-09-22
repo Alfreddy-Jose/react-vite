@@ -104,7 +104,7 @@ function TurnoCreate() {
               />
               <div className="col-sm-2 col-xl-2">
                 <label htmlFor="inicio_periodo" className="mt-4">
-                  PERIODO
+                  PERÍODO
                 </label>
                 <select
                   name="inicio_periodo"
@@ -128,7 +128,7 @@ function TurnoCreate() {
               />
               <div className="col-sm-2 col-xl-2">
                 <label htmlFor="final_periodo" className="mt-4">
-                  PERIODO
+                  PERÍODO
                 </label>
                 <select
                   name="final_periodo"

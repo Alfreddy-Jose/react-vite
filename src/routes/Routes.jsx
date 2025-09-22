@@ -11,6 +11,8 @@ import LaboratoriosCreate from "../pages/espacios/LaboratorioCreate";
 import LaboratorioEdit from "../pages/espacios/LaboratorioEdit";
 import Laboratorios from "../pages/espacios/Laboratorios";
 import HorarioFull from "../pages/horario/HorarioFull";
+import { Horarios } from "../pages/horario/Horario";
+import { HorarioCreate } from "../pages/horario/HorarioCreate";
 import { LapsoAcademico } from "../pages/lapsoAcademico/LapsoAcademico";
 import { LapsoAcademicoCreate } from "../pages/lapsoAcademico/LapsoAcademicoCreate";
 import { LapsoAcademicoEdit } from "../pages/lapsoAcademico/LapsoAcademicoEdit";
@@ -49,6 +51,8 @@ import { SeccionesEdit } from "../pages/secciones/SeccionesEdit";
 import DocenteEdit from "../pages/docente/DocenteEdit";
 import HomePage from "../pages/HomePage";
 import TrayectoEdit from "../pages/trayectos/TrayectoEdit";
+import { HorarioClases } from "../pages/horario/HorarioClases";
+import { HorariosDocentes } from "../pages/horario/HorarioDocente";
 
 export function AppRoutes() {
   return (
@@ -529,11 +533,41 @@ export function AppRoutes() {
         />
         {/* Rutas para Horario */}
         <Route
-          path="/horario"
+          path="/horarios"
           element={
             <ProtectedRoute>
               <Layout>
-                <HorarioFull />
+                <Horarios />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/horarios/create"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <HorarioCreate />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/horarios/:id/clases"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <HorarioClases />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/horarios/docente"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <HorariosDocentes />
               </Layout>
             </ProtectedRoute>
           }

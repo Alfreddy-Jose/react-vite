@@ -130,7 +130,7 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                 {permisos.includes("Tipo Matricula.ver") ? (
                   <Link to="/matricula">
                     <i className="fas fa-clipboard-list"></i>
-                    <p>Tipo Matricula</p>
+                    <p>Tipo Matrícula</p>
                   </Link>
                 ) : null}
               </li>
@@ -186,7 +186,7 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                 {permisos.includes("gestionar persona") ? (
                   <a data-bs-toggle="collapse" href="#persona">
                     <i className="fas fa-person"></i>
-                    <p>Gestion de Personas</p>
+                    <p>Gestión de Personas</p>
                     <span className="caret"></span>
                   </a>
                 ) : null}
@@ -295,14 +295,28 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                 </div>
               </li>
 
-              <li
-                className={`nav-item ${isActive("/horario") ? "active" : ""}`}
-              >
-                <Link to="/horario">
-                  <i className="fa-solid fa-calendar"></i>
-                  <p>Horario</p>
-                </Link>
+              <li className="nav-item">
+                  <a data-bs-toggle="collapse" href="#horarios">
+                    <i className="fa-solid fa-calendar"></i>
+                    <p>Horarios</p>
+                    <span className="caret"></span>
+                  </a>
+                <div className="collapse" id="horarios">
+                  <ul className="nav nav-collapse">
+                      <li>
+                        <Link to="/horarios">
+                          <span className="sub-item">Horarios por Sección</span>
+                        </Link>
+                      </li>
+                    <li>
+                        <Link to="/horarios/docente">
+                          <span className="sub-item">Horarios por Docente</span>
+                        </Link>
+                    </li>
+                  </ul>
+                </div>
               </li>
+
             </ul>
           </div>
         </div>

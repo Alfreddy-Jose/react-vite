@@ -75,7 +75,7 @@ export function Secciones() {
               <b>PNF: </b> {row.pnf.nombre}
             </p>
             <p>
-              <b>TIPO MATRICULA: </b> {row.matricula.nombre}
+              <b>TIPO MATRÍCULA: </b> {row.matricula.nombre}
             </p>
             <p>
               <b>TRAYECTO: </b>

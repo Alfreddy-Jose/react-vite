@@ -91,7 +91,7 @@ export function TipoMatricula() {
       {/* Contenedor para la tablas */}
       <ContainerTable
         // Titulo para la tabla
-        title="TIPO MATRICULA"
+        title="TIPO MATRÍCULA"
 
         button_pdf={
           permisos.includes("Tipo Matricula.pdf") ?

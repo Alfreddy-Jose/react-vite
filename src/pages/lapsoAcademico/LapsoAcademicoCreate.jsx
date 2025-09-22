@@ -82,7 +82,7 @@ export function LapsoAcademicoCreate() {
   return (
     <form onSubmit={formik.handleSubmit}>
       <ContainerIput
-        title="NUEVO LAPSO ACADEMICO"
+        title="NUEVO LAPSO ACADÉMICO"
         link={
           <Create path="/lapsos" text="Volver" style="btn btn-secondary mb-4" />
         }

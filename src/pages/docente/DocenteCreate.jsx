@@ -92,7 +92,7 @@ function DocenteCreate() {
               formik={formik}
               valueKey="id"
               labelKey="nombre"
-              placeholder="BUSCAR PERSONA"
+              placeholder="BUSCAR DOCENTE"
             />
 
             {/* Input para PNF de DOCENTE */}

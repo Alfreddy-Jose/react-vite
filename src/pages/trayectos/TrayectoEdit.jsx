@@ -5,7 +5,7 @@ import { ContainerIput } from "../../components/ContainerInput";
 import { Create } from "../../components/Link";
 import { InputLabel } from "../../components/InputLabel";
 import { Buttom } from "../../components/Buttom";
-import Api, { PostAll } from "../../services/Api";
+import Api, { PutAll } from "../../services/Api";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 
@@ -24,7 +24,7 @@ function TrayectoEdit() {
   // Funcion para enviar datos al backend
   const onSubmit = async (values, { setErrors }) => {
     try {
-      await PostAll(values, "/trayectos", navegation);
+      await PutAll(values, "/trayectos", navegation, id,"/trayectos");
     } catch (error) {
       if (error.response && error.response.data.errors) {
         // Transforma los arrays de Laravel a strings para Formik
