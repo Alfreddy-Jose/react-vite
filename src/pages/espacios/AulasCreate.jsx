@@ -23,7 +23,7 @@ const validationSchema = Yup.object({
   codigo: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
   etapa: Yup.string()
     .matches(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "Solo letras permitidas") // Solo letras
-    .max(1, "Maximo 1 carácteres") // Máximo 1 carácter
+    .max(1, "Máximo 1 caracter") // Máximo 1 carácter
     .required("Este campo es obligatorio"), // Campo obligatorio
   nro_aula: Yup.string()
     .matches(/^[0-:-9]*$/, "Formato incorrecto") // Solo números

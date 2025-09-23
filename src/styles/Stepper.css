@@ -73,7 +73,7 @@
 
 /* estado activo (el paso donde está el usuario) */
 .step-circle.active {
-  background: #198754;
+  background: rgb(25, 135, 84);
   border-color: #198754;
   color: #fff;
   box-shadow: 0 6px 12px rgba(25, 135, 84, 0.3);

@@ -12,7 +12,6 @@ import SelectSearch from "../../components/SelectSearch";
 
 // Validaciones para cada campo
 const validationSchema = Yup.object({
-  nombre_aula: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
   codigo: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
   etapa: Yup.string()
     .matches(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "Solo letras permitidas") // Solo letras
@@ -33,14 +32,14 @@ export default function AulasEdit() {
   // Funcion para enviar datos al backend
   const onSubmit = async (values, { setErrors }) => {
     try {
-      await PutAll(values, "/aula", navegation, id, "/aula");
+      await PutAll(values, "/aula", navegation, id, "/aula");      
     } catch (error) {
       if (error.response && error.response.data.errors) {
         // Transforma los arrays de Laravel a strings para Formik
         const formikErrors = {};
         Object.entries(error.response.data.errors).forEach(([key, value]) => {
           formikErrors[key] = value[0];
-        });
+        }); 
         setErrors(error.response.data.errors);
       }
     }

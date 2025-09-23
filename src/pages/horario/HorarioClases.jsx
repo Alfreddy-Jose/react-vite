@@ -17,8 +17,7 @@ export function HorarioClases() {
     const fetchHorario = async () => {
       try {
         const res = await Api.get(`/horario/${id}`);
-        setHorario(res.data);
-        console.log(res.data);        
+        setHorario(res.data);        
       } catch (error) {
         AlertaError("Error al cargar horario");
         console.error(error);

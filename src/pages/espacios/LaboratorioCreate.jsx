@@ -29,7 +29,7 @@ const validationSchema = Yup.object({
     .required("Este campo es obligatorio"), // Campo obligatorio
   etapa: Yup.string()
     .matches(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "Solo letras permitidas") // solo letras
-    .max(1, "Maximo 1 carácteres") // Máximo 1 carácter
+    .max(1, "Máximo 1 caracter") // Máximo 1 carácter
     .required("Este campo es obligatorio"), // Campo obligatorio
   abreviado_lab: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
   sede_id: Yup.number().required("Este campo es obligatorio"),

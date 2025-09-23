@@ -17,7 +17,14 @@ import SelectControl from "../../components/SelectDependiente";
 import { ContainerIput } from "../../components/ContainerInput";
 import { Link } from "react-router-dom";
 
-function Evento({ evento, onResizeStart, isResizing, onEditar, onEliminar }) {
+function Evento({
+  id,
+  evento,
+  onResizeStart,
+  isResizing,
+  onEditar,
+  onEliminar,
+}) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: evento.id,
     data: { evento },
@@ -41,6 +48,7 @@ function Evento({ evento, onResizeStart, isResizing, onEditar, onEliminar }) {
 
   return (
     <div
+      id={id}
       ref={(node) => {
         setNodeRef(node);
       }}
@@ -185,6 +193,7 @@ function Celda({
             <Evento
               key={`${evento.id}-${bloqueActual}`} // Key más específica
               evento={evento}
+              id={`evento-${evento.id}`}
               onResizeStart={onResizeStart}
               onEditar={onEditar}
               onEliminar={onEliminar}
@@ -199,7 +208,7 @@ export default function Calendar(horarioId) {
   const [bloques, setBloques] = useState([]);
   const [eventoEditando, setEventoEditando] = useState(null);
   const [mostrarModal, setMostrarModal] = useState(false);
-  
+  const [eventoRecienAgregado, setEventoRecienAgregado] = useState(null);
   const [todosLosEventos, setTodosLosEventos] = useState([]);
   const [eventos, setEventos] = useState([]);
 
@@ -235,11 +244,8 @@ export default function Calendar(horarioId) {
   // Al cargar el componente
   const cargarClases = async () => {
     try {
-      console.log(horarioId.horario);
-      
       const response = await Api.get(`/horarios/${horarioId.horarioId}/clases`);
       const evento = response.data;
-      console.log(response.data);
 
       const eventosFormateados = evento.map((evento) => ({
         id: evento.id.toString(),
@@ -277,30 +283,6 @@ export default function Calendar(horarioId) {
       console.log(error);
     }
   };
-
-  useEffect(() => {
-    if (horarioId) {
-      setSedes({
-        value: horarioId.seccion?.sede?.id,
-        label: horarioId.seccion?.sede?.nombre_sede,
-      });
-
-      setPnfs({
-        value: horarioId.seccion?.pnf?.id,
-        label: horarioId.seccion?.pnf?.nombre,
-      });
-
-      setTrayecto({
-        value: horarioId.seccion?.trayecto?.id,
-        label: horarioId.seccion?.trayecto?.nombre,
-      });
-
-      setTrimestres({
-        value: horarioId.trimestre?.id,
-        label: horarioId.trimestre?.nombre,
-      });
-    }
-  }, [horarioId]);
 
   useEffect(() => {
     if (horarioId) {
@@ -437,6 +419,22 @@ export default function Calendar(horarioId) {
     obtenerTrayectos();
   }, []);
 
+  useEffect(() => {
+    if (eventoRecienAgregado) {
+      const elemento = document.getElementById(
+        `evento-${eventoRecienAgregado}`
+      );
+      if (elemento) {
+        elemento.scrollIntoView({ behavior: "smooth", block: "center" });
+        elemento.classList.add("highlight");
+
+        setTimeout(() => {
+          elemento.classList.remove("highlight");
+        }, 2500);
+      }
+    }
+  }, [eventoRecienAgregado]);
+
   const obtenerValor = (prop) => {
     if (prop === null || prop === undefined) {
       return prop;
@@ -497,7 +495,7 @@ export default function Calendar(horarioId) {
         duracion: eventoActualizado.duracion,
       };
 
-      const response = await Api.put(`/clase/${eventoId}`, payload);
+      await Api.put(`/clase/${eventoId}`, payload);
     } catch (error) {
       if (error.response) {
         console.error(
@@ -716,7 +714,11 @@ export default function Calendar(horarioId) {
           eventoOriginal.materia ||
           eventoOriginal.materia_id;
 
-        const horasMateria = materiaSeleccionada?.horas || 0;
+        // traer horas semanales desde la base de datos
+        const response = await Api.get(`/unidad_curricular/${materiaId}/horas`);
+        const horasMateria = response.data.hora_total_est || 0;
+        console.log("horas de la materia " + horasMateria);
+
         const horasUsadasMateria = eventos
           .filter(
             (e) =>
@@ -726,6 +728,8 @@ export default function Calendar(horarioId) {
                 e.materia_id === materiaId)
           )
           .reduce((acc, e) => acc + (e.duracion || 1), 0);
+        console.log("Horas usadas de la materia " + horasUsadasMateria);
+
         if (horasUsadasMateria + duracionNueva > horasMateria) {
           AlertaError("¡Las horas semanales de la materia se agotaron!");
           setEventos((prev) =>
@@ -939,7 +943,6 @@ export default function Calendar(horarioId) {
     );
     console.log(hyCoincidencia);
 
-
     console.log(nuevoEvento.materia.value);
 
     // Calcular la suma de horas ya usadas para la materia
@@ -956,8 +959,11 @@ export default function Calendar(horarioId) {
     eventos.forEach((e) => {
       console.log(e.duracion);
     });
-    console.log("valor de materiaSeleccionada?.horas:", materiaSeleccionada?.horas);
-    
+    console.log(
+      "valor de materiaSeleccionada?.horas:",
+      materiaSeleccionada?.horas
+    );
+
     const horasUsadasMateria = eventos
       .filter((e) => {
         e.materias?.value &&
@@ -1028,10 +1034,14 @@ export default function Calendar(horarioId) {
     try {
       // Enviar datos al backend
       const response = await Api.post(`/clases`, payload);
-      await Api.put(
+      const response2 = await Api.put(
         `/docente_horas/${payload.docente_id}?horas_dedicacion=${-duracionNum}`
       );
-
+      console.log(response2.message);
+      
+      if (response2) {
+        Alerta(response2.message);
+      }
       let eventoDesdeBackend = null;
       if (response.data && response.data.clase && response.data.clase.id) {
         eventoDesdeBackend = response.data.clase.id;
@@ -1060,6 +1070,7 @@ export default function Calendar(horarioId) {
           color: "#e3f2fd",
         },
       ]);
+      setEventoRecienAgregado(eventoDesdeBackend.toString());
     } catch (error) {
       AlertaError(
         "Error al guardar la clase" + " " + error.response.data.message
@@ -1273,10 +1284,6 @@ export default function Calendar(horarioId) {
                     docentes.find(
                       (e) => String(e.id) === String(option?.value)
                     ) || null
-                  );
-                  console.log(
-                    "Horas del docente seleccionado: " +
-                      docenteSeleccionado.horas
                   );
                   setNuevoEvento((prev) => ({ ...prev, docente: option }));
                 }}
@@ -1660,6 +1667,7 @@ export default function Calendar(horarioId) {
                                 );
                                 setMaterias(response.data);
                                 setMateriaSeleccionada(response.data[0]);
+                                console.log(response.data);
                               } catch (error) {
                                 AlertaError("Error al cargar las materias");
                                 console.log(error);
