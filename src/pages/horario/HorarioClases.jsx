@@ -16,7 +16,7 @@ export function HorarioClases() {
   useEffect(() => {
     const fetchHorario = async () => {
       try {
-        const res = await Api.get(`/horarios/${id}/clases`);
+        const res = await Api.get(`/horario/${id}`);
         setHorario(res.data);
         console.log(res.data);        
       } catch (error) {
@@ -48,7 +48,7 @@ export function HorarioClases() {
         {horario.trimestre?.nombre}
       </h2>
 
-      <Calendar horarioId={id}/>
+      <Calendar horarioId={horario.id} horario={horario}/>
 
       <button
         className="btn btn-secondary traslation mt-4"

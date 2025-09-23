@@ -195,11 +195,11 @@ function Celda({
   );
 }
 
-export default function Calendar(props) {
+export default function Calendar(horarioId) {
   const [bloques, setBloques] = useState([]);
   const [eventoEditando, setEventoEditando] = useState(null);
   const [mostrarModal, setMostrarModal] = useState(false);
-  const { horarioId } = props;
+  
   const [todosLosEventos, setTodosLosEventos] = useState([]);
   const [eventos, setEventos] = useState([]);
 
@@ -235,8 +235,11 @@ export default function Calendar(props) {
   // Al cargar el componente
   const cargarClases = async () => {
     try {
-      const response = await Api.get(`/horarios/${horarioId}/clases`);
+      console.log(horarioId.horario);
+      
+      const response = await Api.get(`/horarios/${horarioId.horarioId}/clases`);
       const evento = response.data;
+      console.log(response.data);
 
       const eventosFormateados = evento.map((evento) => ({
         id: evento.id.toString(),
@@ -274,6 +277,30 @@ export default function Calendar(props) {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    if (horarioId) {
+      setSedes({
+        value: horarioId.seccion?.sede?.id,
+        label: horarioId.seccion?.sede?.nombre_sede,
+      });
+
+      setPnfs({
+        value: horarioId.seccion?.pnf?.id,
+        label: horarioId.seccion?.pnf?.nombre,
+      });
+
+      setTrayecto({
+        value: horarioId.seccion?.trayecto?.id,
+        label: horarioId.seccion?.trayecto?.nombre,
+      });
+
+      setTrimestres({
+        value: horarioId.trimestre?.id,
+        label: horarioId.trimestre?.nombre,
+      });
+    }
+  }, [horarioId]);
 
   useEffect(() => {
     if (horarioId) {
@@ -984,7 +1011,7 @@ export default function Calendar(props) {
     }
 
     const payload = {
-      horario_id: horarioId,
+      horario_id: horarioId.horarioId,
       sede_id: parseInt(nuevoEvento.sede.value),
       pnf_id: parseInt(nuevoEvento.pnf.value),
       trayecto_id: parseInt(nuevoEvento.trayecto.value),
