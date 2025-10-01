@@ -26,6 +26,7 @@ export function Universidad() {
   const [universidad, setUniversidad] = useState([]);
   const navegation = useNavigate();
   const location = useLocation();
+  const [permisos, setPermisos] = useState([]);
   const [loading, setLoading] = useState(true); // Estado de carga
   const [initialValues, setInitialValues] = useState({
     rif_univ: "",
@@ -73,6 +74,10 @@ export function Universidad() {
   });
 
   useEffect(() => {
+    // Leer permisos cada vez que el componente se monta o el localStorage cambia
+    const permisos = JSON.parse(localStorage.getItem("permissions")) || [];
+    setPermisos(permisos);
+
     // Trayendo los datos del registro
     const getUniversidad = async () => {
       try {
@@ -158,20 +163,29 @@ export function Universidad() {
         buttom={
           <>
             {/* cambiar texto a editar si ya hay universidad */}
-            <Buttom
-              text={universidad.length > 0 ? "Editar" : "Guardar"}
-              title={universidad.length > 0 ? "Editar" : "Guardar"}
-              type="submit"
-              style="btn btn-success"
-            />
-
-            <Buttom
-              text="Cancelar"
-              title="Cancelar"
-              type="reset"
-              style="btn btn-danger ms-1"
-              onClick={() => formik.resetForm()}
-            />
+            {(permisos.includes("universidad.crear") &&
+              universidad.length <= 0) ||
+            (permisos.includes("universidad.editar") &&
+              universidad.length > 0) ? (
+              <Buttom
+                text={universidad.length > 0 ? "Editar" : "Guardar"}
+                title={universidad.length > 0 ? "Editar" : "Guardar"}
+                type="submit"
+                style="btn btn-success"
+              />
+            ) : null}
+            {(permisos.includes("universidad.crear") &&
+              universidad.length <= 0) ||
+            (permisos.includes("universidad.editar") &&
+              universidad.length > 0) ? (
+              <Buttom
+                text="Limpiar"
+                title="Limpiar"
+                type="reset"
+                style="btn btn-secondary ms-1"
+                onClick={() => formik.resetForm()}
+              />
+            ) : null}
           </>
         }
       />

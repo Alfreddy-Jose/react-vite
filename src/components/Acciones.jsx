@@ -41,19 +41,37 @@ export default function Acciones({ url, urlDelete, navegar, editar = null, elimi
         navegation({ navegar }, { state: { message: response.data.message } });
       }
     } catch (error) {
-      AlertaError("Error al eliminar el registro");
-      console.log(error);
+      // Cerrar loader
+      Swal.close();
+
+      console.log("Error detallado:", error);
+      console.log("Datos del error:", error.response?.data);
+
+      // Manejar error de restricción de llave foránea
+      if (error.response?.data?.error_type === "foreign_key_constraint") {
+        AlertaError(error.response.data.message || "No se puede eliminar, este registro está siendo utilizado en otras partes del sistema");
+        return;
+      }
+
+      // Manejar error 500 u otros
+      if (error.response?.status === 500) {
+        AlertaError("Error del servidor: " + (error.response.data.message || "Intente más tarde"));
+        return;
+      }
+
+      // Error genérico
+      AlertaError(error.response?.data?.message || "Ocurrió un error inesperado");
     }
   };
 
   return (
     <div className="d-flex justify-content-center aling-content-center">
-      {/* {permisos.includes(editar) ? ( */}
+      {permisos.includes(editar) ? (
         <Link className="btn traslation btn-primary" to={url} title="Editar">
           <i className="far fa-edit"></i>
         </Link>
-      {/* ) : null} */}
-      {/* {permisos.includes(eliminar) ? ( */}
+      ) : null}
+      {permisos.includes(eliminar) ? (
         <button
           title="Eliminar"
           className="btn traslation btn-danger ms-1"
@@ -61,7 +79,7 @@ export default function Acciones({ url, urlDelete, navegar, editar = null, elimi
         >
           <i className="far fa-trash-alt"></i>
         </button>
-      {/* ) : null} */}
+      ) : null}
     </div>
   );
 }

@@ -133,9 +133,9 @@ export function UsuarioCreate() {
               />
               <Buttom
                 type="button"
-                style="btn-danger ms-1"
-                title="Cancelar"
-                text="Cancelar"
+                style="btn-secondary ms-1"
+                title="Limpiar"
+                text="Limpiar"
                 onClick={() => formik.resetForm()}
               />
             </>

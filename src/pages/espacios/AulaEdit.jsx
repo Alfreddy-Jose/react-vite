@@ -128,10 +128,10 @@ export default function AulasEdit() {
               />
 
               <Buttom
-                text="Cancelar"
-                title="Cancelar"
+                text="Limpiar"
+                title="Limpiar"
                 type="button"
-                style="btn-danger ms-1"
+                style="btn-secondary ms-1"
                 onClick={() => formik.resetForm()}
               />
             </>

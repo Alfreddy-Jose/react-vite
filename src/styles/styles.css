@@ -140,3 +140,28 @@ svg[data-prefix="fas"] {
     animation: slideInFromTop 0.3s ease-out !important;
 }
 
+.card-hover {
+    transition: transform 220ms cubic-bezier(.2, .8, .2, 1), box-shadow 220ms ease, filter 220ms ease;
+    transform: scale(0.96);
+    /* tamaño inicial (más pequeño) */
+    cursor: pointer;
+}
+
+.card-hover:hover,
+.card-hover:focus {
+    transform: scale(1);
+    /* vuelve al tamaño normal */
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
+    filter: brightness(0.98);
+    /* oscurece levemente para contraste */
+    outline: none;
+}
+
+.card-hover:active {
+    transform: scale(0.99);
+}
+
+/* focus visible accesible */
+.card-hover:focus-visible {
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15), 0 12px 30px rgba(0, 0, 0, 0.12);
+}

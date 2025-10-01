@@ -150,7 +150,7 @@ export function LapsoAcademico() {
             id={`estado-lapso-${row.id}`}
             checked={row.status === true } // Esto debe ser un booleano
             onChange={() => toggleEstadoLapso(row.id, row.status)}
-            //disabled={!permisos.includes("lapso.editar")}
+            disabled={!permisos.includes("lapso.cambiar estado")}
           />
           <label
             className="form-check-label"

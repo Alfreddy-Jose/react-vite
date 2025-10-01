@@ -154,10 +154,10 @@ function TurnoCreate() {
               />
               <Buttom
                 type="button"
-                style="btn-danger ms-1"
-                title="Cancelar"
-                text="Cancelar"
-              onClick={() => formik.resetForm()}
+                style="btn-secondary ms-1"
+                title="Limpiar"
+                text="Limpiar"
+                onClick={() => formik.resetForm()}
               />
             </>
           }

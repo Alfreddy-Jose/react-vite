@@ -160,10 +160,10 @@ export function HorarioCreate() {
                 text="Guardar Horario"
               />
               <Buttom
-                text="Cancelar"
-                title="Cancelar"
+                text="Limpiar"
+                title="Limpiar"
                 type="reset"
-                style="btn-danger ms-1"
+                style="btn-secondary ms-1"
               />
             </>
           }

@@ -367,7 +367,7 @@ export default function Calendar(horarioId) {
     }
   };
 
-  const dias = ["LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO"];
+  const dias = ["LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO"];
 
   // Datos para selects
   const [sedes, setSedes] = useState([]);
@@ -515,6 +515,52 @@ export default function Calendar(horarioId) {
     }
   }, []);
 
+  // Nuevo evento con valores compatibles con react-select
+  const [nuevoEvento, setNuevoEvento] = useState({
+    sede: null,
+    pnf: null,
+    trayecto: null,
+    trimestre: null,
+    materia: null,
+    docente: null,
+    aula: null,
+    dia: null,
+    bloque: null,
+    duracion: 1,
+  });
+
+  // Bloques disponibles: solo los que no están ocupados por el docente ni el aula en ese día y permiten la duración seleccionada
+  const getBloquesDisponibles = () => {
+    if (!nuevoEvento.dia || !nuevoEvento.docente || !nuevoEvento.aula) return bloques;
+    const dia = nuevoEvento.dia.value;
+    const docenteId = nuevoEvento.docente.value;
+    const aulaId = nuevoEvento.aula.value;
+    const duracion = parseInt(nuevoEvento.duracion) || 1;
+
+    // Filtrar usando todosLosEventos (de todos los horarios)
+    const ocupados = new Set();
+    todosLosEventos.forEach((e) => {
+      if (e.dia === dia && (e.docente?.value === docenteId || e.aula?.value === aulaId)) {
+        for (let i = 0; i < e.duracion; i++) {
+          ocupados.add(e.bloque + i);
+        }
+      }
+    });
+
+    // Solo mostrar bloques donde haya espacio suficiente para la duración
+    return bloques.filter((bloque) => {
+      for (let i = 0; i < duracion; i++) {
+        if (ocupados.has(bloque.id + i)) return false;
+      }
+      return true;
+    });
+  };
+
+  const bloqueOptionsDisponibles = getBloquesDisponibles().map((b) => ({
+    value: b.id,
+    label: `${b.rango}`,
+  }));
+
   // Adaptar datos para react-select
   const sedesOptions = sedes.map((s) => ({
     value: s.value || s.id,
@@ -531,10 +577,6 @@ export default function Calendar(horarioId) {
   }));
   const aulaOptions = aulas.map((a) => ({ value: a.id, label: a.nombre_aula }));
   const diaOptions = dias.map((d) => ({ value: d, label: d }));
-  const bloqueOptions = bloques.map((b) => ({
-    value: b.id,
-    label: `${b.rango}`,
-  }));
   const trayectoOptions = trayectos.map((t) => ({
     value: t.id,
     label: t.nombre,
@@ -548,19 +590,19 @@ export default function Calendar(horarioId) {
     label: m.text,
   }));
 
-  // Nuevo evento con valores compatibles con react-select
-  const [nuevoEvento, setNuevoEvento] = useState({
-    sede: null,
-    pnf: null,
-    trayecto: null,
-    trimestre: null,
-    materia: null,
-    docente: null,
-    aula: null,
-    dia: null,
-    bloque: null,
-    duracion: 1,
-  });
+  useEffect(() => {
+    const obtenerTrayectos = async () => {
+      try {
+        const response = await Api.get(`/horarios/trayectos`);
+        setTrayecto(response.data);
+        setTrayectoSeleccionado(response.data[0]); // Selecciona el primer trayecto por defecto
+      } catch (error) {
+        AlertaError("Error al cargar los trayectos");
+        console.error(error);
+      }
+    };
+    obtenerTrayectos();
+  }, []);
 
   const resizeData = useRef({
     initialY: null,
@@ -731,7 +773,7 @@ export default function Calendar(horarioId) {
         console.log("Horas usadas de la materia " + horasUsadasMateria);
 
         if (horasUsadasMateria + duracionNueva > horasMateria) {
-          AlertaError("¡Las horas semanales de la materia se agotaron!");
+          AlertaError("¡Las horas semanales de la unidad curricular se agotaron!");
           setEventos((prev) =>
             prev.map((ev) =>
               ev.id === resizingEventId && ev.duracion !== duracionOriginal
@@ -880,7 +922,7 @@ export default function Calendar(horarioId) {
       !nuevoEvento.dia ||
       nuevoEvento.bloque === null
     ) {
-      AlertaError("Completa todos los campos");
+      AlertaError("Completa los campos vacíos");
       return;
     }
 
@@ -1034,13 +1076,12 @@ export default function Calendar(horarioId) {
     try {
       // Enviar datos al backend
       const response = await Api.post(`/clases`, payload);
-      const response2 = await Api.put(
+      await Api.put(
         `/docente_horas/${payload.docente_id}?horas_dedicacion=${-duracionNum}`
       );
-      console.log(response2.message);
       
-      if (response2) {
-        Alerta(response2.message);
+      if (response) {
+        Alerta(response.data.message);
       }
       let eventoDesdeBackend = null;
       if (response.data && response.data.clase && response.data.clase.id) {
@@ -1329,7 +1370,7 @@ export default function Calendar(horarioId) {
                 label="BLOQUE"
                 name="bloque"
                 value={nuevoEvento.bloque}
-                options={bloqueOptions}
+                options={bloqueOptionsDisponibles}
                 onChange={(option) =>
                   setNuevoEvento((prev) => ({ ...prev, bloque: option }))
                 }
@@ -1440,13 +1481,12 @@ export default function Calendar(horarioId) {
                       setEventos((prev) =>
                         prev.filter((e) => e.id !== evento.id)
                       );
-                      console.log("Eliminando evento con ID:", evento.id);
-
                       try {
                         const response = await Api.delete(
                           `/clase/${evento.id}`
                         );
                         console.log("Respuesta de eliminación:", response.data);
+                        Alerta(response.data.message);
 
                         // Sumar la duración a las horas del docente
                         const docenteId =

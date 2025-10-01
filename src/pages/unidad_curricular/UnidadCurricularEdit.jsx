@@ -36,7 +36,7 @@ const validationSchema = Yup.object({
     .required("Este campo es obligatorio")
     .matches(/^[0-:-9]*$/, "Solo números"),
   hora_practica: Yup.string()
-    .required("Este campo es obligatorio")
+    .nullable()
     .matches(/^[0-:-9]*$/, "Solo números"),
   periodo: Yup.string().required("Este campo es obligatorio"),
   trayecto_id: Yup.string().required("Este campo es obligatorio"),
@@ -175,7 +175,7 @@ function UnidadCurricularEdit() {
   // Funcion para enviar datos al backend
   const onSubmit = async (values, { setErrors }) => {
     values.hora_total_est =
-      parseInt(values.hora_teorica) + parseInt(values.hora_practica);
+      (parseInt(values.hora_teorica) || 0) + (parseInt(values.hora_practica) || 0);
 
     try {
       await PutAll(
@@ -388,9 +388,9 @@ function UnidadCurricularEdit() {
               />
               <Buttom
                 type="button"
-                style="btn-danger ms-1"
-                title="Cancelar"
-                text="Cancelar"
+                style="btn-secondary ms-1"
+                title="Limpiar"
+                text="Limpiar"
                 onClick={handleCancel}
               />
             </>

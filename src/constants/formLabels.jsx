@@ -111,4 +111,8 @@ export const FORM_LABELS = {
     DEDICACIÓN: "DEDICACIÓN",
     TIPO: "TIPO DE CONTRATO",
   },
+  VOCERO: {
+    SECCION: "SECCIÓN",
+    VOCERO: "BUSCAR VOCERO"
+  }
 };

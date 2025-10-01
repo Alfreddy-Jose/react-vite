@@ -14,15 +14,21 @@ const permisos = JSON.parse(localStorage.getItem("permissions")) || [];
 const columns = [
   {
     name: "ID",
-    selector: (row, index) => index + 1, sortable: true ,
+    selector: (row, index) => index + 1,
+    sortable: true,
   },
   {
-    name: "CÉDULA PERSONA",
+    name: "CÉDULA",
     selector: (row) => row.persona.cedula_persona,
   },
   {
-    name: "PERSONA",
+    name: "NOMBRE",
     selector: (row) => row.persona.nombre,
+    sortable: true,
+  },
+  {
+    name: "SECCIÓN",
+    selector: (row) => row.seccion.nombre,
     sortable: true,
   },
   {
@@ -42,13 +48,7 @@ const columns = [
             <b>APELLIDO: </b> {row.persona.apellido}
           </p>
           <p>
-            <b>PNF: </b> {row.pnf.nombre}
-          </p>
-          <p>
-            <b>DIRECCIÓN: </b> {row.persona.direccion}
-          </p>
-          <p>
-            <b>MUNICIPIO: </b> {row.persona.municipio}
+            <b>SECCIÓN: </b> {row.seccion.nombre}
           </p>
           <p>
             <b>TELÉFONO: </b> {row.persona.telefono}
@@ -63,34 +63,27 @@ const columns = [
             <b>GRADO INSTITUCIONAL:</b> {row.persona.grado_inst}
           </p>
           <p>
-            <b>CATEGORÍA:</b> {row.categoria}
+            <b>MUNICIPIO: </b> {row.persona.municipio}
           </p>
-          {/* mostrar Unidades curriculares si es una o mas */}
-          {row.unidades_curriculares && (
-            <p>
-              <b>UNIDADES CURRICULARES: </b>
-              {row.unidades_curriculares.map((unidades) => (
-                <span key={unidades.id}>{unidades.nombre}, </span>
-              ))}
-            </p>
-          )}
+          <p>
+            <b>DIRECCIÓN: </b> {row.persona.direccion}
+          </p>
         </Modal>
       </div>
     ),
   },
   // Mostrar columna solo si tiene al menos uno de los permisos
-  ...(permisos.includes("docente.editar") ||
-  permisos.includes("docente.eliminar")
+  ...(permisos.includes("vocero.editar") || permisos.includes("vocero.eliminar")
     ? [
         {
           name: "ACCIONES",
           cell: (row) => (
             <Acciones
-              url={`/docente/${row.id}/edit`}
-              urlDelete={`/docente/${row.id}`}
-              navegar="/docentes"
-              editar="docente.editar"
-              eliminar="docente.eliminar"
+              url={`/vocero/${row.id}/edit`}
+              urlDelete={`/vocero/${row.id}`}
+              navegar="/voceros"
+              editar="vocero.editar"
+              eliminar="vocero.eliminar"
             />
           ),
         },
@@ -98,14 +91,14 @@ const columns = [
     : []),
 ];
 
-function Docente() {
-  const [docentes, setDocentes] = useState([]);
+function Voceros() {
+  const [voceros, setVoceros] = useState([]);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
 
   useEffect(() => {
     // Mostrar la lista de registros
-    GetAll(setDocentes, setLoading, "/docentes");
+    GetAll(setVoceros, setLoading, "/voceros");
 
     // Motrar Alerta al registrar un nuevo Coordinador
     if (location.state?.message) {
@@ -121,20 +114,20 @@ function Docente() {
       {/* Contenedor para la tablas de Administrador */}
       <ContainerTable
         // Titulo para la tabla PNF
-        title="DOCENTES"
+        title="VOCEROS"
         // Boton para crear nuevos registros
 
         link={
-          permisos.includes("docente.crear") ? (
-            <Create path="/docente/create" />
+          permisos.includes("vocero.crear") ? (
+            <Create path="/vocero/create" />
           ) : null
         }
         isLoading={loading}
         // Tabla
-        tabla={<Tabla columns={columns} data={docentes} />}
+        tabla={<Tabla columns={columns} data={voceros} />}
       />
     </>
   );
 }
 
-export default Docente;
+export default Voceros;

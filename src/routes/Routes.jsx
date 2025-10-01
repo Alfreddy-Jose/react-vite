@@ -10,7 +10,6 @@ import AulasCreate from "../pages/espacios/AulasCreate";
 import LaboratoriosCreate from "../pages/espacios/LaboratorioCreate";
 import LaboratorioEdit from "../pages/espacios/LaboratorioEdit";
 import Laboratorios from "../pages/espacios/Laboratorios";
-import HorarioFull from "../pages/horario/HorarioFull";
 import { Horarios } from "../pages/horario/Horario";
 import { HorarioCreate } from "../pages/horario/HorarioCreate";
 import { LapsoAcademico } from "../pages/lapsoAcademico/LapsoAcademico";
@@ -53,6 +52,10 @@ import HomePage from "../pages/HomePage";
 import TrayectoEdit from "../pages/trayectos/TrayectoEdit";
 import { HorarioClases } from "../pages/horario/HorarioClases";
 import { HorariosDocentes } from "../pages/horario/HorarioDocente";
+import Voceros from "../pages/vocero/Vocero";
+import VoceroCreate from "../pages/vocero/VoceroCreate";
+import VoceroEdit from "../pages/vocero/VoceroEdit";
+import Unauthorized from "../pages/Unauthorized";
 
 export function AppRoutes() {
   return (
@@ -73,11 +76,14 @@ export function AppRoutes() {
           }
         />
 
+        {/* Ruta de no autorizado */}
+        <Route path="/unauthorized" element={<Unauthorized />} />
+
         {/* Rutas de Usuario */}
         <Route
           path="/usuarios"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="usuario.ver">
               <Layout>
                 <Usuario />
               </Layout>
@@ -87,7 +93,7 @@ export function AppRoutes() {
         <Route
           path="/usuarios/create"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="usuario.crear">
               <Layout>
                 <UsuarioCreate />
               </Layout>
@@ -97,7 +103,7 @@ export function AppRoutes() {
         <Route
           path="/usuario/:id/edit"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="usuario.editar">
               <Layout>
                 <UsuarioEdit />
               </Layout>
@@ -109,7 +115,7 @@ export function AppRoutes() {
         <Route
           path="/pnf"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="pnf.ver">
               <Layout>
                 <Pnf />
               </Layout>
@@ -119,7 +125,7 @@ export function AppRoutes() {
         <Route
           path="/pnf/create"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="pnf.crear">
               <Layout>
                 <PnfCreate />
               </Layout>
@@ -129,7 +135,7 @@ export function AppRoutes() {
         <Route
           path="/pnf/:id/edit"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="pnf.editar">
               <Layout>
                 <PnfEdit />
               </Layout>
@@ -141,17 +147,17 @@ export function AppRoutes() {
         <Route
           path="/sede"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="sede.ver">
               <Layout>
                 <Sede />
               </Layout>
             </ProtectedRoute>
           }
-        />
+        />tipo matricula.ver
         <Route
           path="/sede/create"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission='sede.crear'>
               <Layout>
                 <SedeCreate />
               </Layout>
@@ -161,7 +167,7 @@ export function AppRoutes() {
         <Route
           path="/sede/:id/edit"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission='sede.editar'>
               <Layout>
                 <SedeEdit />
               </Layout>
@@ -173,7 +179,7 @@ export function AppRoutes() {
         <Route
           path="/lapsos"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="lapso.ver">
               <Layout>
                 <LapsoAcademico />
               </Layout>
@@ -183,7 +189,7 @@ export function AppRoutes() {
         <Route
           path="/lapso_academico/create"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="lapso.crear">
               <Layout>
                 <LapsoAcademicoCreate />
               </Layout>
@@ -193,7 +199,7 @@ export function AppRoutes() {
         <Route
           path="/lapso_academico/:id/edit"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="lapso.editar">
               <Layout>
                 <LapsoAcademicoEdit />
               </Layout>
@@ -205,7 +211,7 @@ export function AppRoutes() {
         <Route
           path="/trayectos"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="trayecto.ver">
               <Layout>
                 <Trayecto />
               </Layout>
@@ -215,7 +221,7 @@ export function AppRoutes() {
         <Route
           path="/trayecto/create"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="trayecto.crear">
               <Layout>
                 <TrayectoCreate />
               </Layout>
@@ -225,7 +231,7 @@ export function AppRoutes() {
         <Route
           path="/trayecto/:id/edit"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="trayecto.editar">
               <Layout>
                 <TrayectoEdit />
               </Layout>
@@ -237,8 +243,8 @@ export function AppRoutes() {
         <Route
           path="/unidad_curricular"
           element={
-            <ProtectedRoute>
-              <Layout>
+            <ProtectedRoute requiredPermission="unidad Curricular.ver">
+              <Layout>tipo matricula.ver
                 <UnidadCurricular />
               </Layout>
             </ProtectedRoute>
@@ -247,7 +253,7 @@ export function AppRoutes() {
         <Route
           path="/unidad_curricular/create"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="unidad Curricular.crear">
               <Layout>
                 <UnidadCurricularCreate />
               </Layout>
@@ -257,19 +263,19 @@ export function AppRoutes() {
         <Route
           path="/unidad_curricular/:id/edit"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="unidad Curricular.editar">
               <Layout>
                 <UnidadCurricularEdit />
               </Layout>
             </ProtectedRoute>
           }
-        />
+        />tipo matricula.ver
 
         {/* Rutas de Tipo de matricula */}
         <Route
           path="/matricula"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="Tipo Matricula.ver">
               <Layout>
                 <TipoMatricula />
               </Layout>
@@ -279,7 +285,7 @@ export function AppRoutes() {
         <Route
           path="/tipo_matricula/create"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="Tipo Matricula.crear">
               <Layout>
                 <TipoMatriculaCreate />
               </Layout>
@@ -289,7 +295,7 @@ export function AppRoutes() {
         <Route
           path="/tipo_matricula/:id/edit"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="Tipo Matricula.editar">
               <Layout>
                 <TipoMatriculaEdit />
               </Layout>
@@ -301,7 +307,7 @@ export function AppRoutes() {
         <Route
           path="/secciones"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="seccion.ver">
               <Layout>
                 <Secciones />
               </Layout>
@@ -311,7 +317,7 @@ export function AppRoutes() {
         <Route
           path="/seccion/create"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="seccion.crear">
               <Layout>
                 <SeccionesCreate />
               </Layout>
@@ -321,7 +327,7 @@ export function AppRoutes() {
         <Route
           path="/seccion/:id/edit"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="seccion.editar">
               <Layout>
                 <SeccionesEdit />
               </Layout>
@@ -333,7 +339,7 @@ export function AppRoutes() {
         <Route
           path="/turnos"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="turno.ver">
               <Layout>
                 <Turno />
               </Layout>
@@ -343,7 +349,7 @@ export function AppRoutes() {
         <Route
           path="/turno/create"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="turno.crear">
               <Layout>
                 <TurnoCreate />
               </Layout>
@@ -355,7 +361,7 @@ export function AppRoutes() {
         <Route
           path="/aula"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="aula.ver">
               <Layout>
                 <Aulas />
               </Layout>
@@ -365,7 +371,7 @@ export function AppRoutes() {
         <Route
           path="/aula/create"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="aula.crear">
               <Layout>
                 <AulasCreate />
               </Layout>
@@ -375,7 +381,7 @@ export function AppRoutes() {
         <Route
           path="/aula/:id/edit"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="aula.editar">
               <Layout>
                 <AulasEdit />
               </Layout>
@@ -385,7 +391,7 @@ export function AppRoutes() {
         <Route
           path="/laboratorio"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="laboratorio.ver">
               <Layout>
                 <Laboratorios />
               </Layout>
@@ -395,7 +401,7 @@ export function AppRoutes() {
         <Route
           path="/laboratorio/create"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="laboratorio.crear">
               <Layout>
                 <LaboratoriosCreate />
               </Layout>
@@ -405,7 +411,7 @@ export function AppRoutes() {
         <Route
           path="/laboratorio/:id/edit"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="laboratorio.editar">
               <Layout>
                 <LaboratorioEdit />
               </Layout>
@@ -417,7 +423,7 @@ export function AppRoutes() {
         <Route
           path="/roles"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="rol.ver">
               <Layout>
                 <Roles />
               </Layout>
@@ -427,7 +433,7 @@ export function AppRoutes() {
         <Route
           path="/rol/create"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="rol.crear">
               <Layout>
                 <RolesCreate />
               </Layout>
@@ -437,7 +443,7 @@ export function AppRoutes() {
         <Route
           path="/rol/:id/edit"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="rol.editar">
               <Layout>
                 <RolesEdit />
               </Layout>
@@ -449,7 +455,7 @@ export function AppRoutes() {
         <Route
           path="/universidad"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="universidad.ver">
               <Layout>
                 <Universidad />
               </Layout>
@@ -461,7 +467,7 @@ export function AppRoutes() {
         <Route
           path="/persona"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="persona.ver">
               <Layout>
                 <Persona />
               </Layout>
@@ -471,7 +477,7 @@ export function AppRoutes() {
         <Route
           path="/persona/create"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="persona.crear">
               <Layout>
                 <PersonaCreate />
               </Layout>
@@ -481,7 +487,7 @@ export function AppRoutes() {
         <Route
           path="/persona/:id/edit"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="persona.editar">
               <Layout>
                 <PersonaEdit />
               </Layout>
@@ -492,7 +498,7 @@ export function AppRoutes() {
         <Route
           path="/coordinador"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="coordinador.ver">
               <Layout>
                 <Coordinador />
               </Layout>
@@ -504,7 +510,7 @@ export function AppRoutes() {
         <Route
           path="/docentes"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="docente.ver">
               <Layout>
                 <Docente />
               </Layout>
@@ -514,7 +520,7 @@ export function AppRoutes() {
         <Route
           path="/docente/create"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="docente.crear">
               <Layout>
                 <DocenteCreate />
               </Layout>
@@ -524,13 +530,46 @@ export function AppRoutes() {
         <Route
           path="/docente/:id/edit"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission="docente.editar">
               <Layout>
                 <DocenteEdit />
               </Layout>
             </ProtectedRoute>
           }
         />
+
+        {/* Rutas para Vocero */}
+        <Route
+          path="/voceros"
+          element={
+            <ProtectedRoute requiredPermission="vocero.ver">
+              <Layout>
+                <Voceros />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/vocero/create"
+          element={
+            <ProtectedRoute requiredPermission="vocero.crear">
+              <Layout>
+                <VoceroCreate />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/vocero/:id/edit"
+          element={
+            <ProtectedRoute requiredPermission="vocero.editar">
+              <Layout>
+                <VoceroEdit />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
         {/* Rutas para Horario */}
         <Route
           path="/horarios"

@@ -305,15 +305,15 @@ function RolesCreate() {
                     />
                     <Checkbox
                       name="permisos"
-                      label={FORM_LABELS.ROLES_PERMISOS.ESTADO}
-                      value="lapso.cambiar estado"
+                      label={FORM_LABELS.ROLES_PERMISOS.PDF}
+                      value="lapso.pdf"
                       formik={formik}
                       disabled={!isModuleEnabled("lapso")}
                     />
                     <Checkbox
                       name="permisos"
-                      label={FORM_LABELS.ROLES_PERMISOS.PDF}
-                      value="lapso.pdf"
+                      label={FORM_LABELS.ROLES_PERMISOS.ESTADO}
+                      value="lapso.cambiar estado"
                       formik={formik}
                       disabled={!isModuleEnabled("lapso")}
                     />
@@ -363,6 +363,56 @@ function RolesCreate() {
               />
 
               <CardCheckbox
+                title="UNIDAD CURRICULAR"
+                checkbox={
+                  <>
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.VER}
+                      value="unidad Curricular.ver"
+                      formik={formik}
+                      disabled={false}
+                      onChange={(e) => {
+                        handleModuleToggle("unidad Curricular")(e);
+                        formik.handleChange(e);
+                      }}
+                      checked={formik.values.permisos.includes(
+                        "unidad Curricular.ver"
+                      )}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.CREAR}
+                      value="unidad Curricular.crear"
+                      formik={formik}
+                      disabled={!isModuleEnabled("unidad Curricular")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.EDITAR}
+                      value="unidad Curricular.editar"
+                      formik={formik}
+                      disabled={!isModuleEnabled("unidad Curricular")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.ELIMINAR}
+                      value="unidad Curricular.eliminar"
+                      formik={formik}
+                      disabled={!isModuleEnabled("unidad Curricular")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.PDF}
+                      value="unidad Curricular.pdf"
+                      formik={formik}
+                      disabled={!isModuleEnabled("unidad Curricular")}
+                    />
+                  </>
+                }
+              />
+
+              <CardCheckbox
                 title="TIPO MATRÍCULA"
                 checkbox={
                   <>
@@ -376,7 +426,9 @@ function RolesCreate() {
                         handleModuleToggle("matricula")(e);
                         formik.handleChange(e);
                       }}
-                      checked={formik.values.permisos.includes("Tipo Matricula.ver")}
+                      checked={formik.values.permisos.includes(
+                        "Tipo Matricula.ver"
+                      )}
                     />
                     <Checkbox
                       name="permisos"
@@ -459,6 +511,104 @@ function RolesCreate() {
               />
 
               <CardCheckbox
+                title="AULA"
+                checkbox={
+                  <>
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.VER}
+                      value="aula.ver"
+                      formik={formik}
+                      disabled={false}
+                      onChange={(e) => {
+                        handleModuleToggle("aula")(e);
+                        formik.handleChange(e);
+                      }}
+                      checked={formik.values.permisos.includes("aula.ver")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.CREAR}
+                      value="aula.crear"
+                      formik={formik}
+                      disabled={!isModuleEnabled("aula")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.EDITAR}
+                      value="seccion.editar"
+                      formik={formik}
+                      disabled={!isModuleEnabled("aula")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.ELIMINAR}
+                      value="aula.eliminar"
+                      formik={formik}
+                      disabled={!isModuleEnabled("aula")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.PDF}
+                      value="aula.pdf"
+                      formik={formik}
+                      disabled={!isModuleEnabled("aula")}
+                    />
+                  </>
+                }
+              />
+
+              <CardCheckbox
+                title="LABORATORIO"
+                checkbox={
+                  <>
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.VER}
+                      value="laboratorio.ver"
+                      formik={formik}
+                      disabled={false}
+                      onChange={(e) => {
+                        handleModuleToggle("laboratorio")(e);
+                        formik.handleChange(e);
+                      }}
+                      checked={formik.values.permisos.includes(
+                        "laboratorio.ver"
+                      )}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.CREAR}
+                      value="laboratorio.crear"
+                      formik={formik}
+                      disabled={!isModuleEnabled("laboratorio")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.EDITAR}
+                      value="laboratorio.editar"
+                      formik={formik}
+                      disabled={!isModuleEnabled("laboratorio")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.ELIMINAR}
+                      value="laboratorio.eliminar"
+                      formik={formik}
+                      disabled={!isModuleEnabled("laboratorio")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.PDF}
+                      value="laboratorio.pdf"
+                      formik={formik}
+                      disabled={!isModuleEnabled("laboratorio")}
+                    />
+                  </>
+                }
+              />
+
+              <CardCheckbox
                 title="TURNO"
                 checkbox={
                   <>
@@ -513,7 +663,9 @@ function RolesCreate() {
                         handleModuleToggle("coordinador")(e);
                         formik.handleChange(e);
                       }}
-                      checked={formik.values.permisos.includes("coordinador.ver")}
+                      checked={formik.values.permisos.includes(
+                        "coordinador.ver"
+                      )}
                     />
                     <Checkbox
                       name="permisos"
@@ -539,6 +691,186 @@ function RolesCreate() {
                   </>
                 }
               />
+
+              <CardCheckbox
+                title="PERSONA"
+                checkbox={
+                  <>
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.VER}
+                      value="persona.ver"
+                      formik={formik}
+                      disabled={false}
+                      onChange={(e) => {
+                        handleModuleToggle("persona")(e);
+                        formik.handleChange(e);
+                      }}
+                      checked={formik.values.permisos.includes("persona.ver")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.CREAR}
+                      value="persona.crear"
+                      formik={formik}
+                      disabled={!isModuleEnabled("persona")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.EDITAR}
+                      value="persona.editar"
+                      formik={formik}
+                      disabled={!isModuleEnabled("persona")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.ELIMINAR}
+                      value="persona.eliminar"
+                      formik={formik}
+                      disabled={!isModuleEnabled("persona")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.PDF}
+                      value="persona.pdf"
+                      formik={formik}
+                      disabled={!isModuleEnabled("persona")}
+                    />
+                  </>
+                }
+              />
+
+              <CardCheckbox
+                title="DOCENTE"
+                checkbox={
+                  <>
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.VER}
+                      value="docente.ver"
+                      formik={formik}
+                      disabled={false}
+                      onChange={(e) => {
+                        handleModuleToggle("docente")(e);
+                        formik.handleChange(e);
+                      }}
+                      checked={formik.values.permisos.includes("docente.ver")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.CREAR}
+                      value="docente.crear"
+                      formik={formik}
+                      disabled={!isModuleEnabled("docente")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.EDITAR}
+                      value="docente.editar"
+                      formik={formik}
+                      disabled={!isModuleEnabled("docente")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.ELIMINAR}
+                      value="docente.eliminar"
+                      formik={formik}
+                      disabled={!isModuleEnabled("docente")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.PDF}
+                      value="docente.pdf"
+                      formik={formik}
+                      disabled={!isModuleEnabled("docente")}
+                    />
+                  </>
+                }
+              />
+
+              <CardCheckbox
+                title="VOCERO"
+                checkbox={
+                  <>
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.VER}
+                      value="vocero.ver"
+                      formik={formik}
+                      disabled={false}
+                      onChange={(e) => {
+                        handleModuleToggle("vocero")(e);
+                        formik.handleChange(e);
+                      }}
+                      checked={formik.values.permisos.includes("vocero.ver")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.CREAR}
+                      value="vocero.crear"
+                      formik={formik}
+                      disabled={!isModuleEnabled("vocero")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.EDITAR}
+                      value="vocero.editar"
+                      formik={formik}
+                      disabled={!isModuleEnabled("vocero")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.ELIMINAR}
+                      value="vocero.eliminar"
+                      formik={formik}
+                      disabled={!isModuleEnabled("vocero")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.PDF}
+                      value="vocero.pdf"
+                      formik={formik}
+                      disabled={!isModuleEnabled("vocero")}
+                    />
+                  </>
+                }
+              />
+
+              <CardCheckbox
+                title="UNIVERSIDAD"
+                checkbox={
+                  <>
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.VER}
+                      value="universidad.ver"
+                      formik={formik}
+                      disabled={false}
+                      onChange={(e) => {
+                        handleModuleToggle("universidad")(e);
+                        formik.handleChange(e);
+                      }}
+                      checked={formik.values.permisos.includes(
+                        "universidad.ver"
+                      )}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.CREAR}
+                      value="universidad.crear"
+                      formik={formik}
+                      disabled={!isModuleEnabled("universidad")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.EDITAR}
+                      value="universidad.editar"
+                      formik={formik}
+                      disabled={!isModuleEnabled("universidad")}
+                    />
+                  </>
+                }
+              />
             </div>
           </>
         }
@@ -552,9 +884,9 @@ function RolesCreate() {
             />
             <Buttom
               type="button"
-              style="btn-danger ms-1"
-              title="Cancelar"
-              text="Cancelar"
+              style="btn-secondary ms-1"
+              title="Limpiar"
+              text="Limpiar"
               onClick={() => formik.resetForm()}
             />
           </>

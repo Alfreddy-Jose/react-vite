@@ -85,7 +85,7 @@ export function LapsoAcademicoEdit() {
   return (
     <form onSubmit={formik.handleSubmit}>
       <ContainerIput
-        title="EDITAR LAPSO ACADEMICO"
+        title="EDITAR LAPSO ACADÉMICO"
         link={
           <Create path="/lapsos" text="Volver" style="btn btn-secondary mb-4" />
         }
@@ -129,10 +129,10 @@ export function LapsoAcademicoEdit() {
             />
 
             <Buttom
-              text="Cancelar"
-              title="Cancelar"
+              text="Limpiar"
+              title="Limpiar"
               type="button"
-              style="btn-danger ms-1"
+              style="btn-secondary ms-1"
               onClick={() => formik.resetForm()}
             />
           </>

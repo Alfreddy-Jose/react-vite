@@ -75,10 +75,10 @@ function UnidadCurricular() {
               <b>NOMBRE: </b> {row.nombre}
             </p>
             <p>
-              <b>HORAS PRÁCTICAS: </b> {row.hora_practica}
+              <b>HORAS PRÁCTICAS: </b> {row.hora_practica || 0}
             </p>
             <p>
-              <b>HORAS TEÓRICAS: </b> {row.hora_teorica}
+              <b>HORAS TEÓRICAS: </b> {row.hora_teorica || 0}
             </p>
             <p>
               <b>HORAS TOTAL ESTIMADAS: </b> {row.hora_total_est}
@@ -134,7 +134,7 @@ function UnidadCurricular() {
         // Titulo para la tabla
         title="UNIDADES CURRICULARES"
         button_pdf={
-          permisos.includes("unidad.pdf") ?
+          permisos.includes("unidad Curricular.pdf") ?
           (<Buttom
             type="button"
             style="btn btn-danger mb-3"

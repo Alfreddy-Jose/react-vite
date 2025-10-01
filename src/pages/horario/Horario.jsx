@@ -6,7 +6,6 @@ import { Link, useLocation } from "react-router-dom";
 import Alerta from "../../components/Alert";
 import { Modal, ButtomModal } from "../../components/Modal";
 import { Tabla } from "../../components/Tabla";
-import Acciones from "../../components/Acciones";
 
 export function Horarios() {
   const [horarios, setHorarios] = useState([]);
@@ -83,24 +82,6 @@ export function Horarios() {
         </Link>
       ),
     },
-    // Acciones si tiene permisos
-    /*     ...(permisos.includes("horarios.editar") ||
-    permisos.includes("horarios.eliminar")
-      ? [*/
-    {
-      name: "ACCIONES",
-      cell: (row) => (
-        <Acciones
-          url={`/horarios/${row.id}/edit`}
-          urlDelete={`/horarios/${row.id}`}
-          navegar="/horarios"
-          editar="horarios.editar"
-          eliminar="horarios.eliminar"
-        />
-      ),
-    },
-    /*]
-      : []), */
   ];
 
   return (

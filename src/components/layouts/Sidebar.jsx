@@ -147,7 +147,8 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
               </li>
 
               <li className="nav-item">
-                {permisos.includes("Gestionar Espacios") ? (
+                {permisos.includes("aula.ver") ||
+                permisos.includes("laboratorio.ver") ? (
                   <a data-bs-toggle="collapse" href="#espacios">
                     <i className="fas fa-chalkboard-teacher"></i>
                     <p>Espacios</p>
@@ -183,7 +184,10 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                 ) : null}
               </li>
               <li className="nav-item">
-                {permisos.includes("gestionar persona") ? (
+                {permisos.includes("persona.ver") ||
+                permisos.includes("vocero.ver") ||
+                permisos.includes("coordinador.ver") ||
+                permisos.includes("docente.ver") ? (
                   <a data-bs-toggle="collapse" href="#persona">
                     <i className="fas fa-person"></i>
                     <p>Gestión de Personas</p>
@@ -192,33 +196,45 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                 ) : null}
                 <div className="collapse" id="persona">
                   <ul className="nav nav-collapse">
+                    {permisos.includes("persona.ver") ? (
+                      <li>
+                        <Link to="/persona">
+                          <span className="sub-item">Crear persona</span>
+                        </Link>
+                      </li>
+                    ) : null}
                     <li>
-                      <Link to="/persona">
-                        <span className="sub-item">Crear persona</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <a data-bs-toggle="collapse" href="#tipos">
-                        <span className="sub-item">Tipos</span>
-                        <span className="caret"></span>
-                      </a>
+                      {permisos.includes("vocero.ver") ||
+                      permisos.includes("coordinador.ver") ||
+                      permisos.includes("docente.ver") ? (
+                        <a data-bs-toggle="collapse" href="#tipos">
+                          <span className="sub-item">Tipos</span>
+                          <span className="caret"></span>
+                        </a>
+                      ) : null}
                       <div className="collapse" id="tipos">
                         <ul className="nav nav-collapse subnav">
-                          <li>
-                            <Link to="/coordinador">
-                              <span className="sub-item">Coodinador</span>
-                            </Link>
-                          </li>
-                          <li>
-                            <Link to="/docentes">
-                              <span className="sub-item">Docente</span>
-                            </Link>
-                          </li>
-                          <li>
-                            <a href="#">
-                              <span className="sub-item">Vocero</span>
-                            </a>
-                          </li>
+                          {permisos.includes("coordinador.ver") ? (
+                            <li>
+                              <Link to="/coordinador">
+                                <span className="sub-item">Coodinador</span>
+                              </Link>
+                            </li>
+                          ) : null}
+                          {permisos.includes("docente.ver") ? (
+                            <li>
+                              <Link to="/docentes">
+                                <span className="sub-item">Docente</span>
+                              </Link>
+                            </li>
+                          ) : null}
+                          {permisos.includes("vocero.ver") ? (
+                            <li>
+                              <Link to="/voceros">
+                                <span className="sub-item">Vocero</span>
+                              </Link>
+                            </li>
+                          ) : null}
                         </ul>
                       </div>
                     </li>
@@ -296,27 +312,26 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
               </li>
 
               <li className="nav-item">
-                  <a data-bs-toggle="collapse" href="#horarios">
-                    <i className="fa-solid fa-calendar"></i>
-                    <p>Horarios</p>
-                    <span className="caret"></span>
-                  </a>
+                <a data-bs-toggle="collapse" href="#horarios">
+                  <i className="fa-solid fa-calendar"></i>
+                  <p>Horarios</p>
+                  <span className="caret"></span>
+                </a>
                 <div className="collapse" id="horarios">
                   <ul className="nav nav-collapse">
-                      <li>
-                        <Link to="/horarios">
-                          <span className="sub-item">Horarios por Sección</span>
-                        </Link>
-                      </li>
                     <li>
-                        <Link to="/horarios/docente">
-                          <span className="sub-item">Horarios por Docente</span>
-                        </Link>
+                      <Link to="/horarios">
+                        <span className="sub-item">Horarios por Sección</span>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/horarios/docente">
+                        <span className="sub-item">Horarios por Docente</span>
+                      </Link>
                     </li>
                   </ul>
                 </div>
               </li>
-
             </ul>
           </div>
         </div>
