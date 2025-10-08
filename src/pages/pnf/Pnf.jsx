@@ -8,12 +8,17 @@ import { Modal, ButtomModal } from "../../components/Modal";
 import { Tabla } from "../../components/Tabla";
 import Acciones from "../../components/Acciones";
 import { Buttom } from "../../components/Buttom";
+import { SearchBox } from "../../components/SearchBox";
 
 export function Pnf() {
   const [pnf, setPnf] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [pnfFiltrados, setPnfFiltrados] = useState([]);
   const [permisos, setPermisos] = useState([]);
   const location = useLocation();
+
+  // Campos por los que buscar - definidos directamente aquí
+  const camposBusqueda = ["codigo", "nombre", "abreviado", "abreviado_coord"];
 
   useEffect(() => {
     // Leer permisos del localStorage
@@ -31,6 +36,11 @@ export function Pnf() {
     // Limpiar el estado de navegacion para no mostrar el mensaje nuevamente
     window.history.replaceState({}, "");
   }, [location.state]);
+
+  // Inicializar datos filtrados
+  useEffect(() => {
+    setPnfFiltrados(pnf);
+  }, [pnf]);
 
   const descargarPDF = async () => {
     try {
@@ -116,15 +126,24 @@ export function Pnf() {
       <ContainerTable
         // Titulo para la tabla PNF
         title="PNF"
+        // Propiedades para el buscador
+        data={pnf}
+        searchData={pnf}
+        onSearchFiltered={setPnfFiltrados}
+        searchFields={camposBusqueda}
+        placeholder="BUSCAR..."
+        showStats={true}
+        // Boton para generar PDF
         button_pdf={
           permisos.includes("pnf.pdf") ? (
-          <Buttom
-            type="button"
-            style="btn btn-danger mb-3"
-            onClick={descargarPDF}
-            title="Generar PDF"
-            text="Generar PDF"
-          />) : null
+            <Buttom
+              type="button"
+              style="btn btn-danger mb-3"
+              onClick={descargarPDF}
+              title="Generar PDF"
+              text="Generar PDF"
+            />
+          ) : null
         }
         // Boton para crear nuevos registros
         link={
@@ -132,7 +151,7 @@ export function Pnf() {
         }
         isLoading={loading}
         // Tabla
-        tabla={<Tabla columns={columns} data={pnf} />}
+        tabla={<Tabla columns={columns} data={pnfFiltrados} />}
       />
     </>
   );

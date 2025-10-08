@@ -12,13 +12,26 @@ import { FORM_LABELS } from "../../constants/formLabels";
 import SelectSearch from "../../components/SelectSearch";
 import { Buttom } from "../../components/Buttom";
 import { useAuth } from "../../context/AuthContext";
+import { SearchBox } from "../../components/SearchBox";
 
 export function Secciones() {
   const [secciones, setSecciones] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [seccionesFiltrados, setSeccionesFiltrados] = useState([]);
   const [permisos, setPermisos] = useState([]);
   const location = useLocation();
 
+  // Campos por los que buscar - definidos directamente aquí
+  const camposBusqueda = [
+    "nombre",
+    "pnf.nombre",
+    "matricula.nombre",
+    "sede.nombre_sede",
+    "trayecto.nombre",
+    "sede.nombre_sede",
+    "lapso.ano",
+    "numero_seccion",
+  ];
 
   // Nueva función para buscar secciones
   const buscarSecciones = async (parametros) => {
@@ -51,6 +64,11 @@ export function Secciones() {
     // Limpiar el estado de navegacion para no mostrar el mensaje nuevamente
     window.history.replaceState({}, "");
   }, [location.state]);
+
+  // Inicializar datos filtrados
+  useEffect(() => {
+    setSeccionesFiltrados(secciones);
+  }, [secciones]);
 
   // Definir las columnas de la tabla
   const columns = [
@@ -119,8 +137,19 @@ export function Secciones() {
       {/* Contenedor para la tablas */}
       <ContainerTable
         header_parametros={
-          <SeccionParametros buscarSecciones={buscarSecciones} permisos={permisos } />
+          <SeccionParametros
+            buscarSecciones={buscarSecciones}
+            permisos={permisos}
+          />
         }
+        // Propiedades para el buscador
+        data={secciones}
+        searchData={secciones}
+        onSearchFiltered={setSeccionesFiltrados}
+        searchFields={camposBusqueda}
+        placeholder="BUSCAR..."
+        showStats={true}
+
         // Titulo para la tabla
         title="SECCIONES"
         // Boton para crear nuevos registros
@@ -130,7 +159,7 @@ export function Secciones() {
           ) : null
         }
         // Tabla
-        tabla={<Tabla data={secciones} columns={columns} />}
+        tabla={<Tabla data={seccionesFiltrados} columns={columns} />}
         // Indicador de carga
         isLoading={loading}
       />
@@ -155,11 +184,7 @@ export function SeccionParametros({ buscarSecciones, permisos }) {
     initialValues,
     onSubmit: () => {},
   });
-
-  /*   const handleGenerarPDF = () => {
-    const params = new URLSearchParams(formik.values).toString();
-    window.open(`api/secciones/pdf?${params}`, "_blank");
-  }; */
+  // Función para generar y descargar el PDF
   const handleGenerarPDF = async () => {
     const params = new URLSearchParams(
       Object.fromEntries(
@@ -251,14 +276,15 @@ export function SeccionParametros({ buscarSecciones, permisos }) {
                 onClick={() => formik.resetForm()}
                 style="btn-secondary me-2"
               />
-              { permisos.includes("seccion.pdf") ?
-              (<Buttom
-                type="button"
-                text="Generar PDF"
-                title="PDF"
-                style="btn-danger me-2"
-                onClick={handleGenerarPDF}
-              />) : null }
+              {permisos.includes("seccion.pdf") ? (
+                <Buttom
+                  type="button"
+                  text="Generar PDF"
+                  title="PDF"
+                  style="btn-danger me-2"
+                  onClick={handleGenerarPDF}
+                />
+              ) : null}
             </div>
           </div>
         </form>

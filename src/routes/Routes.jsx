@@ -153,7 +153,7 @@ export function AppRoutes() {
               </Layout>
             </ProtectedRoute>
           }
-        />tipo matricula.ver
+        />
         <Route
           path="/sede/create"
           element={
@@ -244,7 +244,7 @@ export function AppRoutes() {
           path="/unidad_curricular"
           element={
             <ProtectedRoute requiredPermission="unidad Curricular.ver">
-              <Layout>tipo matricula.ver
+              <Layout>
                 <UnidadCurricular />
               </Layout>
             </ProtectedRoute>
@@ -269,7 +269,7 @@ export function AppRoutes() {
               </Layout>
             </ProtectedRoute>
           }
-        />tipo matricula.ver
+        />
 
         {/* Rutas de Tipo de matricula */}
         <Route

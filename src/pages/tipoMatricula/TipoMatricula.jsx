@@ -11,8 +11,16 @@ import { Buttom } from "../../components/Buttom";
 export function TipoMatricula() {
   const [loading, setLoading] = useState(true);
   const [matricula, setMatricula] = useState([]);
+  const [matriculaFiltrados, setMatriculaFiltrados] = useState([]);
   const [permisos, setPermisos] = useState([]);
   const location = useLocation();
+
+  // Campos por los que buscar - definidos directamente aquí
+  const camposBusqueda = ["numero", "nombre"];
+  // Inicializar datos filtrados
+  useEffect(() => {
+    setMatriculaFiltrados(matricula);
+  }, [matricula]);
 
   useEffect(() => {
     // Leer permisos del localStorage
@@ -92,7 +100,14 @@ export function TipoMatricula() {
       <ContainerTable
         // Titulo para la tabla
         title="TIPO MATRÍCULA"
-
+        // Propiedades para el buscador
+        data={matricula}
+        searchData={matricula}
+        onSearchFiltered={setMatriculaFiltrados}
+        searchFields={camposBusqueda}
+        placeholder="BUSCAR..."
+        showStats={true}
+        // Boton para descargar PDF
         button_pdf={
           permisos.includes("Tipo Matricula.pdf") ?
           (<Buttom
@@ -110,7 +125,7 @@ export function TipoMatricula() {
           ) : null
         }
         // Tabla
-        tabla={<Tabla data={matricula} columns={columns}></Tabla>}
+        tabla={<Tabla data={matriculaFiltrados} columns={columns}></Tabla>}
         isLoading={loading}
       />
     </>

@@ -15,8 +15,17 @@ import { Buttom } from "../../components/Buttom";
 export function Sede() {
   const [sedes, setSedes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [sedesFiltrados, setSedesFiltrados] = useState([]);
   const [permisos, setPermisos] = useState([]);
   const location = useLocation();
+
+  // Campos por los que buscar - definidos directamente aquí
+  const camposBusqueda = [
+    "nro_sede",
+    "nombre_sede",
+    "nombre_abreviado",
+    "municipio.municipio",
+  ];
 
   useEffect(() => {
     const permisosLS = JSON.parse(localStorage.getItem("permissions")) || [];
@@ -28,6 +37,11 @@ export function Sede() {
     }
     window.history.replaceState({}, "");
   }, [location.state]);
+
+    // Inicializar datos filtrados
+  useEffect(() => {
+    setSedesFiltrados(sedes);
+  }, [sedes]);
 
   const descargarPDF = async () => {
     try {
@@ -83,7 +97,7 @@ export function Sede() {
             </p>
             <p>
               {/* Mostrar municipio en mayúsculas */}
-              <b>MUNICIPIO: </b> { row.municipio.municipio.toUpperCase()}
+              <b>MUNICIPIO: </b> {row.municipio.municipio.toUpperCase()}
             </p>
           </Modal>
         </div>
@@ -128,15 +142,24 @@ export function Sede() {
     <>
       <ContainerTable
         title="SEDES"
+        // Propiedades para el buscador
+        data={sedes}
+        searchData={sedes}
+        onSearchFiltered={setSedesFiltrados}
+        searchFields={camposBusqueda}
+        placeholder="BUSCAR..."
+        showStats={true}
+        // Boton para generar PDF
         button_pdf={
-          permisos.includes("sede.pdf") ?
-          (<Buttom
-            type="button"
-            style="btn btn-danger mb-3"
-            onClick={descargarPDF}
-            title="Generar PDF"
-            text="Generar PDF"
-          />) : null
+          permisos.includes("sede.pdf") ? (
+            <Buttom
+              type="button"
+              style="btn btn-danger mb-3"
+              onClick={descargarPDF}
+              title="Generar PDF"
+              text="Generar PDF"
+            />
+          ) : null
         }
         link={
           permisos.includes("sede.crear") ? (
@@ -144,7 +167,7 @@ export function Sede() {
           ) : null
         }
         isLoading={loading}
-        tabla={<Tabla data={sedes} columns={columns} />}
+        tabla={<Tabla data={sedesFiltrados} columns={columns} />}
       />
     </>
   );

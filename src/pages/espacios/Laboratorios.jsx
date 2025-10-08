@@ -14,7 +14,15 @@ export default function Laboratorios() {
   const [loading, setLoading] = useState(true);
   const [laboratorios, setLaboratorios] = useState([]);
   const [permisos, setPermisos] = useState([]);
+  const [laboratoriosFiltrados, setLaboratoriosFiltrados] = useState([]);
   const location = useLocation();
+
+  // Campos por los que buscar - definidos directamente aquí
+  const camposBusqueda = ["codigo", "nombre_aula", "sede.nombre_sede"];
+  // Inicializar datos filtrados
+  useEffect(() => {
+    setLaboratoriosFiltrados(laboratorios);
+  }, [laboratorios]);
 
   useEffect(() => {
     // Leer permisos del localStorage
@@ -110,7 +118,14 @@ export default function Laboratorios() {
       <ContainerTable
         // Titulo para la tabla
         title="LABORATORIO"
-
+        // Propiedades para el buscador
+        data={laboratorios}
+        searchData={laboratorios}
+        onSearchFiltered={setLaboratoriosFiltrados}
+        searchFields={camposBusqueda}
+        placeholder="BUSCAR..."
+        showStats={true}
+        // Boton para generar PDF
         button_pdf={
           permisos.includes("laboratorio.pdf") ?
           (<Buttom 
@@ -129,7 +144,7 @@ export default function Laboratorios() {
           ) : null
         }
         // Tabla
-        tabla={<Tabla columns={columns} data={laboratorios} />}
+        tabla={<Tabla columns={columns} data={laboratoriosFiltrados} />}
         // mostrando sniper cuando se cargan los datos
         isLoading={loading}
       />

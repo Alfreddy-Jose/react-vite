@@ -10,8 +10,17 @@ import Acciones from "../../components/Acciones";
 export default function Trayecto() {
   const [loading, setLoading] = useState(true);
   const [trayectos, setTrayectos] = useState([]);
+  const [trayectosFiltrados, setTrayectosFiltrados] = useState([]);
   const [permisos, setPermisos] = useState([]);
   const location = useLocation();
+
+  // Campos por los que buscar - definidos directamente aquí
+  const camposBusqueda = ["nombre"];
+
+  // Inicializar datos filtrados
+  useEffect(() => {
+    setTrayectosFiltrados(trayectos);
+  }, [trayectos]);
 
   useEffect(() => {
     // Leer permisos del localStorage
@@ -59,12 +68,19 @@ export default function Trayecto() {
       <ContainerTable
         // Titulo para la tabla
         title="TRAYECTOS"
+        // Propiedades para el buscador
+        data={trayectos}
+        searchData={trayectos}
+        onSearchFiltered={setTrayectosFiltrados}
+        searchFields={camposBusqueda}
+        placeholder="BUSCAR..."
+        showStats={true}
         // Boton para crear nuevos registros
         link={<Create path="/trayecto/create" />}
         // Tabla
         tabla={
           permisos.includes("trayecto.crear") ? (
-            <Tabla columns={columns} data={trayectos} />
+            <Tabla columns={columns} data={trayectosFiltrados} />
           ) : null
         }
         // Manejar Loader

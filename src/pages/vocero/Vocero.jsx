@@ -94,7 +94,21 @@ const columns = [
 function Voceros() {
   const [voceros, setVoceros] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [vocerosFiltrados, setVocerosFiltrados] = useState([]);
   const location = useLocation();
+
+  // Campos por los que buscar - definidos directamente aquí
+  const camposBusqueda = [
+    "persona.cedula_persona",
+    "persona.nombre",
+    "persona.apellido",
+    "persona.email",
+    "seccion.nombre",
+  ];
+  // Inicializar datos filtrados
+  useEffect(() => {
+    setVocerosFiltrados(voceros);
+  }, [voceros]);
 
   useEffect(() => {
     // Mostrar la lista de registros
@@ -115,8 +129,14 @@ function Voceros() {
       <ContainerTable
         // Titulo para la tabla PNF
         title="VOCEROS"
+        // Propiedades para el buscador
+        data={voceros}
+        searchData={voceros}
+        onSearchFiltered={setVocerosFiltrados}
+        searchFields={camposBusqueda}
+        placeholder="BUSCAR..."
+        showStats={true}
         // Boton para crear nuevos registros
-
         link={
           permisos.includes("vocero.crear") ? (
             <Create path="/vocero/create" />
@@ -124,7 +144,7 @@ function Voceros() {
         }
         isLoading={loading}
         // Tabla
-        tabla={<Tabla columns={columns} data={voceros} />}
+        tabla={<Tabla columns={columns} data={vocerosFiltrados} />}
       />
     </>
   );

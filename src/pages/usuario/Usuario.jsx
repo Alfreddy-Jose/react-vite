@@ -6,12 +6,17 @@ import Acciones from "../../components/Acciones";
 import { Tabla } from "../../components/Tabla";
 import Alerta from "../../components/Alert";
 import { useLocation } from "react-router-dom";
+import { SearchBox } from "../../components/SearchBox";
 
 export function Usuario() {
   const [loading, setLoading] = useState(true);
   const [usuarios, setUsuarios] = useState([]);
+  const [usuariosFiltrados, setUsuariosFiltrados] = useState([]);
   const [permisos, setPermisos] = useState([]);
   const location = useLocation();
+
+  // Campos por los que buscar - definidos directamente aquí
+  const camposBusqueda = ["name", "email", "roles[0].name"];
 
   useEffect(() => {
     // Leer permisos cada vez que el componente se monta o el localStorage cambia
@@ -28,6 +33,11 @@ export function Usuario() {
     // Limpiar el estado de navegacion para no mostrar el mensaje nuevamente
     window.history.replaceState({}, "");
   }, [location.state]);
+
+  // Inicializar datos filtrados
+  useEffect(() => {
+    setUsuariosFiltrados(usuarios);
+  }, [usuarios]);
 
   const columns = [
     { name: "ID", selector: (row, index) => index + 1, sortable: true },
@@ -65,6 +75,13 @@ export function Usuario() {
       <ContainerTable
         // Titulo para la tabla
         title="USUARIOS"
+        // Propiedades para el buscador
+        data={usuarios}
+        searchData={usuarios}
+        onSearchFiltered={setUsuariosFiltrados}
+        searchFields={camposBusqueda}
+        placeholder="BUSCAR..."
+        showStats={true}
         // Boton para crear nuevos registros
         link={
           permisos.includes("usuario.crear") ? (
@@ -72,7 +89,7 @@ export function Usuario() {
           ) : null
         }
         // Tabla
-        tabla={<Tabla columns={columns} data={usuarios} />}
+        tabla={<Tabla columns={columns} data={usuariosFiltrados} />}
         // Manejar Loader
         isLoading={loading}
       />

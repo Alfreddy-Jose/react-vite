@@ -8,6 +8,14 @@ import Alerta, { AlertaError } from "../../components/Alert";
 export function HorariosDocentes() {
   const [docentes, setDocentes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [docentesFiltrados, setDocentesFiltrados] = useState([]);
+
+  // Campos por los que buscar - definidos directamente aquí
+  const camposBusqueda = ["persona.nombre", "persona.apellido"];
+  // Inicializar datos filtrados
+  useEffect(() => {
+    setDocentesFiltrados(docentes);
+  }, [docentes]);
 
   useEffect(() => {
     const cargarDocentes = async () => {
@@ -75,8 +83,15 @@ export function HorariosDocentes() {
   return (
     <ContainerTable
       title="HORARIOS POR DOCENTES"
+      // propiedades para el buscador
+      data={docentes}
+      searchData={docentes}
+      onSearchFiltered={setDocentesFiltrados}
+      searchFields={camposBusqueda}
+      placeholder="BUSCAR..."
+      showStats={true}
       isLoading={loading}
-      tabla={<Tabla columns={columns} data={docentes} />}
+      tabla={<Tabla columns={columns} data={docentesFiltrados} />}
     />
   );
 }

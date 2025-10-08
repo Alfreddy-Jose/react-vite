@@ -249,6 +249,13 @@ function RolesEdit() {
                       formik={formik}
                       disabled={!isModuleEnabled("pnf")}
                     />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.PDF}
+                      value="pnf.pdf"
+                      formik={formik}
+                      disabled={!isModuleEnabled("pnf")}
+                    />
                   </>
                 }
               />
@@ -290,6 +297,13 @@ function RolesEdit() {
                       formik={formik}
                       disabled={!isModuleEnabled("sede")}
                     />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.PDF}
+                      value="sede.pdf"
+                      formik={formik}
+                      disabled={!isModuleEnabled("sede")}
+                    />
                   </>
                 }
               />
@@ -328,6 +342,13 @@ function RolesEdit() {
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.ELIMINAR}
                       value="lapso.eliminar"
+                      formik={formik}
+                      disabled={!isModuleEnabled("lapso")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.PDF}
+                      value="lapso.pdf"
                       formik={formik}
                       disabled={!isModuleEnabled("lapso")}
                     />
@@ -472,6 +493,13 @@ function RolesEdit() {
                       formik={formik}
                       disabled={!isModuleEnabled("matricula")}
                     />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.PDF}
+                      value="Tipo Matricula.pdf"
+                      formik={formik}
+                      disabled={!isModuleEnabled("matricula")}
+                    />
                   </>
                 }
               />
@@ -513,6 +541,13 @@ function RolesEdit() {
                       formik={formik}
                       disabled={!isModuleEnabled("seccion")}
                     />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.PDF}
+                      value="seccion.pdf"
+                      formik={formik}
+                      disabled={!isModuleEnabled("seccion")}
+                    />
                   </>
                 }
               />
@@ -543,7 +578,7 @@ function RolesEdit() {
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.EDITAR}
-                      value="seccion.editar"
+                      value="aula.editar"
                       formik={formik}
                       disabled={!isModuleEnabled("aula")}
                     />

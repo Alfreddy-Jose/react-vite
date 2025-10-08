@@ -17,6 +17,7 @@ import SelectControl from "../../components/SelectDependiente";
 import { ContainerIput } from "../../components/ContainerInput";
 import { Link } from "react-router-dom";
 
+
 function Evento({
   id,
   evento,
@@ -211,6 +212,7 @@ export default function Calendar(horarioId) {
   const [eventoRecienAgregado, setEventoRecienAgregado] = useState(null);
   const [todosLosEventos, setTodosLosEventos] = useState([]);
   const [eventos, setEventos] = useState([]);
+  const [infoHorario, setInfoHorario] = useState(null);
 
   // cargar todas las clases
   const todasLasClases = async () => {
@@ -244,9 +246,15 @@ export default function Calendar(horarioId) {
   // Al cargar el componente
   const cargarClases = async () => {
     try {
+      // Cargar todas las clases del horario
       const response = await Api.get(`/horarios/${horarioId.horarioId}/clases`);
       const evento = response.data;
-
+      // Cargar informacion del horario
+      const respuesta = await Api.get(`/horario/${horarioId.horarioId}`);
+      setInfoHorario(respuesta.data);
+      console.log("Horario cargado:", respuesta.data);
+      // Luego de obtener el horario, cargar las materias
+      obtenerMaterias(respuesta.data);
       const eventosFormateados = evento.map((evento) => ({
         id: evento.id.toString(),
         dia: evento.dia,
@@ -291,6 +299,32 @@ export default function Calendar(horarioId) {
       todasLasClases();
     }
   }, [horarioId]);
+
+  const obtenerMaterias = async (infoHorario) => {
+    console.log("Trimestre seleccionado: ", infoHorario?.trimestre?.id);
+    // cargar materias segun el trimestre
+    try {
+      const response = await Api.get(
+        `/horarios/trimestres/${infoHorario?.trimestre?.id}/unidadesCurriculares`
+      );
+      setMaterias(response.data);
+      setMateriaSeleccionada(response.data[0]);
+    } catch (error) {
+      AlertaError("Error al cargar las materias");
+      console.log(error.message);
+    }
+    // cargar aulas segun la sede
+    try {
+      const response = await Api.get(
+        `/horarios/sede/${infoHorario?.seccion?.sede_id}/espacios`
+      );
+      setAulas(response.data);
+      setAulaSeleccionada(response.data[0]);
+    } catch (error) {
+      AlertaError("Error al cargar las aulas");
+      console.log(error);
+    }
+  };
 
   const exportarPDF = async () => {
     try {
@@ -362,7 +396,7 @@ export default function Calendar(horarioId) {
       const response = await Api.get("/bloques");
       setBloques(response.data);
     } catch (error) {
-      AlertaError("Error al cargar las sedes");
+      AlertaError("Error al cargar los bloques de horas");
       console.error(error);
     }
   };
@@ -531,7 +565,8 @@ export default function Calendar(horarioId) {
 
   // Bloques disponibles: solo los que no están ocupados por el docente ni el aula en ese día y permiten la duración seleccionada
   const getBloquesDisponibles = () => {
-    if (!nuevoEvento.dia || !nuevoEvento.docente || !nuevoEvento.aula) return bloques;
+    if (!nuevoEvento.dia || !nuevoEvento.docente || !nuevoEvento.aula)
+      return bloques;
     const dia = nuevoEvento.dia.value;
     const docenteId = nuevoEvento.docente.value;
     const aulaId = nuevoEvento.aula.value;
@@ -540,7 +575,10 @@ export default function Calendar(horarioId) {
     // Filtrar usando todosLosEventos (de todos los horarios)
     const ocupados = new Set();
     todosLosEventos.forEach((e) => {
-      if (e.dia === dia && (e.docente?.value === docenteId || e.aula?.value === aulaId)) {
+      if (
+        e.dia === dia &&
+        (e.docente?.value === docenteId || e.aula?.value === aulaId)
+      ) {
         for (let i = 0; i < e.duracion; i++) {
           ocupados.add(e.bloque + i);
         }
@@ -773,7 +811,9 @@ export default function Calendar(horarioId) {
         console.log("Horas usadas de la materia " + horasUsadasMateria);
 
         if (horasUsadasMateria + duracionNueva > horasMateria) {
-          AlertaError("¡Las horas semanales de la unidad curricular se agotaron!");
+          AlertaError(
+            "¡Las horas semanales de la unidad curricular se agotaron!"
+          );
           setEventos((prev) =>
             prev.map((ev) =>
               ev.id === resizingEventId && ev.duracion !== duracionOriginal
@@ -1060,10 +1100,10 @@ export default function Calendar(horarioId) {
 
     const payload = {
       horario_id: horarioId.horarioId,
-      sede_id: parseInt(nuevoEvento.sede.value),
-      pnf_id: parseInt(nuevoEvento.pnf.value),
-      trayecto_id: parseInt(nuevoEvento.trayecto.value),
-      trimestre_id: parseInt(nuevoEvento.trimestre.value),
+      sede_id: parseInt(infoHorario?.seccion?.sede_id),
+      pnf_id: parseInt(infoHorario?.seccion?.pnf_id),
+      trayecto_id: parseInt(infoHorario?.seccion?.trayecto_id),
+      trimestre_id: parseInt(infoHorario?.trimestre_id),
       unidad_curricular_id: parseInt(nuevoEvento.materia.value),
       docente_id: parseInt(nuevoEvento.docente.value),
       espacio_id: parseInt(nuevoEvento.aula.value),
@@ -1079,7 +1119,7 @@ export default function Calendar(horarioId) {
       await Api.put(
         `/docente_horas/${payload.docente_id}?horas_dedicacion=${-duracionNum}`
       );
-      
+
       if (response) {
         Alerta(response.data.message);
       }
@@ -1102,11 +1142,11 @@ export default function Calendar(horarioId) {
           duracion: duracionNum,
           materias: nuevoEvento.materia,
           aula: nuevoEvento.aula.value,
-          sede: nuevoEvento.sede,
-          pnf: nuevoEvento.pnf,
-          trayecto: nuevoEvento.trayecto,
+          sede: infoHorario?.seccion?.sede_id,
+          pnf: infoHorario?.seccion?.pnf_id,
+          trayecto: infoHorario?.seccion?.trayecto_id,
           docente: nuevoEvento.docente,
-          trimestre: nuevoEvento.trimestre.value,
+          trimestre: infoHorario?.trimestre_id,
           texto: `${nuevoEvento.materia.label}\n${nuevoEvento.docente.label}\n${nuevoEvento.aula.label}`,
           color: "#e3f2fd",
         },
@@ -1150,139 +1190,6 @@ export default function Calendar(horarioId) {
           input={
             <>
               <SelectControl
-                label="SEDE"
-                name="sede"
-                value={nuevoEvento.sede}
-                options={sedesOptions}
-                onChange={async (option) => {
-                  setSedeSeleccionada(
-                    sedes.find((e) => String(e.id) === String(option?.value)) ||
-                      {}
-                  );
-                  setPnfs([]);
-                  setPnfSeleccionado(null);
-                  setNuevoEvento((prev) => ({
-                    ...prev,
-                    sede: option,
-                    pnf: null,
-                    aula: null,
-                  }));
-
-                  // Cargar aulas cuando se seleccione una sede
-                  if (option) {
-                    try {
-                      const response = await Api.get(
-                        `/horarios/sede/${option.value}/espacios`
-                      );
-                      setAulas(response.data);
-                      setAulaSeleccionada(response.data[0]);
-                    } catch (error) {
-                      AlertaError("Error al cargar las aulas");
-                      console.log(error);
-                    }
-                  }
-                }}
-                onValueChange={async (option) => {
-                  // Cargar PNFs cuando cambie la sede
-                  if (option) {
-                    try {
-                      const response = await Api.get(
-                        `/horarios/sedes/${option.value}/pnfs`
-                      );
-                      setPnfs(response.data);
-                      setPnfSeleccionado(response.data[0]);
-                    } catch (error) {
-                      AlertaError("Error al cargar los PNFs");
-                      console.log(error);
-                    }
-                  }
-                }}
-              />
-              <SelectControl
-                label="PNF"
-                name="pnf"
-                value={nuevoEvento.pnf}
-                options={pnfOptions}
-                onChange={(option) => {
-                  setPnfSeleccionado(
-                    pnfs.find((e) => String(e.id) === String(option?.value)) ||
-                      null
-                  );
-                  setNuevoEvento((prev) => ({
-                    ...prev,
-                    pnf: option,
-                    docente: null,
-                    materia: null,
-                  }));
-                }}
-              />
-              <SelectControl
-                label="TRAYECTO"
-                name="trayecto"
-                value={nuevoEvento.trayecto}
-                options={trayectoOptions}
-                onChange={(option) => {
-                  setTrayectoSeleccionado(
-                    trayectos.find(
-                      (e) => String(e.id) === String(option?.value)
-                    ) || {}
-                  );
-                  setTrimestres([]);
-                  setTrimestreSeleccionada(null);
-                  setNuevoEvento((prev) => ({
-                    ...prev,
-                    trayecto: option,
-                    trimestre: null,
-                  }));
-                }}
-                onValueChange={async (option) => {
-                  if (option) {
-                    try {
-                      const response = await Api.get(
-                        `/horarios/trayectos/${option.value}/trimestres`
-                      );
-                      setTrimestres(response.data);
-                      setTrimestreSeleccionada(response.data[0]);
-                    } catch (error) {
-                      AlertaError("Error al cargar los trimestres");
-                      console.log(error);
-                    }
-                  }
-                }}
-              />
-              <SelectControl
-                label="TRIMESTRE"
-                name="trimestre"
-                value={nuevoEvento.trimestre}
-                options={trimestreOptions}
-                onChange={(option) => {
-                  setTrimestreSeleccionada(
-                    trimestres.find(
-                      (t) => String(t.id) === String(option?.value)
-                    ) || null
-                  );
-                  setNuevoEvento((prev) => ({
-                    ...prev,
-                    trimestre: option,
-                    materia: null,
-                  }));
-                }}
-                onValueChange={async (option) => {
-                  if (option) {
-                    try {
-                      const response = await Api.get(
-                        `/horarios/trimestres/${option.value}/unidadesCurriculares`
-                      );
-                      setMaterias(response.data);
-                      setMateriaSeleccionada(response.data[0]);
-                    } catch (error) {
-                      AlertaError("Error al cargar las materias");
-                      console.log(error);
-                    }
-                  }
-                }}
-              />
-              <SelectControl
                 label="UNIDAD CURRICULAR"
                 name="materias"
                 value={nuevoEvento.materia}
@@ -1304,7 +1211,7 @@ export default function Calendar(horarioId) {
                   if (option) {
                     try {
                       const response = await Api.get(
-                        `/docentes/unidadesPnfs?pnf_id=${pnfSeleccionado.id}&unidad_curricular_id=${option.value}`
+                        `/docentes/unidadesPnfs?pnf_id=${infoHorario?.seccion?.pnf_id}&unidad_curricular_id=${option.value}`
                       );
                       setDocentes(response.data);
                       setDocenteSeleccionado(response.data[0]);

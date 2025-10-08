@@ -454,7 +454,7 @@ function RolesCreate() {
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.PDF}
-                      value="matricula.pdf"
+                      value="Tipo Matricula.pdf"
                       formik={formik}
                       disabled={!isModuleEnabled("matricula")}
                     />
@@ -536,7 +536,7 @@ function RolesCreate() {
                     <Checkbox
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.EDITAR}
-                      value="seccion.editar"
+                      value="aula.editar"
                       formik={formik}
                       disabled={!isModuleEnabled("aula")}
                     />

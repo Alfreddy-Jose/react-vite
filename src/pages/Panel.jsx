@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import Alerta from "../components/Alert";
 import { useLocation } from "react-router-dom";
@@ -8,6 +8,7 @@ import DisponibilidadDocentes from "../components/DisponibilidadDocentes";
 export function Panel() {
   const { user } = useAuth();
   const location = useLocation();
+
   useEffect(() => {
     // Motrar Alerta al iniciar sesión
     if (location.state?.message) {
@@ -27,9 +28,8 @@ export function Panel() {
           Horarios
         </h6>
         <DashboardKpis />
-
         {/* Sección de Disponibilidad */}
-{/*         <DisponibilidadDocentes /> */}
+        {/*         <DisponibilidadDocentes /> */}
       </div>
     </>
   );

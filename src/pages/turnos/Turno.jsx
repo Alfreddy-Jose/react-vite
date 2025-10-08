@@ -12,7 +12,15 @@ function Turno() {
   const [loading, setLoading] = useState(true);
   const [turnos, setTurnos] = useState([]);
   const [permisos, setPermisos] = useState([]);
+  const [turnosFiltrados, setTurnosFiltrados] = useState([]);
   const location = useLocation();
+
+  // Campos por los que buscar - definidos directamente aquí
+  const camposBusqueda = ["nombre", "inicio", "inicio_periodo", "final", "final_periodo"];
+  // Inicializar datos filtrados
+  useEffect(() => {
+    setTurnosFiltrados(turnos);
+  }, [turnos]);
 
   useEffect(() => {
     // Leer permisos del localStorage
@@ -79,6 +87,13 @@ function Turno() {
       <ContainerTable
         // Titulo para la tabla
         title="TURNOS"
+        // propiedades para el buscador
+        data={turnos}
+        searchData={turnos}
+        onSearchFiltered={setTurnosFiltrados}
+        searchFields={camposBusqueda}
+        placeholder="BUSCAR..."
+        showStats={true}
         // Boton para crear nuevos registros
         link={
           permisos.includes("turno.crear") ? (
@@ -86,7 +101,7 @@ function Turno() {
           ) : null
         }
         // Tabla
-        tabla={<Tabla columns={columns} data={turnos} />}
+        tabla={<Tabla columns={columns} data={turnosFiltrados} />}
         // Manejar Loader
         isLoading={loading}
       />

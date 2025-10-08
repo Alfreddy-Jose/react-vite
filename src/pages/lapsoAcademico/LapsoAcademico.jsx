@@ -20,8 +20,24 @@ export function LapsoAcademico() {
   const [loading, setLoading] = useState(true);
   const [lapsos, setLapsos] = useState([]);
   const [permisos, setPermisos] = useState([]);
+  const [lapsosFiltrados, setLapsosFiltrados] = useState([]);
   const location = useLocation();
   const { refreshLapsos } = useAuth();
+
+  // Campos por los que buscar - definidos directamente aquí
+  const camposBusqueda = [
+    "nombre_lapso",
+    "ano",
+    "tipolapso.nombre",
+    "fecha_inicio",
+    "fecha_fin",
+    "status",
+  ];
+
+  useEffect(() => {
+    // Inicializar datos filtrados
+    setLapsosFiltrados(lapsos);
+  }, [lapsos]);
 
   useEffect(() => {
     // Leer permisos del localStorage
@@ -215,6 +231,14 @@ export function LapsoAcademico() {
       <ContainerTable
         // Titulo para la tabla
         title="LAPSO ACADÉMICO"
+        // Propiedades para el buscador
+        data={lapsos}
+        searchData={lapsos}
+        onSearchFiltered={setLapsosFiltrados}
+        searchFields={camposBusqueda}
+        placeholder="BUSCAR..."
+        showStats={true}
+        // Boton para generar PDF
         button_pdf={
           permisos.includes("lapso.pdf") ?
           (<Buttom 
@@ -232,7 +256,7 @@ export function LapsoAcademico() {
           ) : null
         }
         // Tabla
-        tabla={<Tabla columns={columns} data={lapsos} />}
+        tabla={<Tabla columns={columns} data={lapsosFiltrados} />}
         isLoading={loading}
       />
     </>
