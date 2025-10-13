@@ -8,6 +8,7 @@ import Alerta, { AlertaError } from "../../components/Alert";
 import Acciones from "../../components/Acciones";
 import { Modal, ButtomModal } from "../../components/Modal";
 import { Buttom } from "../../components/Buttom";
+import ImportAulasModal from "../../components/import_modal/ImportAulasModal";
 
 export default function Aulas() {
   const [loading, setLoading] = useState(true);
@@ -15,9 +16,19 @@ export default function Aulas() {
   const [permisos, setPermisos] = useState([]);
   const [aulasFiltradas, setAulasFiltradas] = useState([]);
   const location = useLocation();
+  const [showImportModal, setShowImportModal] = useState(false);
+
+  // Función para manejar éxito de importación
+  const handleImportSuccess = (importedCount) => {
+    console.log(`Se importaron ${importedCount} aulas correctamente`);
+    // Recargar datos o actualizar el estado aquí
+      GetAll(setAulas, setLoading, "/aula");
+
+    Alerta(`Se importaron ${importedCount} aulas correctamente`);
+  };
 
   // Campos por los que buscar - definidos directamente aquí
-  const camposBusqueda = ["codigo", "nombre_aula", "sede.nombre_sede"];
+  const camposBusqueda = ["nombre_aula", "sede.nombre_sede"];
   // Inicializar datos filtrados
   useEffect(() => {
     setAulasFiltradas(aulas);
@@ -61,7 +72,7 @@ export default function Aulas() {
   // Definir las columnas de la tabla
   const columns = [
     { name: "ID", selector: (row, index) => index + 1, sortable: true },
-    { name: "CÓDIGO", selector: (row) => row.codigo, sortable: true },
+    { name: "ETAPA", selector: (row) => row.etapa, sortable: true },
     { name: "NOMBRE", selector: (row) => row.nombre_aula, sortable: true },
     {
       name: "+INFO",
@@ -70,9 +81,6 @@ export default function Aulas() {
           <ButtomModal id={row.id} />
 
           <Modal titleModal={`+INFO ${row.nombre_aula}`} id={row.id}>
-            <p>
-              <b>CÓDIGO: </b> {row.codigo}
-            </p>
             <p>
               <b>NOMBRE: </b> {row.nombre_aula}
             </p>
@@ -131,6 +139,25 @@ export default function Aulas() {
             title="Generar PDF"
             text="Generar PDF"
           />) : null
+        }
+        // Boton para importar desde Excel
+        button_modal={
+          // permisos.includes("aula.importar") ? (
+            <>  
+              <Buttom
+                type="button"
+                style="btn btn-success mb-3 ms-1"
+                onClick={() => setShowImportModal(true)}
+                title="Importar desde Excel"
+                text="Importar desde Excel"
+              />
+              <ImportAulasModal
+                isOpen={showImportModal}
+                onClose={() => setShowImportModal(false)}
+                onImportSuccess={handleImportSuccess}
+              />
+            </>
+          // ) : null
         }
         // Boton para crear nuevos registros
         link={

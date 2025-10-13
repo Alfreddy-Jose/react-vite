@@ -1,6 +1,6 @@
 import { useFormik } from "formik";
 import styles from "../styles/login.module.css";
-import { useLocation /*, useNavigate  */} from "react-router-dom";
+import { useLocation /*, useNavigate  */ } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Api from "../services/Api";
 import { AlertaError } from "../components/Alert";
@@ -36,9 +36,9 @@ export function Login() {
       if (response.status === 200) {
         signIn(response.data);
         Swal.close();
-        
+
         // Usar navigate en lugar de window.location.replace
-/*         navigate(from, { 
+        /*         navigate(from, { 
           replace: true,
           state: { message: response.data.message } 
         }); */
@@ -46,7 +46,7 @@ export function Login() {
       }
     } catch (err) {
       Swal.close();
-      
+
       // Manejar el error de autenticación
       if (err.response && err.response.status === 401) {
         AlertaError("Credenciales incorrectas");
@@ -83,6 +83,7 @@ export function Login() {
                   type="email"
                   name="email"
                   placeholder="Email"
+                  autoComplete="off"
                   onChange={formik.handleChange}
                   value={formik.values.email}
                 />

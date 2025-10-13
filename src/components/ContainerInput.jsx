@@ -6,13 +6,13 @@ export function ContainerIput({ title, link, input, buttom }) {
 
         {/* Link para Volver */}
         {link}
-        
+
         <div className="card p-4">
 
           {/* Titulo del Formulario  */}
           <div className="card-header">
             <div className="card-title">{title}</div>
-          </div>
+          </div> 
 
           {/* Inputs */}
           <div className="row">{input}</div>

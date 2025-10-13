@@ -12,7 +12,6 @@ import SelectSearch from "../../components/SelectSearch";
 
 // Validaciones para cada campo
 const validationSchema = Yup.object({
-  codigo: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
   nombre_aula: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
   equipos: Yup.string()
     .matches(/^[0-:-9]*$/, "Formato incorrecto") // Solo números
@@ -50,7 +49,6 @@ export default function LaboratorioEdit() {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      codigo: laboratorio?.codigo || "",
       nombre_aula: laboratorio?.nombre_aula || "",
       etapa: laboratorio?.etapa || "",
       equipos: laboratorio?.equipos || "",
@@ -99,14 +97,6 @@ export default function LaboratorioEdit() {
                 formik={formik}
                 valueKey="id"
                 labelKey="nombre_sede"
-              />
-              {/* Input para el codigo del laboratorio */}
-              <InputLabel
-                label={FORM_LABELS.AULA.CODIGO}
-                type="text"
-                name="codigo"
-                placeholder="CÓDIGO"
-                formik={formik}
               />
               {/* Input para etapa */}
               <InputLabel

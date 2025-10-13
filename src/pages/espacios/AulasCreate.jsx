@@ -12,7 +12,6 @@ import SelectSearch from "../../components/SelectSearch";
 
 // Iniciando variables
 const initialValues = {
-  codigo: "",
   etapa: "",
   nro_aula: "",
   sede_id: "",
@@ -20,7 +19,7 @@ const initialValues = {
 
 // Validaciones para cada campo
 const validationSchema = Yup.object({
-  codigo: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
+ // codigo: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
   etapa: Yup.string()
     .matches(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "Solo letras permitidas") // Solo letras
     .max(1, "Máximo 1 caracter") // Máximo 1 carácter
@@ -86,13 +85,13 @@ export default function AulasCreate() {
                 labelKey="nombre_sede"
               />
               {/* Input para nombre de aula */}
-              <InputLabel
+{/*               <InputLabel
                 label={FORM_LABELS.AULA.CODIGO}
                 type="text"
                 name="codigo"
                 placeholder="CÓDIGO"
                 formik={formik}
-              />
+              /> */}
               {/* Input para email de usuario */}
               <InputLabel
                 label={FORM_LABELS.AULA.ETAPA}

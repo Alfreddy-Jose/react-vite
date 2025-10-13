@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { GetAll, PostAll } from "../../services/Api";
 import { useNavigate } from "react-router-dom";
 import SelectSearch from "../../components/SelectSearch";
+import InputImage from "../../components/InputImage";
 
 // Inicializando los campos
 const initialValues = {
@@ -17,6 +18,7 @@ const initialValues = {
   password: "",
   confirm: "",
   rol: "",
+  avatar: null,
 };
 
 // Validaciones para cada campo
@@ -34,16 +36,68 @@ const validationSchema = Yup.object({
     .min(6, "Minimo 6 caracteres")
     .oneOf([Yup.ref("password"), undefined], "Las contraseñas no coinciden")
     .required("Este campo es obligatorio"),
+  avatar: Yup.mixed()
+    .test("fileSize", "La imagen es muy pesada (máx. 2MB)", (value) => {
+      if (!value) return true; // Opcional
+      return value && value.size <= 2048 * 1024;
+    })
+    .test("fileType", "Formato no soportado (JPEG, PNG, GIF)", (value) => {
+      if (!value) return true; // Opcional
+      return (
+        value &&
+        ["image/jpeg", "image/png", "image/jpg", "image/gif"].includes(
+          value.type
+        )
+      );
+    }),
 });
 
 export function UsuarioCreate() {
   const navegation = useNavigate();
   const [loading, setLoading] = useState(true);
   const [roles, setRoles] = useState([]);
+  const [avatarPreview, setAvatarPreview] = useState(null);
 
   // Funcion para enviar datos al backend
-  const onSubmit = (values) => {
-    PostAll(values, '/usuarios', navegation);
+  const onSubmit = async (values, { setErrors }) => {
+    try {
+      await PostAll(values, "/usuarios", navegation);
+    } catch (error) {
+      if (error.response && error.response.data.errors) {
+        // Transforma los arrays de Laravel a strings para Formik
+        const formikErrors = {};
+        Object.entries(error.response.data.errors).forEach(([key, value]) => {
+          formikErrors[key] = value[0];
+        });
+        setErrors(error.response.data.errors);
+      }
+    }
+  };
+
+  // Manejar cambio de archivo de avatar
+  const handleAvatarChange = (event) => {
+    const file = event.currentTarget.files[0];
+    if (file) {
+      formik.setFieldValue("avatar", file);
+
+      // Crear preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setAvatarPreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Eliminar avatar seleccionado
+  const handleRemoveAvatar = () => {
+    formik.setFieldValue("avatar", null);
+    setAvatarPreview(null);
+    // Limpiar el input file
+    const fileInput = document.querySelector('input[type="file"]');
+    if (fileInput) {
+      fileInput.value = "";
+    }
   };
 
   const formik = useFormik({
@@ -51,13 +105,13 @@ export function UsuarioCreate() {
     validationSchema,
     onSubmit,
   });
-  
-    useEffect(() => {
-      GetAll(setRoles, setLoading, "/get_roles");
-      setLoading(false);
-    }, []);
-    console.log(loading);
-    
+
+  useEffect(() => {
+    GetAll(setRoles, setLoading, "/get_roles");
+    setLoading(false);
+  }, []);
+  console.log(loading);
+
   return (
     <>
       <form onSubmit={formik.handleSubmit}>
@@ -115,11 +169,20 @@ export function UsuarioCreate() {
                 formik={formik}
               />
               <SelectSearch
-                name='rol'
+                name="rol"
                 label={FORM_LABELS.USER.ROL}
                 options={roles}
                 formik={formik}
                 labelKey="name"
+              />
+              {/* Sección de Avatar */}
+              <InputImage
+                imagePreview={avatarPreview}
+                formik={formik}
+                label={FORM_LABELS.USER.AVATAR}
+                removeImage={handleRemoveAvatar}
+                name="avatar"
+                onChange={handleAvatarChange}
               />
             </>
           }
@@ -136,7 +199,10 @@ export function UsuarioCreate() {
                 style="btn-secondary ms-1"
                 title="Limpiar"
                 text="Limpiar"
-                onClick={() => formik.resetForm()}
+                onClick={() => {
+                  formik.resetForm();
+                  setAvatarPreview(null);
+                }}
               />
             </>
           }

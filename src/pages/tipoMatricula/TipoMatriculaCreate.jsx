@@ -24,8 +24,8 @@ const validationSchema = Yup.object({
 
 export function TipoMatriculaCreate() {
   const navegation = useNavigate();
+  
   // Funcion para enviar datos al backend
-
   const onSubmit = async (values, { setErrors }) => {
     try {
       await PostAll(values, "/matricula", navegation);

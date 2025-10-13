@@ -24,7 +24,7 @@ function TrayectoEdit() {
   // Funcion para enviar datos al backend
   const onSubmit = async (values, { setErrors }) => {
     try {
-      await PutAll(values, "/trayectos", navegation, id,"/trayectos");
+      await PutAll(values, "/trayecto", navegation, id, "/trayectos");
     } catch (error) {
       if (error.response && error.response.data.errors) {
         // Transforma los arrays de Laravel a strings para Formik

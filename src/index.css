@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+@variant dark (&:is(.dark *));
+
+@theme {
+  --default-transition-duration: 150ms;
+  
+  --color-*: initial;
+  --color-background: oklch(1 0 0);
+  --color-foreground: oklch(0.129 0.042 264.695);
+  --color-card: oklch(1 0 0);
+  --color-card-foreground: oklch(0.129 0.042 264.695);
+  --color-popover: oklch(1 0 0);
+  --color-popover-foreground: oklch(0.129 0.042 264.695);
+  --color-primary: oklch(0.208 0.042 265.755);
+  --color-primary-foreground: oklch(0.984 0.003 247.858);
+  --color-secondary: oklch(0.968 0.007 247.896);
+  --color-secondary-foreground: oklch(0.208 0.042 265.755);
+  --color-muted: oklch(0.968 0.007 247.896);
+  --color-muted-foreground: oklch(0.554 0.046 257.417);
+  --color-accent: oklch(0.968 0.007 247.896);
+  --color-accent-foreground: oklch(0.208 0.042 265.755);
+  --color-destructive: oklch(0.577 0.245 27.325);
+  --color-destructive-foreground: oklch(0.984 0.003 247.858);
+  --color-border: oklch(0.929 0.013 255.508);
+  --color-input: oklch(0.929 0.013 255.508);
+  --color-ring: oklch(0.704 0.04 256.788);
+  
+  --radius: 0.5rem;
+  
+  @media (prefers-color-scheme: dark) {
+    --color-background: oklch(0.129 0.042 264.695);
+    --color-foreground: oklch(0.984 0.003 247.858);
+    --color-card: oklch(0.208 0.042 265.755);
+    --color-card-foreground: oklch(0.984 0.003 247.858);
+    --color-popover: oklch(0.208 0.042 265.755);
+    --color-popover-foreground: oklch(0.984 0.003 247.858);
+    --color-primary: oklch(0.929 0.013 255.508);
+    --color-primary-foreground: oklch(0.208 0.042 265.755);
+    --color-secondary: oklch(0.279 0.041 260.031);
+    --color-secondary-foreground: oklch(0.984 0.003 247.858);
+    --color-muted: oklch(0.279 0.041 260.031);
+    --color-muted-foreground: oklch(0.704 0.04 256.788);
+    --color-accent: oklch(0.279 0.041 260.031);
+    --color-accent-foreground: oklch(0.984 0.003 247.858);
+    --color-destructive: oklch(0.704 0.191 22.216);
+    --color-destructive-foreground: oklch(0.984 0.003 247.858);
+    --color-border: oklch(1 0 0 / 10%);
+    --color-input: oklch(1 0 0 / 15%);
+    --color-ring: oklch(0.551 0.027 264.364);
+  }
+}
+
+
+/* Base styles */
+* {
+  border-color: theme(colors.border);
+}
+
+body {
+  background-color: theme(colors.background);
+  color: theme(colors.foreground);
+}
+
+/* Estilos personalizados para react-day-picker */
+.rdp {
+  --rdp-cell-size: 36px;
+  --rdp-accent-color: theme(colors.primary);
+  --rdp-background-color: theme(colors.background);
+  --rdp-accent-color-dark: theme(colors.primary);
+  --rdp-background-color-dark: theme(colors.background);
+  margin: 0;
+}
+
+.rdp-table {
+  margin: 0;
+  max-width: calc(var(--rdp-cell-size) * 7);
+}
+
+.rdp-head_cell, .rdp-cell {
+  width: var(--rdp-cell-size);
+  height: var(--rdp-cell-size);
+}
+
+.rdp-day_selected {
+  background-color: theme(colors.primary);
+  color: theme(colors.primary-foreground);
+}
+
+.rdp-day_selected:hover {
+  background-color: theme(colors.primary);
+  color: theme(colors.primary-foreground);
+}
+
+.rdp-day_today {
+  background-color: theme(colors.accent);
+  color: theme(colors.accent-foreground);
+}
+
+.rdp-day:hover:not(.rdp-day_selected) {
+  background-color: theme(colors.accent);
+  color: theme(colors.accent-foreground);
+}

@@ -149,6 +149,7 @@ export function HorarioCreate() {
                 options={lapsosOptions}
                 value={lapsoSeleccionado}
                 onChange={(option) => setLapsoSeleccionado(option)}
+                hidden={true}
               />
             </>
           }
@@ -163,6 +164,19 @@ export function HorarioCreate() {
                 text="Limpiar"
                 title="Limpiar"
                 type="reset"
+                // funcion para limpiar los selects
+                onClick={() => {
+                  setSeccionSeleccionada(null);
+                  setTrimestreSeleccionado(null);
+                  setLapsoSeleccionado(
+                    lapsoActual
+                      ? {
+                          value: lapsoActual.nombre_lapso,
+                          label: lapsoActual.nombre_lapso,
+                        }
+                      : null
+                  );
+                }}
                 style="btn-secondary ms-1"
               />
             </>

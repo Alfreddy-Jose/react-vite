@@ -12,7 +12,7 @@ import SelectSearch from "../../components/SelectSearch";
 
 // Validaciones para cada campo
 const validationSchema = Yup.object({
-  codigo: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
+  //codigo: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
   etapa: Yup.string()
     .matches(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "Solo letras permitidas") // Solo letras
     .max(1, "Maximo 1 carácteres") // Máximo 1 carácter
@@ -48,7 +48,6 @@ export default function AulasEdit() {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      codigo: aula?.codigo || "",
       etapa: aula?.etapa || "",
       nro_aula: aula?.nro_aula || "",
       sede_id: aula?.sede_id || "",
@@ -93,13 +92,13 @@ export default function AulasEdit() {
                 labelKey="nombre_sede"
               />
               {/* Input para nombre de aula */}
-              <InputLabel
+{/*               <InputLabel
                 label={FORM_LABELS.AULA.CODIGO}
                 type="text"
                 name="codigo"
                 placeholder="CÓDIGO"
                 formik={formik}
-              />
+              /> */}
               {/* Input para email de usuario */}
               <InputLabel
                 label={FORM_LABELS.AULA.ETAPA}

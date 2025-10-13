@@ -28,6 +28,9 @@ export function Panel() {
           Horarios
         </h6>
         <DashboardKpis />
+        {/* Calendario removido - era componente de shadcn/ui */}
+            <div className="flex min-h-svh flex-col items-center justify-center">
+    </div>
         {/* Sección de Disponibilidad */}
         {/*         <DisponibilidadDocentes /> */}
       </div>

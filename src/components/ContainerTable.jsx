@@ -13,6 +13,7 @@ export function ContainerTable({
   searchFields = [],
   placeholder = "Buscar...",
   showStats = true,
+  button_modal = null,
 }) {
   return (
     <div className="row">
@@ -25,7 +26,8 @@ export function ContainerTable({
             ) : null}
             {header_parametros}
             {/* BOTON PDF */}
-            {button_pdf} 
+            {button_pdf}
+            {button_modal}
             <div className="card-title mb-4">{`LISTA DE ${title}`}</div>
             {/* BUSCADOR */}
             <SearchBox

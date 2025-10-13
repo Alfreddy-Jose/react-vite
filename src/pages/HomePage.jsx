@@ -8,9 +8,34 @@ import {
   faUserTie,
   faChalkboard,
 } from "@fortawesome/free-solid-svg-icons";
-import img from "../img/universitarios.jpg";
+// import img from "../img/universitarios.jpg";
 import { Footer } from "../components/layouts/Footer";
 import { Link } from "react-router-dom";
+import CarruselReact from "../components/Carrusel";
+import horario1 from "../img/horario1.jpg";
+import horario2 from "../img/horario.jpg"; // si tienes más
+import universitarios from "../img/universitarios.jpg";
+
+const imagenes = [
+  {
+    url: horario1,
+    alt: "Imagen 1",
+    titulo: "",
+    descripcion: "",
+  },
+  {
+    url: horario2,
+    alt: "Imagen 2",
+    titulo: "",
+    descripcion: "",
+  },
+  {
+    url: universitarios,
+    alt: "Imagen 3",
+    titulo: "",
+    descripcion: "",
+  },
+];
 
 function HomePage() {
   return (
@@ -35,7 +60,7 @@ function HomePage() {
           {/* Sección de imagen y botón */}
           <div className="row align-items-center mb-5">
             <div className="col-lg-6 mb-4 mb-lg-0">
-              <div className="rounded shadow overflow-hidden">
+              {/*               <div className="rounded shadow overflow-hidden">
                 <img
                   src={img}
                   alt="Estudiantes en campus universitario"
@@ -46,13 +71,15 @@ function HomePage() {
                     minHeight: "300px",
                   }}
                 />
-              </div>
-                
+              </div> */}
+              <CarruselReact
+                imagenes={imagenes}
+                intervalo={2500}
+                mostrarIndicadores={true}
+              />
             </div>
             <div className="col-lg-6 text-center text-lg-start">
-              <h2 className="fw-bold mb-4">
-                Bienvenido al Sistema
-              </h2>
+              <h2 className="fw-bold mb-4">Bienvenido al Sistema</h2>
               <p className="lead mb-4">
                 Nuestra plataforma simplifica la administración académica,
                 permitiendo una gestión eficiente de horarios, aulas y recursos

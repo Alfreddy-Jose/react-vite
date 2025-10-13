@@ -9,13 +9,24 @@ import { useLocation } from "react-router-dom";
 import Modal, { ButtomModal } from "../../components/Modal";
 import Acciones from "../../components/Acciones";
 import { Buttom } from "../../components/Buttom";
+import ImportLaboratoriosModal from "../../components/import_modal/ImportLaboratorios";
 
 export default function Laboratorios() {
   const [loading, setLoading] = useState(true);
   const [laboratorios, setLaboratorios] = useState([]);
   const [permisos, setPermisos] = useState([]);
   const [laboratoriosFiltrados, setLaboratoriosFiltrados] = useState([]);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const location = useLocation();
+
+  // Función para manejar éxito de importación
+  const handleImportSuccess = (importedCount) => {
+    console.log(`Se importaron ${importedCount} aulas correctamente`);
+    // Recargar datos o actualizar el estado aquí
+    GetAll(setLaboratorios, setLoading, "/laboratorios");
+
+    Alerta(`Se importaron ${importedCount} laboratorios correctamente`);
+  };
 
   // Campos por los que buscar - definidos directamente aquí
   const camposBusqueda = ["codigo", "nombre_aula", "sede.nombre_sede"];
@@ -61,7 +72,7 @@ export default function Laboratorios() {
 
   const columns = [
     { name: "ID", selector: (row, index) => index + 1, sortable: true },
-    { name: "CODIGO", selector: (row) => row.codigo, sortable: true },
+    { name: "ETAPA", selector: (row) => row.etapa, sortable: true },
     { name: "NOMBRE", selector: (row) => row.nombre_aula, sortable: true },
     {
       name: "+INFO",
@@ -70,9 +81,6 @@ export default function Laboratorios() {
           <ButtomModal id={row.id} />
 
           <Modal titleModal={`+INFO ${row.abreviado_lab}`} id={row.id}>
-            <p>
-              <b>CODIGO: </b> {row.codigo}
-            </p>
             <p>
               <b>NOMBRE: </b> {row.nombre_aula}
             </p>
@@ -108,7 +116,7 @@ export default function Laboratorios() {
               />
             ),
           },
-        ]
+        ] 
       : []),
   ];
 
@@ -136,7 +144,25 @@ export default function Laboratorios() {
             text="Generar PDF"
           />) : null
         }
+        button_modal={
+          // permisos.includes("aula.importar") ? (
+            <>  
+              <Buttom
+                type="button"
+                style="btn btn-success mb-3 mx-2"
+                onClick={() => setIsImportModalOpen(true)}
+                title="Importar desde Excel"
+                text="Importar desde Excel"
+              />
+              <ImportLaboratoriosModal
+                isOpen={isImportModalOpen}
+                onClose={() => setIsImportModalOpen(false)}
+                onImportSuccess={handleImportSuccess}
+              />
+            </>
+          // ) : null
 
+        }
         // Boton para crear nuevos registros
         link={
           permisos.includes("laboratorio.crear") ? (
