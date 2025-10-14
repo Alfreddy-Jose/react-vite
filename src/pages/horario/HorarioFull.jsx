@@ -11,7 +11,7 @@ import {
 } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import "./style.css";
-import Alerta, { AlertaConfirm, AlertaError } from "../../components/Alert";
+import Alerta, { AlertaConfirm, AlertaError, AlertaWarning } from "../../components/Alert";
 import Api from "../../services/Api";
 import SelectControl from "../../components/SelectDependiente";
 import { ContainerIput } from "../../components/ContainerInput";
@@ -212,7 +212,6 @@ export default function Calendar(horarioId) {
   const [eventoRecienAgregado, setEventoRecienAgregado] = useState(null);
   const [todosLosEventos, setTodosLosEventos] = useState([]);
   const [eventos, setEventos] = useState([]);
-  const [infoHorario, setInfoHorario] = useState(null);
 
   // cargar todas las clases
   const todasLasClases = async () => {
@@ -249,12 +248,9 @@ export default function Calendar(horarioId) {
       // Cargar todas las clases del horario
       const response = await Api.get(`/horarios/${horarioId.horarioId}/clases`);
       const evento = response.data;
-      // Cargar informacion del horario
-      const respuesta = await Api.get(`/horario/${horarioId.horarioId}`);
-      setInfoHorario(respuesta.data);
-      console.log("Horario cargado:", respuesta.data);
-      // Luego de obtener el horario, cargar las materias
-      obtenerMaterias(respuesta.data);
+      // Luego de obtener las clases del horario, cargar las materias y aulas
+      obtenerMaterias(horarioId.horario);      
+      // Formatear clases para el calendario
       const eventosFormateados = evento.map((evento) => ({
         id: evento.id.toString(),
         dia: evento.dia,
@@ -301,7 +297,6 @@ export default function Calendar(horarioId) {
   }, [horarioId]);
 
   const obtenerMaterias = async (infoHorario) => {
-    console.log("Trimestre seleccionado: ", infoHorario?.trimestre?.id);
     // cargar materias segun el trimestre
     try {
       const response = await Api.get(
@@ -403,23 +398,8 @@ export default function Calendar(horarioId) {
 
   const dias = ["LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO"];
 
-  // Datos para selects
-  const [sedes, setSedes] = useState([]);
-  const [sedeSelecionada, setSedeSeleccionada] = useState([]);
+  // Datos para select
 
-  useEffect(() => {
-    const obtenerSedes = async () => {
-      try {
-        const response = await Api.get("/horarios/sedes");
-        setSedes(response.data);
-        setSedeSeleccionada(response.data[0]); // Selecciona la primera sede por defecto
-      } catch (error) {
-        AlertaError("Error al cargar las sedes");
-        console.error(error);
-      }
-    };
-    obtenerSedes();
-  }, []);
 
   const [pnfs, setPnfs] = useState([]);
   const [pnfSeleccionado, setPnfSeleccionado] = useState([]);
@@ -427,31 +407,11 @@ export default function Calendar(horarioId) {
   const [aulas, setAulas] = useState([]);
   const [aulaSeleccionada, setAulaSeleccionada] = useState([]);
 
-  const [trimestres, setTrimestres] = useState([]);
-  const [trimestreSeleccionada, setTrimestreSeleccionada] = useState([]);
-
-  const [trayectos, setTrayecto] = useState([]);
-  const [trayectoSeleccionado, setTrayectoSeleccionado] = useState([]);
-
   const [materias, setMaterias] = useState([]);
   const [materiaSeleccionada, setMateriaSeleccionada] = useState([]);
 
   const [docentes, setDocentes] = useState([]);
   const [docenteSeleccionado, setDocenteSeleccionado] = useState([]);
-
-  useEffect(() => {
-    const obtenerTrayectos = async () => {
-      try {
-        const response = await Api.get(`/horarios/trayectos`);
-        setTrayecto(response.data);
-        setTrayectoSeleccionado(response.data[0]); // Selecciona el primer trayecto por defecto
-      } catch (error) {
-        AlertaError("Error al cargar los trayectos");
-        console.error(error);
-      }
-    };
-    obtenerTrayectos();
-  }, []);
 
   useEffect(() => {
     if (eventoRecienAgregado) {
@@ -600,47 +560,20 @@ export default function Calendar(horarioId) {
   }));
 
   // Adaptar datos para react-select
-  const sedesOptions = sedes.map((s) => ({
-    value: s.value || s.id,
-    label: s.label || s.nombre_sede,
-  }));
   const docentesOptions = docentes.map((d) => ({
     value: d.value || d.id,
     label: d.label || d.persona.nombre_completo,
     horas: d.horas_dedicacion,
   }));
-  const pnfOptions = pnfs.map((p) => ({
-    value: p.id,
-    label: p.nombre,
-  }));
   const aulaOptions = aulas.map((a) => ({ value: a.id, label: a.nombre_aula }));
   const diaOptions = dias.map((d) => ({ value: d, label: d }));
-  const trayectoOptions = trayectos.map((t) => ({
-    value: t.id,
-    label: t.nombre,
-  }));
-  const trimestreOptions = trimestres.map((t) => ({
-    value: t.id,
-    label: t.nombre,
-  }));
+
   const materiasOptions = materias.map((m) => ({
     value: m.id,
     label: m.text,
   }));
 
-  useEffect(() => {
-    const obtenerTrayectos = async () => {
-      try {
-        const response = await Api.get(`/horarios/trayectos`);
-        setTrayecto(response.data);
-        setTrayectoSeleccionado(response.data[0]); // Selecciona el primer trayecto por defecto
-      } catch (error) {
-        AlertaError("Error al cargar los trayectos");
-        console.error(error);
-      }
-    };
-    obtenerTrayectos();
-  }, []);
+
 
   const resizeData = useRef({
     initialY: null,
@@ -716,7 +649,7 @@ export default function Calendar(horarioId) {
 
           return nuevosEventos;
         }
-        AlertaError("¡Ya existe un evento en ese rango de bloques!");
+        AlertaWarning("¡Ya existe un evento en ese rango de bloques!");
         return prevEventos;
       });
 
@@ -736,7 +669,7 @@ export default function Calendar(horarioId) {
 
       const deltaY = e.clientY - resizeData.current.initialY;
       const nuevaDuracion = Math.max(
-        1,
+        2,
         Math.round(resizeData.current.initialDuracion + deltaY / 60)
       );
 
@@ -769,7 +702,7 @@ export default function Calendar(horarioId) {
             bloqueActual + duracionNueva > e.bloque
         );
         if (haySolapamiento) {
-          AlertaError("¡Ya existe un evento en ese rango de bloques!");
+          AlertaWarning("¡Ya existe un evento en ese rango de bloques!");
           // Restaurar tamaño anterior SOLO si el valor en el estado ya cambió
           setEventos((prev) =>
             prev.map((ev) =>
@@ -797,7 +730,6 @@ export default function Calendar(horarioId) {
         // traer horas semanales desde la base de datos
         const response = await Api.get(`/unidad_curricular/${materiaId}/horas`);
         const horasMateria = response.data.hora_total_est || 0;
-        console.log("horas de la materia " + horasMateria);
 
         const horasUsadasMateria = eventos
           .filter(
@@ -811,7 +743,7 @@ export default function Calendar(horarioId) {
         console.log("Horas usadas de la materia " + horasUsadasMateria);
 
         if (horasUsadasMateria + duracionNueva > horasMateria) {
-          AlertaError(
+          AlertaWarning(
             "¡Las horas semanales de la unidad curricular se agotaron!"
           );
           setEventos((prev) =>
@@ -953,16 +885,12 @@ export default function Calendar(horarioId) {
   const handleAgregarEvento = async (e) => {
     e.preventDefault();
     if (
-      !sedeSelecionada ||
-      !pnfSeleccionado ||
-      !trayectoSeleccionado ||
       !docenteSeleccionado ||
-      !trimestreSeleccionada ||
       !materiaSeleccionada ||
       !nuevoEvento.dia ||
       nuevoEvento.bloque === null
     ) {
-      AlertaError("Completa los campos vacíos");
+      AlertaWarning("Completa los campos vacíos");
       return;
     }
 
@@ -977,7 +905,7 @@ export default function Calendar(horarioId) {
         bloqueNum + duracionNum > e.bloque
     );
     if (haySolapamiento) {
-      AlertaError("¡Ya existe una clase en ese rango de bloques!");
+      AlertaWarning("¡Ya existe una clase en ese rango de bloques!");
       return;
     }
 
@@ -990,7 +918,7 @@ export default function Calendar(horarioId) {
         bloqueNum + duracionNum > e.bloque
     );
     if (haySolaplamientoDocente) {
-      AlertaError(
+      AlertaWarning(
         "¡El docente ya tiene una clase en ese rango de bloques en otro horario!"
       );
       return;
@@ -999,13 +927,13 @@ export default function Calendar(horarioId) {
     //evitar solapamiento de aulas
     const haySolapamientoAula = todosLosEventos.some(
       (e) =>
-        e.aula.value === nuevoEvento.aula.value &&
+        e.aula.value === nuevoEvento.aula?.value &&
         e.dia === nuevoEvento.dia.value &&
         bloqueNum < e.bloque + e.duracion &&
         bloqueNum + duracionNum > e.bloque
     );
     if (haySolapamientoAula) {
-      AlertaError(
+      AlertaWarning(
         "¡El aula ya tiene una clase en ese rango de bloques en otro horario!"
       );
       return;
@@ -1064,7 +992,7 @@ export default function Calendar(horarioId) {
       } de ${horasMateria} horas semanales de la materia`
     );
     if (horasUsadasMateria + duracionNum > horasMateria) {
-      AlertaError("¡Las horas semanales de la materia se agotaron!");
+      AlertaWarning("¡Se excedieron las horas semanales de la Unidad Curricular!");
       return;
     }
     console.log(
@@ -1089,29 +1017,29 @@ export default function Calendar(horarioId) {
 
     // Calcular la cantidad de bloques
     const cantidadDeBloques = bloques.length;
-
+    console.log("Horas de la materia seleccionada:" + materiaSeleccionada?.horas);
+    
     if (materiaSeleccionada?.horas < duracionNum) {
-      AlertaError("¡Las horas semanales de la materia se agotaron!");
+      AlertaWarning("¡Las horas semanales de la materia se agotaron!");
       return;
     } else if (cantidadDeBloques < duracionNum) {
-      AlertaError("¡No hay suficientes bloques!");
+      AlertaWarning("¡No hay suficientes bloques!");
       return;
     }
 
     const payload = {
       horario_id: horarioId.horarioId,
-      sede_id: parseInt(infoHorario?.seccion?.sede_id),
-      pnf_id: parseInt(infoHorario?.seccion?.pnf_id),
-      trayecto_id: parseInt(infoHorario?.seccion?.trayecto_id),
-      trimestre_id: parseInt(infoHorario?.trimestre_id),
+      sede_id: parseInt(horarioId?.horario?.seccion?.sede_id),
+      pnf_id: parseInt(horarioId?.horario?.seccion?.pnf_id),
+      trayecto_id: parseInt(horarioId?.horario?.seccion?.trayecto_id),
+      trimestre_id: parseInt(horarioId?.horario?.trimestre_id),
       unidad_curricular_id: parseInt(nuevoEvento.materia.value),
       docente_id: parseInt(nuevoEvento.docente.value),
-      espacio_id: parseInt(nuevoEvento.aula.value),
+      espacio_id: (nuevoEvento.aula?.value ? parseInt(nuevoEvento.aula?.value) : null),
       dia: nuevoEvento.dia.value,
       bloque_id: parseInt(nuevoEvento.bloque.value),
       duracion: nuevoEvento.duracion,
     };
-    console.log("Datos ENVIADOS: " + payload);
 
     try {
       // Enviar datos al backend
@@ -1128,7 +1056,7 @@ export default function Calendar(horarioId) {
         eventoDesdeBackend = response.data.clase.id;
       } else {
         AlertaError(
-          "La respuesta del backend no contiene el id del evento. Verifica la estructura de la respuesta."
+          "Error al guardar la clase."
         );
         return;
       }
@@ -1142,11 +1070,11 @@ export default function Calendar(horarioId) {
           duracion: duracionNum,
           materias: nuevoEvento.materia,
           aula: nuevoEvento.aula.value,
-          sede: infoHorario?.seccion?.sede_id,
-          pnf: infoHorario?.seccion?.pnf_id,
-          trayecto: infoHorario?.seccion?.trayecto_id,
+          sede: horarioId?.horario?.seccion?.sede_id,
+          pnf: horarioId?.horario?.seccion?.pnf_id,
+          trayecto: horarioId?.horario?.seccion?.trayecto_id,
           docente: nuevoEvento.docente,
-          trimestre: infoHorario?.trimestre_id,
+          trimestre: horarioId?.horario?.trimestre_id,
           texto: `${nuevoEvento.materia.label}\n${nuevoEvento.docente.label}\n${nuevoEvento.aula.label}`,
           color: "#e3f2fd",
         },
@@ -1204,14 +1132,14 @@ export default function Calendar(horarioId) {
                     ...prev,
                     materia: option,
                     docente: null,
-                    duracion: 1,
+                    duracion: 2,
                   }));
                 }}
                 onValueChange={async (option) => {
                   if (option) {
                     try {
                       const response = await Api.get(
-                        `/docentes/unidadesPnfs?pnf_id=${infoHorario?.seccion?.pnf_id}&unidad_curricular_id=${option.value}`
+                        `/docentes/unidadesPnfs?pnf_id=${horarioId?.horario?.seccion?.pnf_id}&unidad_curricular_id=${option.value}`
                       );
                       setDocentes(response.data);
                       setDocenteSeleccionado(response.data[0]);
@@ -1289,7 +1217,7 @@ export default function Calendar(horarioId) {
                 <input
                   type="number"
                   name="duracion"
-                  min={1}
+                  min={2}
                   max={
                     materiaSeleccionada?.horas ? materiaSeleccionada.horas : 15
                   }

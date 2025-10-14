@@ -1,103 +1,126 @@
-/* contenedor */
+/* 🧭 Tarjeta padre envolvente con dos secciones: contexto y marca pasos */
+.stepper-wrapper-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 0;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  margin-bottom: 2rem;
+  border: 1px solid #eaeaea;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 🔹 Mitad superior: Información del contexto */
+.stepper-wrapper-card .context-info-card {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;           
+  z-index: 1000;
+  background: #f9fafb;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 1rem;
+  transition: all 0.3s ease;
+}
+.context-info-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.icon {
+  font-size: 1.4rem;
+  color: #0d6efd;
+  background-color: #e7f0ff;
+  border-radius: 50%;
+  padding: 0.6rem;
+}
+
+.info-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.info-value {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #212529;
+}
+
+/* 🔸 Mitad inferior: Marca pasos */
+.stepper-wrapper-card .stepper-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.2rem 0;
+  background: #fff;
+}
+
+/* 🔸 Paso, círculo y conectores — sin cambios */
 .stepper {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 24px;
-  padding: 8px 4px;
   justify-content: center;
   position: relative;
 }
 
-/* cada paso (círculo + etiqueta) */
 .step {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 90px;
-  min-width: 70px;
-  position: relative;
-}
-
-/* círculo numerado */
-.step-circle {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 2px solid #d0d0d0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #ffffff;
-  font-weight: 600;
-  font-size: 14px;
-  color: #555;
-  transition: all 0.3s ease; /* animación suave */
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-/* etiqueta debajo del círculo */
-.step-label {
-  margin-top: 8px;
-  font-size: 13px;
   text-align: center;
-  color: #555;
-  transition: color 0.3s ease;
+  min-width: 90px;
 }
 
-/* línea entre pasos */
-.step-connector {
-  flex: 1;
-  height: 3px;
-  background: #e0e0e0;
-  margin: 0 8px;
-  border-radius: 2px;
-  transition: background 0.3s ease;
+.step-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: #dee2e6;
+  color: #495057;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
 
-/* estado completado (línea y círculo) */
-.step-connector.completed {
-  background: #0d6efd;
+.step-circle.active {
+  background-color: #0d6efd;
+  color: #fff;
+  transform: scale(1.1);
 }
 
 .step-circle.completed {
-  background: #0d6efd;
-  border-color: #0d6efd;
+  background-color: #198754;
   color: #fff;
-  transform: scale(1.05); /* pequeño zoom al completado */
 }
 
-.step-label.completed {
-  color: #0d6efd;
+.step-label {
+  margin-top: 0.7rem;
+  font-size: 0.85rem;
+  color: #495057;
 }
 
-/* estado activo (el paso donde está el usuario) */
-.step-circle.active {
-  background: rgb(25, 135, 84);
-  border-color: #198754;
-  color: #fff;
-  box-shadow: 0 6px 12px rgba(25, 135, 84, 0.3);
-  transform: scale(1.15); /* zoom más fuerte en el actual */
+.step-connector {
+  height: 3px;
+  width: 50px;
+  background-color: #dee2e6;
+  transition: background-color 0.3s;
 }
 
-.step-label.active {
-  color: #198754;
-  font-weight: bold;
-}
-
-/* Hover sutil (aunque no sean clicables, da sensación de UI viva) */
-.step-circle:hover {
-  transform: scale(1.08);
-  transition: transform 0.2s ease;
-}
-
-/* Responsive */
-@media (max-width: 480px) {
-  .step {
-    width: 56px;
-    min-width: 56px;
-  }
-  .step-label {
-    display: none;
-  }
+.step-connector.completed {
+  background-color: #198754;
 }

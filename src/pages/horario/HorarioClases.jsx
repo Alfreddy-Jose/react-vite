@@ -5,6 +5,7 @@ import Alerta, { AlertaError } from "../../components/Alert";
 import Calendar from "../horario/HorarioFull";
 import Spinner from "../../components/Spinner";
 import Stepper from "../../components/Stepper";
+import { LapsoAcademico } from "../lapsoAcademico/LapsoAcademico";
 
 export function HorarioClases() {
   const { id } = useParams(); // id del horario
@@ -17,7 +18,7 @@ export function HorarioClases() {
     const fetchHorario = async () => {
       try {
         const res = await Api.get(`/horario/${id}`);
-        setHorario(res.data);        
+        setHorario(res.data);
       } catch (error) {
         AlertaError("Error al cargar horario");
         console.error(error);
@@ -41,13 +42,20 @@ export function HorarioClases() {
 
   return (
     <div>
-      <Stepper steps={["NUEVO HORARIO", "CLASES"]} currentStep={2} />
-      <h2 className="mb-4">
-        CLASES DEL HORARIO - SECCIÓN {horario.seccion?.nombre} | TRIMESTRE{" "}
-        {horario.trimestre?.nombre}
-      </h2>
-
-      <Calendar horarioId={horario.id} horario={horario}/>
+        <Stepper
+          steps={["NUEVO HORARIO", "CLASES"]}
+          currentStep={2}
+          contextInfo={{
+            pnf: horario.seccion?.pnf?.nombre || "PNF",
+            sede: horario.seccion?.sede?.nombre_sede || "Sede",
+            trayecto: horario.seccion?.trayecto?.nombre || "Trayecto",
+            trimestre: horario.trimestre?.nombre || "Trimestre",
+            seccion: horario.seccion?.nombre || "Sección",
+            LapsoAcademico: horario.lapso_academico || "Lapso Academico",
+          }}
+        />
+      <br />
+      <Calendar horarioId={horario.id} horario={horario} />
 
       <button
         className="btn btn-secondary traslation mt-4"
