@@ -12,7 +12,6 @@ import { Buttom } from "../../components/Buttom";
 function Docente() {
   const [docentes, setDocentes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [docentesFiltrada, setDocentesFiltrada] = useState([]);
   const [permisos, setPermisos] = useState([]);
   const location = useLocation();
 
@@ -24,10 +23,6 @@ function Docente() {
     "persona.email",
     "pnf.nombre",
   ];
-  // Inicializar datos filtrados
-  useEffect(() => {
-    setDocentesFiltrada(docentes);
-  }, [docentes]);
 
   useEffect(() => {
     // Leer permisos del localStorage
@@ -72,12 +67,17 @@ function Docente() {
       sortable: true,
     },
     {
-      name: "CÉDULA PERSONA",
+      name: "CÉDULA",
       selector: (row) => row.persona.cedula_persona,
     },
     {
-      name: "PERSONA",
+      name: "NOMBRE",
       selector: (row) => row.persona.nombre,
+      sortable: true,
+    },
+    {
+      name: "APELLIDO",
+      selector: (row) => row.persona.apellido,
       sortable: true,
     },
     {
@@ -162,13 +162,6 @@ function Docente() {
       <ContainerTable
         // Titulo para la tabla PNF
         title="DOCENTES"
-        // Propiedades para el buscador
-        data={docentes}
-        searchData={docentes}
-        onSearchFiltered={setDocentesFiltrada}
-        searchFields={camposBusqueda}
-        placeholder="BUSCAR..."
-        showStats={true}
         // Boton para descargar PDF
         button_pdf={
           permisos.includes("docente.pdf") ? (
@@ -189,7 +182,7 @@ function Docente() {
         }
         isLoading={loading}
         // Tabla
-        tabla={<Tabla columns={columns} data={docentesFiltrada} />}
+        tabla={<Tabla columns={columns} data={docentes} searchFields={camposBusqueda} />}
       />
     </>
   );

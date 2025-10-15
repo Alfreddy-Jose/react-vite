@@ -7,12 +7,10 @@ import { Create } from "../../components/Link";
 import { Tabla } from "../../components/Tabla";
 import Acciones from "../../components/Acciones";
 import Modal, { ButtomModal } from "../../components/Modal";
-import { SearchBox } from "../../components/SearchBox";
 
 function Roles() {
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [rolesFiltrados, setRolesFiltrados] = useState([]);
   const [permisos, setPermisos] = useState([]);
   const location = useLocation();
 
@@ -35,11 +33,6 @@ function Roles() {
     // Limpiar el estado de navegacion para no mostrar el mensaje nuevamente
     window.history.replaceState({}, "");
   }, [location.state]);
-
-  // Inicializar datos filtrados
-  useEffect(() => {
-    setRolesFiltrados(roles);
-  }, [roles]);
 
   const columns = [
     {
@@ -97,19 +90,12 @@ function Roles() {
       <ContainerTable
         // Titulo para la tabla
         title="ROLES"
-        // Propiedades para el buscador
-        data={roles}
-        searchData={roles}
-        onSearchFiltered={setRolesFiltrados}
-        searchFields={camposBusqueda}
-        placeholder="BUSCAR..."
-        showStats={true}
         // Boton para crear nuevos registros
         link={
           permisos.includes("rol.crear") ? <Create path="/rol/create" /> : null
         }
         // Tabla
-        tabla={<Tabla columns={columns} data={rolesFiltrados} />}
+        tabla={<Tabla columns={columns} data={roles} searchFields={camposBusqueda} />}
         // Manejar el estado de carga
         isLoading={loading}
       />

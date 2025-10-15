@@ -12,12 +12,10 @@ import { FORM_LABELS } from "../../constants/formLabels";
 import SelectSearch from "../../components/SelectSearch";
 import { Buttom } from "../../components/Buttom";
 import { useAuth } from "../../context/AuthContext";
-import { SearchBox } from "../../components/SearchBox";
 
 export function Secciones() {
   const [secciones, setSecciones] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [seccionesFiltrados, setSeccionesFiltrados] = useState([]);
   const [permisos, setPermisos] = useState([]);
   const location = useLocation();
 
@@ -64,11 +62,6 @@ export function Secciones() {
     // Limpiar el estado de navegacion para no mostrar el mensaje nuevamente
     window.history.replaceState({}, "");
   }, [location.state]);
-
-  // Inicializar datos filtrados
-  useEffect(() => {
-    setSeccionesFiltrados(secciones);
-  }, [secciones]);
 
   // Definir las columnas de la tabla
   const columns = [
@@ -142,14 +135,6 @@ export function Secciones() {
             permisos={permisos}
           />
         }
-        // Propiedades para el buscador
-        data={secciones}
-        searchData={secciones}
-        onSearchFiltered={setSeccionesFiltrados}
-        searchFields={camposBusqueda}
-        placeholder="BUSCAR..."
-        showStats={true}
-
         // Titulo para la tabla
         title="SECCIONES"
         // Boton para crear nuevos registros
@@ -159,7 +144,7 @@ export function Secciones() {
           ) : null
         }
         // Tabla
-        tabla={<Tabla data={seccionesFiltrados} columns={columns} />}
+        tabla={<Tabla data={secciones} columns={columns} searchFields={camposBusqueda} />}
         // Indicador de carga
         isLoading={loading}
       />

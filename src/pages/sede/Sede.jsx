@@ -15,7 +15,6 @@ import { Buttom } from "../../components/Buttom";
 export function Sede() {
   const [sedes, setSedes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [sedesFiltrados, setSedesFiltrados] = useState([]);
   const [permisos, setPermisos] = useState([]);
   const location = useLocation();
 
@@ -37,11 +36,6 @@ export function Sede() {
     }
     window.history.replaceState({}, "");
   }, [location.state]);
-
-    // Inicializar datos filtrados
-  useEffect(() => {
-    setSedesFiltrados(sedes);
-  }, [sedes]);
 
   const descargarPDF = async () => {
     try {
@@ -142,13 +136,6 @@ export function Sede() {
     <>
       <ContainerTable
         title="SEDES"
-        // Propiedades para el buscador
-        data={sedes}
-        searchData={sedes}
-        onSearchFiltered={setSedesFiltrados}
-        searchFields={camposBusqueda}
-        placeholder="BUSCAR..."
-        showStats={true}
         // Boton para generar PDF
         button_pdf={
           permisos.includes("sede.pdf") ? (
@@ -167,7 +154,7 @@ export function Sede() {
           ) : null
         }
         isLoading={loading}
-        tabla={<Tabla data={sedesFiltrados} columns={columns} />}
+        tabla={<Tabla data={sedes} columns={columns} searchFields={camposBusqueda} />}
       />
     </>
   );

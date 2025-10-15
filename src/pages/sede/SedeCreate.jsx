@@ -64,7 +64,7 @@ export function SedeCreate() {
       setMunicipios([]);
     } finally {
       setLoadingMunicipios(false);
-    }
+    } 
   };
 
   // Función para enviar datos

@@ -9,7 +9,7 @@ import { Create } from "../../components/Link";
 import { Buttom } from "../../components/Buttom";
 import SelectSearch from "../../components/SelectSearch";
 import { TextAreaLabel } from "../../components/TextAreaLabel";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const initialValues = {
   cedula_persona: "",
@@ -20,6 +20,8 @@ const initialValues = {
   telefono: "",
   email: "",
   tipo_persona: "",
+  municipio_id: "",
+  estado_id: "", // Añadido este campo que faltaba
   grado_inst: "",
 };
 // Validando campos
@@ -36,7 +38,6 @@ const validationSchema = Yup.object({
     .matches(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "Solo letras permitidas") // solo letras permitidas
     .required("Este campo es obligatorio"), // Campo requerido
   direccion: Yup.string().required("Este campo es obligatorio"), // Campo requerido
-  municipio: Yup.string().required("Este campo es obligatorio"), // Campo requerido
   telefono: Yup.string()
     .matches(/^[0-9]*$/, "Solo números permitidos") // Solo números
     .required("Este campo es obligatorio") // Campo requerido
@@ -46,14 +47,34 @@ const validationSchema = Yup.object({
   //.required("Este campo es obligatorio"),
   tipo_persona: Yup.string().required("Este campo es obligatorio"), // Campo requerido
   grado_inst: Yup.string().required("Este campo es obligatorio"), // Campo requerido
+  estado_id: Yup.string().required("Este campo es obligatorio"),
+  municipio_id: Yup.string().required("Este campo es obligatorio"),
 });
 
 function PersonaCreate() {
   const navegation = useNavigate();
-  const [excelFile, setExcelFile] = useState(null);
-  const [uploading, setUploading] = useState(false);
-  const [importMessage, setImportMessage] = useState("");
-  const [importErrors, setImportErrors] = useState([]);
+  const [estados, setEstados] = useState([]);
+  const [municipios, setMunicipios] = useState([]);
+  const [loadingMunicipios, setLoadingMunicipios] = useState(false);
+
+  // Función para cargar municipios
+  const cargarMunicipios = async (estadoId) => {
+    if (!estadoId) {
+      setMunicipios([]);
+      return;
+    }
+
+    setLoadingMunicipios(true);
+    try {
+      const response = await Api.get(`/sede/getMunicipios/${estadoId}`);
+      setMunicipios(response.data);
+    } catch (error) {
+      console.error("Error al cargar Municipios:", error);
+      setMunicipios([]);
+    } finally {
+      setLoadingMunicipios(false);
+    }
+  };
 
   // Funcion para enviar datos al backend
   const onSubmit = async (values, { setErrors }) => {
@@ -71,110 +92,37 @@ function PersonaCreate() {
     }
   };
 
-  // Función para manejar la selección del archivo Excel
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    if (selectedFile) {
-      // Validar que sea un archivo Excel
-      const validTypes = [
-        "application/vnd.ms-excel",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "application/vnd.oasis.opendocument.spreadsheet",
-      ];
-
-      if (
-        !validTypes.includes(selectedFile.type) &&
-        !selectedFile.name.match(/\.(xls|xlsx|ods)$/)
-      ) {
-        setImportMessage(
-          "Por favor, sube un archivo Excel válido (.xls, .xlsx)"
-        );
-        setExcelFile(null);
-        return;
-      }
-
-      setExcelFile(selectedFile);
-      setImportMessage("");
-      setImportErrors([]);
-    }
-  };
-
-  // Función para importar el archivo Excel
-  const handleImportExcel = async () => {
-    if (!excelFile) {
-      setImportMessage("Por favor, selecciona un archivo Excel");
-      return;
-    }
-
-    setUploading(true);
-    setImportMessage("");
-    setImportErrors([]);
-
-    const formData = new FormData();
-    formData.append("excel_file", excelFile);
-
-    try {
-      const response = await Api.post("/api/import-personas", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        onUploadProgress: (progressEvent) => {
-          const progress = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
-          );
-          setImportMessage(`Subiendo archivo: ${progress}%`);
-        },
-      });
-
-      setImportMessage(
-        `¡Importación exitosa! ${
-          response.data.imported_count || 0
-        } personas importadas correctamente.`
-      );
-
-      // Mostrar errores si existen
-      if (response.data.errors && response.data.errors.length > 0) {
-        setImportErrors(response.data.errors);
-      }
-
-      // Limpiar archivo después de importar
-      setExcelFile(null);
-      document.getElementById("excel-file").value = "";
-
-      // Recargar la página después de 2 segundos para ver los nuevos registros
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
-    } catch (error) {
-      console.error("Error al importar archivo:", error);
-
-      if (error.response && error.response.data) {
-        setImportMessage(
-          `Error: ${
-            error.response.data.message || "Error al procesar el archivo"
-          }`
-        );
-
-        if (error.response.data.errors) {
-          setImportErrors(
-            Array.isArray(error.response.data.errors)
-              ? error.response.data.errors
-              : [error.response.data.errors]
-          );
-        }
-      } else {
-        setImportMessage("Error al procesar el archivo Excel");
-      }
-    } finally {
-      setUploading(false);
-    }
-  };
-
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues,
     validationSchema,
     onSubmit,
   });
+
+  // Efecto para cargar estados
+  useEffect(() => {
+    const getEstados = async () => {
+      try {
+        const response = await Api.get(`/sede/getEstados`);
+        setEstados(response.data);
+      } catch (error) {
+        console.error("Error al cargar Estados:", error);
+        setEstados([]);
+      }
+    };
+
+    getEstados();
+  }, []);
+
+  // Efecto para cargar municipios cuando cambia el estado
+  useEffect(() => {
+    if (formik.values.estado_id) {
+      cargarMunicipios(formik.values.estado_id);
+    } else {
+      setMunicipios([]);
+      formik.setFieldValue("municipio_id", "");
+    }
+  }, [formik.values.estado_id]);
 
   return (
     <div>
@@ -187,84 +135,6 @@ function PersonaCreate() {
               text="Volver"
               style="btn btn-secondary mb-4"
             />
-          }
-          importar={
-            <div className="card mb-4">
-              <div className="card-header">
-                <h5 className="card-title">IMPORTAR PERSONAS DESDE EXCEL</h5>
-              </div>
-              <div className="card-body">
-                <div className="row align-items-center">
-                  <div className="col-md-6">
-                    <div className="mb-3">
-                      <label htmlFor="excel-file" className="form-label">
-                        SELECCIONAR ARCHIVO EXCEL
-                      </label>
-                      <input
-                        id="excel-file"
-                        type="file"
-                        accept=".xls,.xlsx,.ods"
-                        onChange={handleFileChange}
-                        className="form-control"
-                        disabled={uploading}
-                        aria-label="Seleccionar archivo Excel"
-                      />
-                      <div className="form-text">
-                        FORMATOS ACEPTADOS: .xls, .xlsx, .ods
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-md-6">
-                    <div className="d-flex gap-2 mb-3 align-items-center">
-                      <button
-                        type="button"
-                        onClick={handleImportExcel}
-                        disabled={uploading || !excelFile}
-                        className="btn btn-success traslation"
-                        aria-disabled={uploading || !excelFile}
-                      >
-                        {uploading ? (
-                          <>
-                            <span className="spinner-border spinner-border-sm me-2" />
-                            Importando...
-                          </>
-                        ) : (
-                          "Importar Excel"
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {importMessage && (
-                  <div
-                    className={`alert ${
-                      importMessage.includes("éxito") ||
-                      importMessage.includes("exitosa")
-                        ? "alert-success"
-                        : importMessage.includes("Error")
-                        ? "alert-danger"
-                        : "alert-info"
-                    } mt-3`}
-                  >
-                    {importMessage}
-                  </div>
-                )}
-
-                {importErrors.length > 0 && (
-                  <div className="alert alert-warning mt-3">
-                    <h6 className="alert-heading">
-                      Errores en la importación:
-                    </h6>
-                    <ul className="mb-0">
-                      {importErrors.map((error, index) => (
-                        <li key={index}>{error}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            </div>
           }
           input={
             <>
@@ -333,13 +203,41 @@ function PersonaCreate() {
                   { id: "BACHILLER", nombre: "BACHILLER" },
                 ]}
               />
-              {/* Input para municipio de PERSONA */}
-              <InputLabel
-                label={FORM_LABELS.PERSONAS.MUNICIPIO}
-                type="text"
-                name="municipio"
-                placeholder="MUNICIPIO"
+              {/* Select para estado */}
+              <SelectSearch
+                label={FORM_LABELS.SEDE.ESTADO}
+                name="estado_id"
+                placeholder="SELECCIONE UN ESTADO"
+                options={estados}
+                labelKey="estado"
+                valueKey="id_estado"
+                value={formik.values.estado_id}
                 formik={formik}
+              />
+
+              {/* Select para municipio */}
+              <SelectSearch
+                label={FORM_LABELS.SEDE.MUNICIPIO}
+                name="municipio_id"
+                placeholder={
+                  !formik.values.estado_id
+                    ? "PRIMERO SELECCIONE UN ESTADO"
+                    : loadingMunicipios
+                    ? "CARGANDO MUNICIPIOS..."
+                    : municipios.length === 0
+                    ? "NO HAY MUNICIPIOS"
+                    : "SELECCIONE UN MUNICIPIO"
+                }
+                options={municipios}
+                labelKey="municipio"
+                valueKey="id_municipio"
+                value={formik.values.municipio_id}
+                formik={formik}
+                disabled={
+                  !formik.values.estado_id ||
+                  loadingMunicipios ||
+                  municipios.length === 0
+                }
               />
               {/* Input para direccion de PERSONA */}
               <TextAreaLabel

@@ -36,12 +36,36 @@ const validationSchema = Yup.object({
   grado_inst: Yup.string()
     .required("Este campo es obligatorio") // Campo requerido
     .matches(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "Solo letras permitidas"), // solo letras permitidas
+  estado_id: Yup.string().required("Este campo es obligatorio"),
+  municipio_id: Yup.string().required("Este campo es obligatorio"),
 });
 
 function PersonaEdit() {
   const { id } = useParams();
   const navegation = useNavigate();
   const [personas, setPersona] = useState();
+  const [estados, setEstados] = useState([]);
+  const [municipios, setMunicipios] = useState([]);
+  const [loadingMunicipios, setLoadingMunicipios] = useState(false);
+
+  // Función para cargar municipios basados en el estado seleccionado
+  const cargarMunicipios = async (estadoId) => {
+    if (!estadoId) {
+      setMunicipios([]);
+      return;
+    }
+
+    setLoadingMunicipios(true);
+    try {
+      const response = await Api.get(`/sede/getMunicipios/${estadoId}`);
+      setMunicipios(response.data);
+    } catch (error) {
+      console.error("Error al cargar Municipios:", error);
+      setMunicipios([]);
+    } finally {
+      setLoadingMunicipios(false);
+    }
+  };
 
   // Funcion para enviar datos al backend
   const onSubmit = async (values) => {
@@ -56,7 +80,8 @@ function PersonaEdit() {
       nombre: personas?.nombre || "",
       apellido: personas?.apellido || "",
       direccion: personas?.direccion || "",
-      municipio: personas?.municipio || "",
+      estado_id: personas?.municipio.estado.id_estado || "",
+      municipio_id: personas?.municipio.id_municipio || "",
       telefono: personas?.telefono || "",
       email: personas?.email || "",
       tipo_persona: personas?.tipo_persona || "",
@@ -66,12 +91,29 @@ function PersonaEdit() {
     onSubmit,
   });
 
+  // Efecto para cargar estados al montar el componente
+  useEffect(() => {
+    const getEstados = async () => {
+      try {
+        const response = await Api.get(`/sede/getEstados`);
+        setEstados(response.data);
+      } catch (error) {
+        console.error("Error al cargar Estados:", error);
+        setEstados([]);
+      }
+    };
+
+    getEstados();
+  }, []);
+
   useEffect(() => {
     // Trayendo los datos del registro
     const getPersonas = async () => {
       try {
         const response = await Api.get(`persona/${id}`);
         setPersona(response.data);
+        console.log(response.data);
+        
       } catch (error) {
         console.error(
           "Error al cargar los datos:",
@@ -92,6 +134,16 @@ function PersonaEdit() {
 
     getPersonas();
   }, [id]);
+
+  // Efecto para cargar municipios cuando cambia el estado seleccionado
+  useEffect(() => {
+    if (formik.values.estado_id) {
+      cargarMunicipios(formik.values.estado_id);
+    } else {
+      setMunicipios([]);
+      formik.setFieldValue("municipio_id", "");
+    }
+  }, [formik.values.estado_id]);
 
   return (
     <form onSubmit={formik.handleSubmit}>
@@ -171,13 +223,40 @@ function PersonaEdit() {
                 { id: "BACHILLER", nombre: "BACHILLER" },
               ]}
             />
-            {/* Input para municipio de PERSONA */}
-            <InputLabel
-              label={FORM_LABELS.PERSONAS.MUNICIPIO}
-              type="text"
-              name="municipio"
-              placeholder="MUNICIPIO"
+            {/* Select para estado */}
+            <SelectSearch
+              label={FORM_LABELS.SEDE.ESTADO}
+              name="estado_id"
+              placeholder="SELECCIONE UN ESTADO"
+              options={estados}
+              labelKey="estado"
+              valueKey="id_estado"
               formik={formik}
+            />
+
+            {/* Select para municipio */}
+            <SelectSearch
+              label={FORM_LABELS.SEDE.MUNICIPIO}
+              name="municipio_id"
+              placeholder={
+                !formik.values.estado_id
+                  ? "PRIMERO SELECCIONE UN ESTADO"
+                  : loadingMunicipios
+                  ? "CARGANDO MUNICIPIOS..."
+                  : municipios.length === 0
+                  ? "NO HAY MUNICIPIOS"
+                  : "SELECCIONE UN MUNICIPIO"
+              }
+              options={municipios}
+              labelKey="municipio"
+              valueKey="id_municipio"
+              value={formik.values.municipio_id}
+              formik={formik}
+              disabled={
+                !formik.values.estado_id ||
+                loadingMunicipios ||
+                municipios.length === 0
+              }
             />
             {/* Input para direccion de PERSONA */}
             <TextAreaLabel

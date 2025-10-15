@@ -11,15 +11,10 @@ export function Horarios() {
   const [horarios, setHorarios] = useState([]);
   const [loading, setLoading] = useState(true);
 /*   const [permisos, setPermisos] = useState([]); */
-  const [horariosFiltrados, setHorariosFiltrados] = useState([]);
   const location = useLocation();
 
   // Campos por los que buscar - definidos directamente aquí
   const camposBusqueda = ["seccion.nombre", "trimestre.nombre", "estado"];
-  // Inicializar datos filtrados
-  useEffect(() => {
-    setHorariosFiltrados(horarios);
-  }, [horarios]);
 
   useEffect(() => {
     // Leer permisos desde localStorage
@@ -96,13 +91,6 @@ export function Horarios() {
     <>
       <ContainerTable
         title="HORARIOS POR SECCIONES"
-        // propiedades para el buscador
-        data={horarios}
-        searchData={horarios}
-        onSearchFiltered={setHorariosFiltrados}
-        searchFields={camposBusqueda}
-        placeholder="BUSCAR..."
-        showStats={true}
         // Boton para crear nuevos registros
         link={
           // permisos.includes("horarios.crear") ? (
@@ -110,7 +98,7 @@ export function Horarios() {
           //  ) : null
         }
         isLoading={loading}
-        tabla={<Tabla columns={columns} data={horariosFiltrados} />}
+        tabla={<Tabla columns={columns} data={horarios} searchFields={camposBusqueda} />}
       />
     </>
   );

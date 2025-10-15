@@ -6,7 +6,7 @@ import { FORM_LABELS } from "../../constants/formLabels";
 import { Buttom } from "../../components/Buttom";
 import * as Yup from "yup";
 import { useEffect, useState } from "react";
-import { GetAll, PostAll } from "../../services/Api";
+import { GetAll, PostAllWithFile } from "../../services/Api";
 import { useNavigate } from "react-router-dom";
 import SelectSearch from "../../components/SelectSearch";
 import InputImage from "../../components/InputImage";
@@ -61,7 +61,18 @@ export function UsuarioCreate() {
   // Funcion para enviar datos al backend
   const onSubmit = async (values, { setErrors }) => {
     try {
-      await PostAll(values, "/usuarios", navegation);
+      const formData = new FormData();
+      formData.append("nombre", values.nombre);
+      formData.append("email", values.email);
+      formData.append("password", values.password);
+      formData.append("password_confirmation", values.confirm); // importante para Laravel
+      formData.append("rol", values.rol);
+
+      if (values.avatar) {
+        formData.append("avatar", values.avatar);
+      }
+      await PostAllWithFile(formData, "/usuarios", navegation);
+      //await PostAll(formData, "/usuarios", navegation);
     } catch (error) {
       if (error.response && error.response.data.errors) {
         // Transforma los arrays de Laravel a strings para Formik
@@ -133,7 +144,7 @@ export function UsuarioCreate() {
                 name="nombre"
                 placeholder="INGRESE UN NOMBRE"
                 onBlur={formik.handleBlur}
-                value={formik.values.codigo}
+                value={formik.values.nombre}
                 formik={formik}
               />
               {/* Input para email de usuario */}
@@ -153,7 +164,7 @@ export function UsuarioCreate() {
                 name="password"
                 placeholder="***********"
                 onBlur={formik.handleBlur}
-                value={formik.values.codigo}
+                value={formik.values.email}
                 formik={formik}
                 // Añadiendo el icono de ojo para mostrar/ocultar contraseña
                 eye={true}
@@ -165,7 +176,7 @@ export function UsuarioCreate() {
                 name="confirm"
                 placeholder="************"
                 onBlur={formik.handleBlur}
-                value={formik.values.codigo}
+                value={formik.values.password}
                 formik={formik}
               />
               <SelectSearch

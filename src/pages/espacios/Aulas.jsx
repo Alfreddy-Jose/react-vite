@@ -14,7 +14,6 @@ export default function Aulas() {
   const [loading, setLoading] = useState(true);
   const [aulas, setAulas] = useState([]);
   const [permisos, setPermisos] = useState([]);
-  const [aulasFiltradas, setAulasFiltradas] = useState([]);
   const location = useLocation();
   const [showImportModal, setShowImportModal] = useState(false);
 
@@ -29,10 +28,6 @@ export default function Aulas() {
 
   // Campos por los que buscar - definidos directamente aquí
   const camposBusqueda = ["nombre_aula", "sede.nombre_sede"];
-  // Inicializar datos filtrados
-  useEffect(() => {
-    setAulasFiltradas(aulas);
-  }, [aulas]);
 
   useEffect(() => {
     // Leer permisos del localStorage
@@ -122,13 +117,6 @@ export default function Aulas() {
       <ContainerTable
         // Titulo para la tabla
         title="AULAS"
-        // Propiedades para el buscador
-        data={aulas}
-        searchData={aulas}
-        onSearchFiltered={setAulasFiltradas}
-        searchFields={camposBusqueda}
-        placeholder="BUSCAR..."
-        showStats={true}
         // Boton para generar PDF
         button_pdf={
           permisos.includes("aula.pdf") ?
@@ -166,7 +154,7 @@ export default function Aulas() {
           ) : null
         }
         // Tabla
-        tabla={<Tabla columns={columns} data={aulasFiltradas} />}
+        tabla={<Tabla columns={columns} data={aulas} searchFields={camposBusqueda} />}
         // Loader
         isLoading={loading}
       />

@@ -57,7 +57,7 @@ export const GetAll = async (setAll, setLoading, url) => {
     // Manejo de errores
     AlertaError("Error al cargar los datos");
     console.log(error);
-  } finally { 
+  } finally {
     setLoading(false);
   }
 };
@@ -76,11 +76,10 @@ export const PostAll = async (values, url, navegation, lapso = null) => {
   });
 
   try {
-    await Api.post(url, {...values, lapso_id: lapso}).then((response) => {
+    await Api.post(url, { ...values, lapso_id: lapso }).then((response) => {
       console.log({ state: { message: response.data.message } });
       navegation(url, { state: { message: response.data.message } });
     });
-
   } catch (error) {
     console.log(error);
     if (!error.response || error.response.status !== 422) {
@@ -95,6 +94,52 @@ export const PostAll = async (values, url, navegation, lapso = null) => {
     }
   }
 };
+
+// Nueva función específica para FormData
+export const PostAllWithFile = async (
+  formData,
+  url,
+  navegation,
+  lapso = null
+) => {
+  let cerrar = true;
+
+  Swal.fire({
+    title: "Guardando...",
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
+    },
+  });
+
+  try {
+    // Agregar lapso_id si existe
+    if (lapso) {
+      formData.append("lapso_id", lapso);
+    }
+
+    await Api.post(url, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }).then((response) => {
+      console.log({ state: { message: response.data.message } });
+      navegation(url, { state: { message: response.data.message } });
+    });
+  } catch (error) {
+    console.log(error);
+    if (!error.response || error.response.status !== 422) {
+      AlertaError("Error al guardar los datos");
+      cerrar = false;
+    }
+    throw error;
+  } finally {
+    if (cerrar) {
+      Swal.close();
+    }
+  }
+};
+
 // Actualizando Todos los datos
 export const PutAll = async (values, url, navegation, id, urlNavegar) => {
   let cerrar = true; // Variable local
@@ -119,6 +164,54 @@ export const PutAll = async (values, url, navegation, id, urlNavegar) => {
     throw error; // <-- ¡Agrega esta línea!
   } finally {
     // cerrar loader en caso de exito
+    if (cerrar) {
+      Swal.close();
+    }
+  }
+};
+
+// En services/Api.js
+export const PutAllWithFile = async (
+  formData,
+  url,
+  navegation,
+  lapso = null,
+  redirectUrl = null
+) => {
+  let cerrar = true;
+
+  Swal.fire({
+    title: "Actualizando...",
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
+    },
+  });
+
+  try {
+    // Agregar lapso_id si existe
+    if (lapso) {
+      formData.append("lapso_id", lapso);
+    }
+
+    await Api.post(url, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }).then((response) => {
+      console.log({ state: { message: response.data.message } });
+      if (navegation && redirectUrl) {
+        navegation(redirectUrl, { state: { message: response.data.message } });
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    if (!error.response || error.response.status !== 422) {
+      AlertaError("Error al actualizar los datos");
+      cerrar = false;
+    }
+    throw error;
+  } finally {
     if (cerrar) {
       Swal.close();
     }

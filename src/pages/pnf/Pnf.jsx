@@ -8,12 +8,10 @@ import { Modal, ButtomModal } from "../../components/Modal";
 import { Tabla } from "../../components/Tabla";
 import Acciones from "../../components/Acciones";
 import { Buttom } from "../../components/Buttom";
-import { SearchBox } from "../../components/SearchBox";
 
 export function Pnf() {
   const [pnf, setPnf] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [pnfFiltrados, setPnfFiltrados] = useState([]);
   const [permisos, setPermisos] = useState([]);
   const location = useLocation();
 
@@ -36,11 +34,6 @@ export function Pnf() {
     // Limpiar el estado de navegacion para no mostrar el mensaje nuevamente
     window.history.replaceState({}, "");
   }, [location.state]);
-
-  // Inicializar datos filtrados
-  useEffect(() => {
-    setPnfFiltrados(pnf);
-  }, [pnf]);
 
   const descargarPDF = async () => {
     try {
@@ -126,13 +119,6 @@ export function Pnf() {
       <ContainerTable
         // Titulo para la tabla PNF
         title="PNF"
-        // Propiedades para el buscador
-        data={pnf}
-        searchData={pnf}
-        onSearchFiltered={setPnfFiltrados}
-        searchFields={camposBusqueda}
-        placeholder="BUSCAR..."
-        showStats={true}
         // Boton para generar PDF
         button_pdf={
           permisos.includes("pnf.pdf") ? (
@@ -151,7 +137,7 @@ export function Pnf() {
         }
         isLoading={loading}
         // Tabla
-        tabla={<Tabla columns={columns} data={pnfFiltrados} />}
+        tabla={<Tabla columns={columns} data={pnf} searchFields={camposBusqueda} />}
       />
     </>
   );

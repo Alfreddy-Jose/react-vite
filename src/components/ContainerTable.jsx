@@ -1,5 +1,4 @@
 import Spinner from "./Spinner";
-import { SearchBox } from "./SearchBox";
 
 export function ContainerTable({
   title,
@@ -8,11 +7,6 @@ export function ContainerTable({
   isLoading = false,
   header_parametros = null,
   button_pdf = null,
-  onSearchFiltered = () => {},
-  searchData = [],
-  searchFields = [],
-  placeholder = "Buscar...",
-  showStats = true,
   button_modal = null,
 }) {
   return (
@@ -29,14 +23,7 @@ export function ContainerTable({
             {button_pdf}
             {button_modal}
             <div className="card-title mb-4">{`LISTA DE ${title}`}</div>
-            {/* BUSCADOR */}
-            <SearchBox
-              data={searchData}
-              onFilteredData={onSearchFiltered}
-              searchFields={searchFields}
-              placeholder={placeholder}
-              showStats={showStats}
-            />
+            {/* EL BUSCADOR AHORA ESTÁ INTEGRADO EN LA TABLA */}
           </div>
           {isLoading ? <Spinner /> : tabla}
         </div>

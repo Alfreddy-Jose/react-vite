@@ -83,7 +83,7 @@ export function SedeEdit() {
       municipio_id: sede?.municipio.id_municipio || "",
       universidad_id: sede?.universidad_id || ""
     },
-    validationSchema,
+    validationSchema, 
     onSubmit,
   });
 

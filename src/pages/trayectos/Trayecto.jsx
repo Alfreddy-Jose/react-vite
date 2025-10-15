@@ -10,17 +10,11 @@ import Acciones from "../../components/Acciones";
 export default function Trayecto() {
   const [loading, setLoading] = useState(true);
   const [trayectos, setTrayectos] = useState([]);
-  const [trayectosFiltrados, setTrayectosFiltrados] = useState([]);
   const [permisos, setPermisos] = useState([]);
   const location = useLocation();
 
-  // Campos por los que buscar - definidos directamente aquí
+  // Campos por los que buscar
   const camposBusqueda = ["nombre"];
-
-  // Inicializar datos filtrados
-  useEffect(() => {
-    setTrayectosFiltrados(trayectos);
-  }, [trayectos]);
 
   useEffect(() => {
     // Leer permisos del localStorage
@@ -29,22 +23,30 @@ export default function Trayecto() {
 
     GetAll(setTrayectos, setLoading, "/trayectos");
 
-    // Motrar Alerta al registrar un nuevo PNF
+    // Mostrar Alerta si hay mensaje
     if (location.state?.message) {
       Alerta(location.state.message);
     }
 
-    // Limpiar el estado de navegacion para no mostrar el mensaje nuevamente
+    // Limpiar el estado de navegacion
     window.history.replaceState({}, "");
   }, [location.state]);
 
   // Definir las columnas de la tabla
   const columns = [
-    { name: "ID", selector: (row, index) => index + 1, sortable: true },
-    { name: "NOMBRE", selector: (row) => row.nombre, sortable: true },
-    // Mostrar columna solo si tiene al menos uno de los permisos
-    ...(permisos.includes("trayecto.editar") ||
-    permisos.includes("trayecto.eliminar")
+    { 
+      name: "ID", 
+      selector: (row) => row.id, 
+      sortable: true,
+      cell: (row, index) => index + 1
+    },
+    { 
+      name: "NOMBRE", 
+      selector: (row) => row.nombre, 
+      sortable: true 
+    },
+    // Mostrar columna solo si tiene permisos
+    ...(permisos.includes("trayecto.editar") || permisos.includes("trayecto.eliminar")
       ? [
           {
             name: "ACCIONES",
@@ -64,26 +66,16 @@ export default function Trayecto() {
 
   return (
     <>
-      {/* Contenedor para la tablas */}
       <ContainerTable
-        // Titulo para la tabla
         title="TRAYECTOS"
-        // Propiedades para el buscador
-        data={trayectos}
-        searchData={trayectos}
-        onSearchFiltered={setTrayectosFiltrados}
-        searchFields={camposBusqueda}
-        placeholder="BUSCAR..."
-        showStats={true}
-        // Boton para crear nuevos registros
         link={<Create path="/trayecto/create" />}
-        // Tabla
         tabla={
-          permisos.includes("trayecto.crear") ? (
-            <Tabla columns={columns} data={trayectosFiltrados} />
-          ) : null
+          <Tabla 
+            columns={columns} 
+            data={trayectos} 
+            searchFields={camposBusqueda}
+          />
         }
-        // Manejar Loader
         isLoading={loading}
       />
     </>

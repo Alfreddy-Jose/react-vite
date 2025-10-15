@@ -3,10 +3,36 @@ import { LogoutButton } from "../Logout";
 import logo from "../../img/PNF.svg";
 import { Link } from "react-router-dom";
 import LapsoSelector from "../LapsoSelect";
+import Api from "../../services/Api";
+
+const getBackendBaseUrl = () => {
+  let url = Api.defaults.baseURL || "";
+  // Elimina /api si está al final
+  if (url.endsWith("/api")) {
+    url = url.slice(0, -4);
+  }
+  // Elimina barra final si existe
+  if (url.endsWith("/")) {
+    url = url.slice(0, -1);
+  }
+  return url;
+};
 
 export function Navbar() {
   const { user } = useAuth();
 
+  const getAvatarUrl = (user) => {
+    if (user.avatar) {
+      // Si el avatar ya es una URL completa
+      if (user.avatar.startsWith("http")) {
+        return user.avatar;
+      }
+      // Si es una ruta relativa, construir la URL completa usando la baseURL del backend
+      return `${getBackendBaseUrl()}/storage/${user.avatar}`;
+    }
+    // Avatar por defecto si no tiene
+    return "/default-avatar.png"; // Asegúrate de tener esta imagen en tu public folder
+  };
   return (
     <div className="main-header">
       <div className="main-header-logo">
@@ -43,7 +69,12 @@ export function Navbar() {
             {/* Select para lapsos */}
             <li>
               <div className="me-3">
-                <label htmlFor="lapso" className="form-label text-center fw-bold mb-0">LAPSO ACADÉMICO</label>
+                <label
+                  htmlFor="lapso"
+                  className="form-label text-center fw-bold mb-0"
+                >
+                  LAPSO ACADÉMICO
+                </label>
                 <LapsoSelector />
               </div>
             </li>
@@ -57,7 +88,21 @@ export function Navbar() {
                 aria-expanded="false"
               >
                 <div className="avatar-sm">
-                  <i className="fa fa-user icon-user"></i>
+                  <img
+                    src={getAvatarUrl(user)}
+                    alt={`Avatar de ${user.name}`}
+                    className="rounded-circle"
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      objectFit: "cover",
+                      border: "2px solid #dee2e6",
+                    }}
+                    onError={(e) => {
+                      // Si la imagen falla al cargar, mostrar una por defecto
+                      e.target.src = "/default-avatar.png";
+                    }}
+                  />
                 </div>
                 <span className="profile-username">
                   <span className="op-7">HOLA, </span>
@@ -69,7 +114,15 @@ export function Navbar() {
                   <li>
                     <div className="user-box">
                       <div className="avatar-lg">
-                        <i className="fa fa-user icon-user-bottom"></i>
+                        <img
+                          src={getAvatarUrl(user)}
+                          alt={`Avatar de ${user.name}`}
+                          className="avatar-img rounded"
+                          onError={(e) => {
+                            // Si la imagen falla al cargar, mostrar una por defecto
+                            e.target.src = "/default-avatar.png";
+                          }}
+                        />
                       </div>
                       <div className="u-text">
                         <h4>{user?.name || ""}</h4>

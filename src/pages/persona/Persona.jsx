@@ -16,7 +16,6 @@ export default function Persona() {
   const [personas, setPersonas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [permisos, setPermisos] = useState([]);
-  const [personasFiltradas, setPersonasFiltradas] = useState([]);
   const location = useLocation();
 
   // Campos por los que buscar - definidos directamente aquí
@@ -28,25 +27,21 @@ export default function Persona() {
     "tipo_persona",
   ];
 
-  // Nueva función para buscar secciones
+  // Nueva función para buscar personas (no secciones)
   const buscarPersonas = async (parametros) => {
     setLoading(true);
     try {
       // Llamada a la API con los parámetros de búsqueda
-      const response = await GetAll(
+      await GetAll(
         setPersonas,
         setLoading,
         `/personas?${new URLSearchParams(parametros).toString()}`
       );
+      // Al buscar, también actualiza el estado filtrado para que los botones funcionen
     } catch (error) {
       setLoading(false);
     }
   };
-
-  // Inicializar datos filtrados
-  useEffect(() => {
-    setPersonasFiltradas(personas);
-  }, [personas]);
 
   useEffect(() => {
     // Leer permisos del localStorage
@@ -65,25 +60,6 @@ export default function Persona() {
     window.history.replaceState({}, "");
   }, [location.state]);
 
-  const descargarPDF = async () => {
-    try {
-      const response = await Api.get("/persona/pdf", {
-        responseType: "blob",
-        withCredentials: true,
-      });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "personas.pdf");
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } catch (error) {
-      AlertaError("Error al descargar el PDF");
-      console.error(error);
-    }
-  };
-
   // Definir las columnas de la tabla
   const columns = [
     {
@@ -98,6 +74,11 @@ export default function Persona() {
     {
       name: "NOMBRE",
       selector: (row) => row.nombre,
+      sortable: true,
+    },
+      {
+      name: "APELLIDO",
+      selector: (row) => row.apellido,
       sortable: true,
     },
     {
@@ -123,7 +104,8 @@ export default function Persona() {
               <b>DIRECCIÓN: </b> {row.direccion}
             </p>
             <p>
-              <b>MUNICIPIO: </b> {row.municipio}
+              {/* mostrando municipio en mayuscula*/}
+              <b>MUNICIPIO: </b> {row.municipio.municipio.toUpperCase()}
             </p>
             <p>
               <b>TELÉFONO: </b> {row.telefono}
@@ -170,25 +152,6 @@ export default function Persona() {
         }
         // Titulo para la tabla Personas
         title="PERSONAS"
-        // Propiedades para el buscador
-        data={personas}
-        searchData={personas}
-        onSearchFiltered={setPersonasFiltradas}
-        searchFields={camposBusqueda}
-        placeholder="BUSCAR..."
-        showStats={true}
-        // Boton para descargar el PDF
-/*         button_pdf={
-          permisos.includes("persona.pdf") ? (
-            <Buttom
-              type="button"
-              style="btn btn-danger mb-3"
-              onClick={descargarPDF}
-              title="Generar PDF"
-              text="Generar PDF"
-            />
-          ) : null
-        } */
         // Boton para crear nuevos registros
         link={
           permisos.includes("persona.crear") ? (
@@ -196,8 +159,8 @@ export default function Persona() {
           ) : null
         }
         isLoading={loading}
-        // Tabla
-        tabla={<Tabla columns={columns} data={personasFiltradas} />}
+        // Tabla SIEMPRE usa personasFiltradas
+        tabla={<Tabla columns={columns} data={personas} searchFields={camposBusqueda} />}
       />
     </>
   );

@@ -41,6 +41,12 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // Nueva función para exponer setUser de forma controlada
+  const updateUser = (newUser) => {
+    setUser(newUser);
+    localStorage.setItem("user", JSON.stringify(newUser));
+  };
+
   useEffect(() => {
     if (isLogin("/login") && isLogin("/")) {
       const fetchUser = async () => {
@@ -103,6 +109,7 @@ export function AuthProvider({ children }) {
         setLapsoActual,
         lapsos,
         refreshLapsos,
+        updateUser, // Exponer updateUser
       }}
     >
       {children}

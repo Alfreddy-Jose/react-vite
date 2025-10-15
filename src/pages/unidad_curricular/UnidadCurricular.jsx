@@ -12,16 +12,11 @@ import { Buttom } from "../../components/Buttom";
 function UnidadCurricular() {
   const [loading, setLoading] = useState(true);
   const [unidad, setUnidad] = useState([]);
-  const [unidadFiltrada, setUnidadFiltrada] = useState([]);
   const [permisos, setPermisos] = useState([]);
   const location = useLocation();
 
   // Campos por los que buscar - definidos directamente aquí
   const camposBusqueda = ["codigo", "nombre", "abreviado", "abreviado_coord"];
-  // Inicializar datos filtrados
-  useEffect(() => {
-    setUnidadFiltrada(unidad);
-  }, [unidad]);
 
   useEffect(() => {
     // Leer permisos del localStorage
@@ -141,13 +136,6 @@ function UnidadCurricular() {
       <ContainerTable
         // Titulo para la tabla
         title="UNIDADES CURRICULARES"
-        // Propiedades para el buscador
-        data={unidad}
-        searchData={unidad}
-        onSearchFiltered={setUnidadFiltrada}
-        searchFields={camposBusqueda}
-        placeholder="BUSCAR..."
-        showStats={true}
         // Boton para descargar PDF
         button_pdf={
           permisos.includes("unidad Curricular.pdf") ?
@@ -166,7 +154,12 @@ function UnidadCurricular() {
           ) : null
         }
         // Tabla
-        tabla={<Tabla columns={columns} data={unidadFiltrada} />}
+        tabla={
+        <Tabla 
+          columns={columns} 
+          data={unidad}
+          searchFields={camposBusqueda}
+          />}
         isLoading={loading}
       />
     </>
