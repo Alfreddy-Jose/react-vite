@@ -20,7 +20,8 @@ const initialValues = {
   direccion: "",
   municipio_id: "",
   estado_id: "", // Añadido este campo que faltaba
-  universidad_id: ""
+  universidad_id: "",
+  pnf_id: "",
 };
 
 // Validando campos
@@ -43,6 +44,8 @@ const validationSchema = Yup.object({
 export function SedeCreate() {
   const navegation = useNavigate();
   const [universidad, setUniversidad] = useState(null);
+  const [pnf, setPnf] = useState(null);
+  const [loadingPnf, setLoadingPnf] = useState(true);
   const [loading, setLoading] = useState(true);
   const [estados, setEstados] = useState([]);
   const [municipios, setMunicipios] = useState([]);
@@ -64,7 +67,7 @@ export function SedeCreate() {
       setMunicipios([]);
     } finally {
       setLoadingMunicipios(false);
-    } 
+    }
   };
 
   // Función para enviar datos
@@ -85,11 +88,12 @@ export function SedeCreate() {
   const formik = useFormik({
     initialValues: {
       ...initialValues,
-      universidad_id: universidad?.id || ""
+      universidad_id: universidad?.id || "",
+      pnf_id: pnf?.id || "",
     },
     validationSchema,
     onSubmit,
-    enableReinitialize: true
+    enableReinitialize: true,
   });
 
   // Efecto para cargar estados
@@ -125,6 +129,24 @@ export function SedeCreate() {
     getUniversidad();
   }, []);
 
+  // Efecto para cargar pnf
+  useEffect(() => {
+    const getPnf = async () => {
+      try {
+        const response = await Api.get("/pnfShow");
+        // Asegúrate de que la respuesta tenga la estructura esperada
+        setPnf(response.data);
+      } catch (error) {
+        console.error("Error fetching pnf data:", error);
+        setPnf(null);
+      } finally {
+        setLoadingPnf(false);
+      }
+    };
+
+    getPnf();
+  }, []);
+
   // Efecto para cargar municipios cuando cambia el estado
   useEffect(() => {
     if (formik.values.estado_id) {
@@ -136,12 +158,15 @@ export function SedeCreate() {
   }, [formik.values.estado_id]);
 
   // Mostrar Spinner mientras carga
-  if (loading) {
+  if (loading || loadingPnf) {
     return <Spinner />;
   }
 
   // Verificar si hay universidad configurada
-  if (!universidad || (Array.isArray(universidad) && universidad.length === 0)) {
+  if (
+    !universidad ||
+    (Array.isArray(universidad) && universidad.length === 0)
+  ) {
     return (
       <div className="d-flex flex-column align-items-center justify-content-center text-center p-4">
         <img src={Warning} alt="imagen de alerta" />
@@ -157,17 +182,29 @@ export function SedeCreate() {
     );
   }
 
+  if (!pnf || (Array.isArray(pnf) && pnf.length === 0)) {
+    return (
+      <div className="d-flex flex-column align-items-center justify-content-center text-center p-4">
+        <img src={Warning} alt="imagen de alerta" />
+        <h2 className="h4 text-dark mb-3">¡Configuración requerida!</h2>
+        <p className="text-muted mb-4">
+          No has configurado los datos del PNF. <br />
+          Por favor completa esta información para continuar.
+        </p>
+        <Link to="/pnf" className="btn btn-primary">
+          Configurar PNF
+        </Link>
+      </div>
+    );
+  }
+
   // Renderizar el formulario
   return (
     <form onSubmit={formik.handleSubmit}>
       <ContainerIput
         title="NUEVA SEDE"
         link={
-          <Create
-            path="/sede"
-            text="Volver"
-            style="btn btn-secondary mb-4"
-          />
+          <Create path="/sede" text="Volver" style="btn btn-secondary mb-4" />
         }
         input={
           <>
@@ -176,6 +213,14 @@ export function SedeCreate() {
               hidden={true}
               name="universidad_id"
               value={universidad.id}
+              formik={formik}
+            />
+
+            {/* Input oculto para pnf_id */}
+            <InputLabel
+              hidden={true}
+              name="pnf_id"
+              value={pnf.id}
               formik={formik}
             />
 
@@ -242,7 +287,11 @@ export function SedeCreate() {
               valueKey="id_municipio"
               value={formik.values.municipio_id}
               formik={formik}
-              disabled={!formik.values.estado_id || loadingMunicipios || municipios.length === 0}
+              disabled={
+                !formik.values.estado_id ||
+                loadingMunicipios ||
+                municipios.length === 0
+              }
             />
             {/* Input para direccion de SEDE */}
             <TextAreaLabel

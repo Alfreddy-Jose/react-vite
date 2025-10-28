@@ -7,7 +7,7 @@ import { InputLabel } from "../../components/InputLabel";
 import { Buttom } from "../../components/Buttom";
 import Api, { PostAll } from "../../services/Api";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import SelectSearch from "../../components/SelectSearch";
 import { TextAreaLabel } from "../../components/TextAreaLabel";
 
@@ -21,6 +21,7 @@ const initialValues = {
   periodo: "",
   trayecto_id: "",
   trimestre_id: "",
+  hora_total_est: "",
 };
 
 // Validaciones para cada campo
@@ -37,6 +38,8 @@ const validationSchema = Yup.object({
   hora_practica: Yup.string()
     .nullable() // Campo opcional
     .matches(/^[0-:-9]*$/, "Solo números"), // Solo números
+  hora_total_est: Yup.string()
+    .required("Este campo es obligatorio"), // Campo obligatorio
   periodo: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
   trayecto_id: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
   descripcion: Yup.string().max(255, "Máximo 255 caracteres"),
@@ -109,8 +112,6 @@ function UnidadCurricularCreate() {
 
   // Funcion para enviar datos al backend
   const onSubmit = async (values, { setErrors }) => {
-    values.hora_total_est =
-      (parseInt(values.hora_teorica) || 0) + (parseInt(values.hora_practica) || 0);
 
     try {
       await PostAll(values, "/unidad_curricular", navegation);
@@ -184,6 +185,14 @@ function UnidadCurricularCreate() {
     }
   }, [periodoSeleccionado, trimestres]);
 
+  // Funcion para generar el total de horas
+  const totalHoras = useMemo(() => {
+    // sumar horas teoricas con horas practicas
+    return (
+      parseInt(formik.values.hora_teorica || 0) + parseInt(formik.values.hora_practica || 0)
+    );
+  }, [formik.values.hora_teorica, formik.values.hora_practica]);
+
 
   return (
     <>
@@ -215,7 +224,7 @@ function UnidadCurricularCreate() {
                 placeholder="UNIDAD CRÉDITO"
                 formik={formik}
               />
-              {/* Input para las horas academicas */}
+              {/* Input para las horas teoricas */}
               <InputLabel
                 label={FORM_LABELS.UNIDAD_CURRICULAR.HORA_TEORICA}
                 type="text"
@@ -223,13 +232,23 @@ function UnidadCurricularCreate() {
                 placeholder="HORA TEORÍCA"
                 formik={formik}
               />
-              {/* Input para el total de horas estimadas*/}
+              {/* Input para horas practicas*/}
               <InputLabel
                 label={FORM_LABELS.UNIDAD_CURRICULAR.HORA_PRACTICA}
                 type="text"
                 name="hora_practica"
                 placeholder="HORA PRÁCTICA"
                 formik={formik}
+              />
+            {/* Input para el total de horas estimadas*/}
+              <InputLabel
+                label={FORM_LABELS.UNIDAD_CURRICULAR.HORA_TOTAL_EST}
+                type="text"
+                name="hora_total_est"
+                placeholder="HORAS TOTALES"
+                formik={formik}
+                disabled={true}
+                value={totalHoras}
               />
               <SelectSearch
                 name="trayecto_id"

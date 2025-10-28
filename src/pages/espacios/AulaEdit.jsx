@@ -7,7 +7,7 @@ import { InputLabel } from "../../components/InputLabel";
 import { Buttom } from "../../components/Buttom";
 import Api, { PutAll } from "../../services/Api";
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import SelectSearch from "../../components/SelectSearch";
 
 // Validaciones para cada campo
@@ -21,6 +21,7 @@ const validationSchema = Yup.object({
     .matches(/^[0-:-9]*$/, "Formato incorrecto") // Solo números
     .required("Este campo es obligatorio"), // Campo obligatorio
   sede_id: Yup.number().required("Este campo es obligatorio"),
+  nombre_aula: Yup.string().required("Este campo es obligatorio"),
 });
 
 export default function AulasEdit() {
@@ -32,14 +33,14 @@ export default function AulasEdit() {
   // Funcion para enviar datos al backend
   const onSubmit = async (values, { setErrors }) => {
     try {
-      await PutAll(values, "/aula", navegation, id, "/aula");      
+      await PutAll(values, "/aula", navegation, id, "/aula");
     } catch (error) {
       if (error.response && error.response.data.errors) {
         // Transforma los arrays de Laravel a strings para Formik
         const formikErrors = {};
         Object.entries(error.response.data.errors).forEach(([key, value]) => {
           formikErrors[key] = value[0];
-        }); 
+        });
         setErrors(error.response.data.errors);
       }
     }
@@ -51,6 +52,7 @@ export default function AulasEdit() {
       etapa: aula?.etapa || "",
       nro_aula: aula?.nro_aula || "",
       sede_id: aula?.sede_id || "",
+      nombre_aula: aula?.nombre_aula || "",
     },
     validationSchema,
     onSubmit,
@@ -72,6 +74,11 @@ export default function AulasEdit() {
     getSedes();
   }, [id]);
 
+  // Funcion para generar el nombre del Aula
+  const nombreAula = useMemo(() => {
+    return `${formik.values.etapa}-${formik.values.nro_aula}`;
+  }, [formik.values.etapa, formik.values.nro_aula]);
+
   return (
     <>
       <form onSubmit={formik.handleSubmit}>
@@ -91,14 +98,6 @@ export default function AulasEdit() {
                 valueKey="id"
                 labelKey="nombre_sede"
               />
-              {/* Input para nombre de aula */}
-{/*               <InputLabel
-                label={FORM_LABELS.AULA.CODIGO}
-                type="text"
-                name="codigo"
-                placeholder="CÓDIGO"
-                formik={formik}
-              /> */}
               {/* Input para email de usuario */}
               <InputLabel
                 label={FORM_LABELS.AULA.ETAPA}
@@ -114,6 +113,16 @@ export default function AulasEdit() {
                 name="nro_aula"
                 placeholder="NÚMERO DE AULA"
                 formik={formik}
+              />
+              {/* Input para nombre de aula */}
+              <InputLabel
+                label={FORM_LABELS.AULA.NAME}
+                type="text"
+                name="nombre_aula"
+                placeholder="NOMBRE"
+                formik={formik}
+                value={nombreAula}
+                disabled={true}
               />
             </>
           }

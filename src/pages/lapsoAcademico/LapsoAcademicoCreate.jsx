@@ -110,8 +110,8 @@ export function LapsoAcademicoCreate() {
               name="nombre_lapso"
               placeholder="NOMBRE LAPSO"
               formik={formik}
+              disabled={true}
               value={nombreLapso}
-              useExternalValue={true}
             />
 
             <InputLabel 

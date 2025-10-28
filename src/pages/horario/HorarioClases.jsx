@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import Api from "../../services/Api";
 import Alerta, { AlertaError } from "../../components/Alert";
 import Calendar from "../horario/HorarioFull";
 import Spinner from "../../components/Spinner";
 import Stepper from "../../components/Stepper";
 import { LapsoAcademico } from "../lapsoAcademico/LapsoAcademico";
+import { Create } from "../../components/Link";
 
 export function HorarioClases() {
   const { id } = useParams(); // id del horario
-  const navigate = useNavigate();
   const [horario, setHorario] = useState(null);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
@@ -42,27 +42,21 @@ export function HorarioClases() {
 
   return (
     <div>
-        <Stepper
-          steps={["NUEVO HORARIO", "CLASES"]}
-          currentStep={2}
-          contextInfo={{
-            pnf: horario.seccion?.pnf?.nombre || "PNF",
-            sede: horario.seccion?.sede?.nombre_sede || "Sede",
-            trayecto: horario.seccion?.trayecto?.nombre || "Trayecto",
-            trimestre: horario.trimestre?.nombre || "Trimestre",
-            seccion: horario.seccion?.nombre || "Sección",
-            LapsoAcademico: horario.lapso_academico || "Lapso Academico",
-          }}
-        />
+      <Stepper
+        steps={["NUEVO HORARIO", "CLASES"]}
+        currentStep={2}
+        contextInfo={{
+          pnf: horario.seccion?.pnf?.nombre || "PNF",
+          sede: horario.seccion?.sede?.nombre_sede || "Sede",
+          trayecto: horario.seccion?.trayecto?.nombre || "Trayecto",
+          trimestre: horario.trimestre?.nombre || "Trimestre",
+          seccion: horario.seccion?.nombre || "Sección",
+          LapsoAcademico: horario.lapso_academico || "Lapso Academico",
+        }}
+      />
       <br />
+      <Create path="/horarios" horario={true} text="Volver" style="btn btn-secondary mb-4" />
       <Calendar horarioId={horario.id} horario={horario} />
-
-      <button
-        className="btn btn-secondary traslation mt-4"
-        onClick={() => navigate("/horarios")}
-      >
-        Volver a Horarios
-      </button>
     </div>
   );
 }

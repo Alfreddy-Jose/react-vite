@@ -46,6 +46,7 @@ export function Usuario() {
     // Limpiar el estado de navegacion para no mostrar el mensaje nuevamente
     window.history.replaceState({}, "");
   }, [location.state]);
+console.log(usuarios);
 
   // Función para obtener la URL completa del avatar
   const getAvatarUrl = (user) => {
@@ -72,7 +73,7 @@ export function Usuario() {
       cell: (row) => (
         <div className="d-flex justify-content-center">
           <img 
-            src={getAvatarUrl(row)}
+            src={getAvatarUrl(row)}            
             alt={`Avatar de ${row.name}`}
             className="rounded-circle"
             style={{

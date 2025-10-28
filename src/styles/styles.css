@@ -165,3 +165,35 @@ svg[data-prefix="fas"] {
 .card-hover:focus-visible {
     box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15), 0 12px 30px rgba(0, 0, 0, 0.12);
 }
+
+.titleUniversidad {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+/* clase para que ocupe solo el 30% de su contenedor padre y se oculte cuando la patalla se de movil */
+.with-title {
+    width: 40%;
+
+    @media (max-width: 768px) {
+        width: 100%;
+    }
+}
+/* ancho del carrusel  */
+.ancho {
+    min-width: 60%;
+    width: 60%;
+    max-width: 60%
+}
+
+/* estilo de la barra azul en la paguina home */
+.barra_blue{
+    width: 100%;
+    height: 20px;
+}
+
+/* estilos para el header del home */
+.header_home{
+    height: 10vh;
+    overflow: hidden;
+}

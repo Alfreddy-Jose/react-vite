@@ -118,7 +118,7 @@ function Evento({
                 onEditar(evento);
               }}
             >
-              Modificar
+              Editar
             </button>
             <button
               className="dropdown-item text-danger"
@@ -399,10 +399,6 @@ export default function Calendar(horarioId) {
   const dias = ["LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO"];
 
   // Datos para select
-
-
-  const [pnfs, setPnfs] = useState([]);
-  const [pnfSeleccionado, setPnfSeleccionado] = useState([]);
 
   const [aulas, setAulas] = useState([]);
   const [aulaSeleccionada, setAulaSeleccionada] = useState([]);
@@ -887,6 +883,7 @@ export default function Calendar(horarioId) {
     if (
       !docenteSeleccionado ||
       !materiaSeleccionada ||
+      !docenteSeleccionado ||
       !nuevoEvento.dia ||
       nuevoEvento.bloque === null
     ) {
@@ -1069,7 +1066,7 @@ export default function Calendar(horarioId) {
           bloque: Number(nuevoEvento.bloque.value),
           duracion: duracionNum,
           materias: nuevoEvento.materia,
-          aula: nuevoEvento.aula.value,
+          aula: nuevoEvento.aula,
           sede: horarioId?.horario?.seccion?.sede_id,
           pnf: horarioId?.horario?.seccion?.pnf_id,
           trayecto: horarioId?.horario?.seccion?.trayecto_id,
@@ -1079,10 +1076,24 @@ export default function Calendar(horarioId) {
           color: "#e3f2fd",
         },
       ]);
+      setTodosLosEventos((prev) => [
+        ...prev,
+        {
+          id: eventoDesdeBackend.toString(),
+          dia: nuevoEvento.dia.value,
+          bloque: Number(nuevoEvento.bloque.value),
+          duracion: duracionNum,
+          materias: nuevoEvento.materia,
+          aula: nuevoEvento.aula,
+          docente: nuevoEvento.docente,
+        },
+      ]);
       setEventoRecienAgregado(eventoDesdeBackend.toString());
     } catch (error) {
       AlertaError(
-        "Error al guardar la clase" + " " + error.response.data.message
+        "Error al guardar la clase" +
+          " " +
+          (error.response?.data?.message || error.message)
       );
       //mostrar error detallado en consola
       console.log(
@@ -1105,6 +1116,23 @@ export default function Calendar(horarioId) {
       materia: null,
       duracion: 1,
     });
+  };
+
+  const handleEditarEvento = (evento) => {
+    // Preseleccionar aula correctamente para el select
+    let aulaObj = null;
+    if (evento.aula && typeof evento.aula === "object" && "value" in evento.aula) {
+      aulaObj = evento.aula;
+    } else if (evento.aula) {
+      // Buscar en aulasOptions
+      const found = aulaOptions.find(a => String(a.value) === String(evento.aula));
+      aulaObj = found || null;
+    }
+    setEventoEditando({
+      ...evento,
+      aula: aulaObj,
+    });
+    setMostrarModal(true);
   };
 
   return (
@@ -1307,10 +1335,7 @@ export default function Calendar(horarioId) {
                     bloqueId={bloque.id}
                     eventosDia={eventos.filter((e) => e.dia === dia)}
                     onResizeStart={handleResizeStart}
-                    onEditar={(evento) => {
-                      setEventoEditando(evento);
-                      setMostrarModal(true);
-                    }}
+                    onEditar={handleEditarEvento}
                     onEliminar={async (evento) => {
                       // Aquí eliminas el evento del estado
                       setEventos((prev) =>
@@ -1376,22 +1401,146 @@ export default function Calendar(horarioId) {
           <div className="modal-dialog">
             <div className="modal-content">
               <form
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
-                  // Actualiza el evento en el array
-                  console.log(eventoEditando.texto);
-                  console.log(eventoEditando);
-
+                  // Validaciones igual que en agregar evento
+                  const eventoAnterior = eventos.find(ev => ev.id === eventoEditando.id);
+                  const materiaEdit = materias.find(m => String(m.id) === String(eventoEditando.materias?.value));
+                  const docenteEdit = docentes.find(d => String(d.id) === String(eventoEditando.docente?.value));
+                  const aulaEdit = aulas.find(a => String(a.id) === String(eventoEditando.aula?.value));
+                  console.log("AulaEdit: " + aulaEdit);
+                  console.log("DocenteEdit: " + docenteEdit);
+                  const diaEdit = eventoEditando.dia?.value;
+                  if (!docenteEdit || !materiaEdit || !aulaEdit) {
+                    AlertaWarning("Completa los campos vacíos");
+                    return;
+                  }
+                  // Validar solapamiento en el mismo horario
+                  const bloqueNum = eventoAnterior.bloque;
+                  const duracionNum = eventoAnterior.duracion;
+                  const haySolapamiento = eventos.some(
+                    (e) =>
+                      e.id !== eventoEditando.id &&
+                      e.dia === diaEdit &&
+                      bloqueNum < e.bloque + e.duracion &&
+                      bloqueNum + duracionNum > e.bloque
+                  );
+                  if (haySolapamiento) {
+                    AlertaWarning("¡Ya existe una clase en ese rango de bloques!");
+                    return;
+                  }
+                  // Validar solapamiento docente en todos los horarios
+                  const haySolaplamientoDocente = todosLosEventos.some(
+                    (e) =>
+                      e.id !== eventoEditando.id &&
+                      e.docente.value === docenteEdit.id &&
+                      e.dia === diaEdit &&
+                      bloqueNum < e.bloque + e.duracion &&
+                      bloqueNum + duracionNum > e.bloque
+                  );
+                  if (haySolaplamientoDocente) {
+                    AlertaWarning(
+                      "¡El docente ya tiene una clase en ese rango de bloques en otro horario!"
+                    );
+                    return;
+                  }
+                  // Validar solapamiento aula en todos los horarios
+                  const haySolapamientoAula = todosLosEventos.some(
+                    (e) =>
+                      e.id !== eventoEditando.id &&
+                      e.aula.value === aulaEdit.id &&
+                      e.dia === diaEdit &&
+                      bloqueNum < e.bloque + e.duracion &&
+                      bloqueNum + duracionNum > e.bloque
+                  );
+                  if (haySolapamientoAula) {
+                    AlertaWarning(
+                      "¡El aula ya tiene una clase en ese rango de bloques en otro horario!"
+                    );
+                    return;
+                  }
+                  // Validar horas de la materia
+                  const horasUsadasMateria = eventos
+                    .filter(
+                      (e) =>
+                        e.id !== eventoEditando.id &&
+                        e.materias?.value === eventoEditando.materias?.value
+                    )
+                    .reduce((acc, e) => acc + (e.duracion || 1), 0);
+                  const horasMateria = materiaEdit?.horas || 0;
+                  if (horasUsadasMateria + duracionNum > horasMateria) {
+                    AlertaWarning("¡Se excedieron las horas semanales de la Unidad Curricular!");
+                    return;
+                  }
+                  // Validar horas del docente
+                  let horasDedicacionDocente = docenteEdit.horas_dedicacion;
+                  // Si cambió el docente, sumar las horas al anterior y restar al nuevo
+                  if (eventoAnterior.docente?.value !== docenteEdit.id) {
+                    // Sumar al anterior
+                    if (eventoAnterior.docente?.value) {
+                      await Api.put(`/docente_horas/${eventoAnterior.docente.value}?horas_dedicacion=${duracionNum}`);
+                    }
+                    // Restar al nuevo
+                    await Api.put(`/docente_horas/${docenteEdit.id}?horas_dedicacion=${-duracionNum}`);
+                  } else {
+                    // Si no cambió, solo validar si tiene suficientes horas
+                    if (horasDedicacionDocente - duracionNum < 0) {
+                      const respuesta = await AlertaConfirm(
+                        "La cantidad de horas dedicadas del docente se ha excedido",
+                        "¿Deseas continuar?",
+                        "Continuar"
+                      );
+                      if (!respuesta.isConfirmed) {
+                        return;
+                      }
+                    }
+                  }
+                  // Actualizar en backend
+                  const payload = {
+                    dia: diaEdit,
+                    bloque_id: bloqueNum,
+                    duracion: duracionNum,
+                    unidad_curricular_id: materiaEdit.id,
+                    docente_id: docenteEdit.id,
+                    espacio_id: aulaEdit.id,
+                  };
+                  try {
+                    const response = await Api.put(`/claseEdit/${eventoEditando.id}`, payload);
+                    Alerta(response.data.message);
+                  } catch (error) {
+                    AlertaError("Error al Editar el evento: " + (error.response?.data?.message || error.message));
+                    return;
+                  }
+                  // Actualiza el evento en el array y resalta visualmente
                   setEventos((prev) =>
                     prev.map((ev) =>
-                      ev.id === eventoEditando.id ? eventoEditando : ev
+                      ev.id === eventoEditando.id
+                        ? {
+                            ...ev,
+                            materias: {
+                              value: eventoEditando.materias?.value,
+                              label: eventoEditando.materias?.label,
+                            },
+                            docente: {
+                              value: eventoEditando.docente?.value,
+                              label: eventoEditando.docente?.label,
+                            },
+                            aula: {
+                              value: eventoEditando.aula?.value,
+                              label: eventoEditando.aula?.label,
+                            },
+                            dia: eventoEditando.dia,
+                            texto: `${eventoEditando.materias.label}\n${eventoEditando.docente.label}\n${eventoEditando.aula.label}`,
+                          }
+                        : ev
                     )
                   );
+                  setEventoRecienAgregado(eventoEditando.id); // Resalta el evento editado
                   setMostrarModal(false);
                 }}
               >
                 <div className="modal-header">
-                  <h5 className="modal-title fs-5">MODIFICAR EVENTO</h5>
+                  <h5 className="modal-title fs-5">EDITAR EVENTO</h5>
                   <button
                     type="button"
                     className="btn-close"
@@ -1400,162 +1549,9 @@ export default function Calendar(horarioId) {
                 </div>
                 <div className="modal-body">
                   <div className="row">
-                    <div className="d-flex d-flex justify-content-center">
-                      <SelectControl
-                        label="SEDE"
-                        name="sede"
-                        disabled={true}
-                        className="col-sm-12 col-xs-12 col-xl-10"
-                        value={eventoEditando.sede}
-                        options={sedesOptions}
-                        onChange={async (option) => {
-                          setSedeSeleccionada(
-                            sedes.find(
-                              (e) => String(e.id) === String(option?.value)
-                            ) || {}
-                          );
-                          setPnfs([]);
-                          setPnfSeleccionado(null);
-                          setEventoEditando({
-                            ...eventoEditando,
-                            sede: option,
-                            pnf: null,
-                            aula: null,
-                          });
-
-                          // Cargar aulas cuando se seleccione una sede
-                          if (option) {
-                            try {
-                              const response = await Api.get(
-                                `/horarios/sede/${option.value}/espacios`
-                              );
-                              setAulas(response.data);
-                              setAulaSeleccionada(response.data[0]);
-                            } catch (error) {
-                              AlertaError("Error al cargar las aulas");
-                              console.log(error);
-                            }
-                          }
-                        }}
-                        onValueChange={async (option) => {
-                          // Cargar PNFs cuando cambie la sede
-                          if (option) {
-                            try {
-                              const response = await Api.get(
-                                `/horarios/sedes/${option.value}/pnfs`
-                              );
-                              setPnfs(response.data);
-                              setPnfSeleccionado(response.data[0]);
-                              console.log(pnfSeleccionado);
-                            } catch (error) {
-                              AlertaError("Error al cargar los PNFs");
-                              console.log(error);
-                            }
-                          }
-                        }}
-                      />
-                    </div>
                     <div className="d-flex justify-content-center">
                       <SelectControl
-                        label="PNF"
-                        name="pnf"
-                        className="col-sm-12 col-xs-12 col-xl-10"
-                        value={eventoEditando.pnf}
-                        options={pnfOptions}
-                        onChange={(option) => {
-                          setPnfSeleccionado(
-                            pnfs.find(
-                              (e) => String(e.id) === String(option?.value)
-                            ) || null
-                          );
-                          setEventoEditando({
-                            ...eventoEditando,
-                            pnf: option,
-                            docente: null,
-                          });
-                          console.log(pnfSeleccionado);
-                        }}
-                      />
-                    </div>
-
-                    <div className="row justify-content-center">
-                      <div className="col-md-5 col-sm-12 mb-2 mb-md-0">
-                        <SelectControl
-                          label="TRAYECTO"
-                          name="trayecto"
-                          className="w-100"
-                          value={eventoEditando.trayecto}
-                          options={trayectoOptions}
-                          onChange={(option) => {
-                            setTrayectoSeleccionado(
-                              trayectos.find(
-                                (e) => String(e.id) === String(option?.value)
-                              ) || null
-                            );
-                            setEventoEditando({
-                              ...eventoEditando,
-                              trayecto: option,
-                              trimestre: null,
-                            });
-                          }}
-                          onValueChange={async (option) => {
-                            if (option) {
-                              try {
-                                const response = await Api.get(
-                                  `/horarios/trayectos/${option.value}/trimestres`
-                                );
-                                setTrimestres(response.data);
-                                setTrimestreSeleccionada(response.data[0]);
-                              } catch (error) {
-                                AlertaError("Error al cargar los trimestres");
-                                console.log(error);
-                              }
-                            }
-                          }}
-                        />
-                      </div>
-                      <div className="col-md-1"></div>
-                      <div className="col-md-5 col-sm-12">
-                        <SelectControl
-                          label="TRIMESTRE"
-                          name="trimestre"
-                          className="w-100"
-                          value={eventoEditando.trimestre}
-                          options={trimestreOptions}
-                          onChange={(option) => {
-                            setTrimestreSeleccionada(
-                              trimestres.find(
-                                (t) => String(t.id) === String(option?.value)
-                              ) || null
-                            );
-                            setEventoEditando({
-                              ...eventoEditando,
-                              trimestre: option,
-                              materias: null,
-                            });
-                          }}
-                          onValueChange={async (option) => {
-                            if (option) {
-                              try {
-                                const response = await Api.get(
-                                  `/horarios/trimestres/${option.value}/unidadesCurriculares`
-                                );
-                                setMaterias(response.data);
-                                setMateriaSeleccionada(response.data[0]);
-                                console.log(response.data);
-                              } catch (error) {
-                                AlertaError("Error al cargar las materias");
-                                console.log(error);
-                                console.log(eventoEditando.trimestre);
-                              }
-                            }
-                          }}
-                        />
-                      </div>
-                    </div>
-                    <div className="d-flex d-flex justify-content-center">
-                      <SelectControl
-                        label="MATERIA"
+                        label="UNIDAD CURRICULAR"
                         name="materias"
                         className="col-sm-12 col-xs-12 col-xl-10"
                         value={eventoEditando.materias}
@@ -1568,20 +1564,15 @@ export default function Calendar(horarioId) {
                           );
                           setEventoEditando({
                             ...eventoEditando,
-                            materia: option,
+                            materias: option,
                             docente: null,
                           });
-                          console.log("pnf value:", eventoEditando.pnf?.value);
-                          console.log(
-                            "tipo de dato:",
-                            typeof eventoEditando.pnf?.value
-                          );
                         }}
                         onValueChange={async (option) => {
-                          if (eventoEditando.pnf?.value && option.value) {
+                          if (option) {
                             try {
                               const response = await Api.get(
-                                `/docentes/unidadesPnfs?pnf_id=${pnfSeleccionado.id}&unidad_curricular_id=${option.value}`
+                                `/docentes/unidadesPnfs?pnf_id=${horarioId?.horario?.seccion?.pnf_id}&unidad_curricular_id=${option.value}`
                               );
                               setDocentes(response.data);
                               setDocenteSeleccionado(response.data[0]);
@@ -1593,8 +1584,7 @@ export default function Calendar(horarioId) {
                         }}
                       />
                     </div>
-
-                    <div className="d-flex d-flex justify-content-center">
+                    <div className="d-flex justify-content-center">
                       <SelectControl
                         label="DOCENTE"
                         name="docente"
@@ -1610,49 +1600,31 @@ export default function Calendar(horarioId) {
                           setEventoEditando({
                             ...eventoEditando,
                             docente: option,
-                            texto: `${eventoEditando.materia?.label}\n${option.label}\n${eventoEditando.aula?.label} `,
                           });
+                          console.log("Aula editando: " + eventoEditando?.aula);
+                          
                         }}
                       />
                     </div>
-                    <div className="row justify-content-center">
-                      <div className="col-md-5 col-sm-12 mb-2 mb-md-0">
-                        <SelectControl
-                          label="AULA"
-                          name="aula"
-                          className="col-sm-12 col-xs-12 col-xl-10"
-                          value={eventoEditando.aula}
-                          options={aulaOptions}
-                          onChange={(option) => {
-                            setAulaSeleccionada(
-                              aulas.find(
-                                (e) => String(e.id) === String(option?.value)
-                              ) || null
-                            );
-                            setEventoEditando({
-                              ...eventoEditando,
-                              aula: option,
-                            });
-                          }}
-                        />
-                      </div>
-                      <div className="col-md-1"></div>{" "}
-                      {/* Espacio entre columnas */}
-                      <div className="col-md-5 col-sm-12">
-                        <label className="form-label mt-4">DURACIÓN</label>
-                        <input
-                          type="number"
-                          className="form-control"
-                          min={1}
-                          value={eventoEditando.duracion}
-                          onChange={(e) =>
-                            setEventoEditando({
-                              ...eventoEditando,
-                              duracion: Number(e.target.value),
-                            })
-                          }
-                        />
-                      </div>
+                    <div className="d-flex justify-content-center">
+                      <SelectControl
+                        label="AULA"
+                        name="aula"
+                        className="col-sm-12 col-xs-12 col-xl-10"
+                        value={eventoEditando.aula}
+                        options={aulaOptions}
+                        onChange={(option) => {
+                          setAulaSeleccionada(
+                            aulas.find(
+                              (e) => String(e.id) === String(option?.value)
+                            ) || null
+                          );
+                          setEventoEditando({
+                            ...eventoEditando,
+                            aula: option,
+                          });
+                        }}
+                      />
                     </div>
                   </div>
                 </div>

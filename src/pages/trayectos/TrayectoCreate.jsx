@@ -17,7 +17,7 @@ const initialValues = {
 const validationSchema = Yup.object({
   nombre: Yup.string()
     .required("Este campo es obligatorio") // Campo obligatorio
-    .matches(/^[0-9]*$/, "Solo letras permitidas"), // Solo letras
+    .matches(/^[0-9]*$/, "Solo números permitidos"), // Solo números
 });
 
 function TrayectoCreate() {

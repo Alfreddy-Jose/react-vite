@@ -33,7 +33,7 @@ const validationSchema = Yup.object({
     .email("Ingrese un email válido")
     .required("Este campo es obligatorio"),
   rol: Yup.string().required("Debes seleccionar una opción"),
-  avatar: Yup.mixed()
+  avatar: Yup.mixed().nullable()
     .test("fileSize", "La imagen es muy pesada (máx. 2MB)", (value) => {
       if (!value || typeof value === "string") return true; // No validar si es null o string (URL existente)
       return value && value.size <= 2048 * 1024;

@@ -113,6 +113,7 @@ export function LapsoAcademicoEdit() {
               name="nombre_lapso"
               placeholder="INGRESE UN NOMBRE"
               formik={formik}
+              disabled={true}
               value={nombreLapso}
               useExternalValue={true}
             />

@@ -15,6 +15,7 @@ import CarruselReact from "../components/Carrusel";
 import horario1 from "../img/horario1.jpg";
 import horario2 from "../img/horario.jpg"; // si tienes más
 import universitarios from "../img/universitarios.jpg";
+import cintillo from "../img/epaaa.jpg";
 
 const imagenes = [
   {
@@ -41,25 +42,49 @@ function HomePage() {
   return (
     <div className="bg-light min-vh-100 d-flex flex-column">
       {/* Encabezado con gradiente azul */}
-      <header
-        className="bg-primary text-white text-center py-5"
+      <div
+        className="bg-primary barra_blue"
         style={{
           background: "linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)",
         }}
+      ></div>
+
+      <header
+        className="bg-white text-white text-center border-bottom shadow header_home mb-4"
+        /*         style={{
+          background: "linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)",
+        }} */
       >
-        <div className="container">
+        {/*         <div className="container">
           <h1 className="fw-bold display-4 mb-3">
             Sistema de Información para la Gestión de Horarios
           </h1>
-        </div>
+        </div> */}
+
+        <img
+          src={cintillo}
+          alt="cintilloCarabobo200"
+          width={"100%"}
+          height={"70px"}
+        />
       </header>
+
+      <div className="container d-flex justify-content-end me-0">
+        <Link
+          to="/login"
+          className="btn btn-success btn-lg px-4 py-3 fw-bold traslation"
+        >
+          <FontAwesomeIcon icon={faClock} className="me-2 fa-icon-fix" />
+          Acceder al Sistema
+        </Link>
+      </div>
 
       {/* Contenido principal */}
       <main className="flex-grow-1 py-5">
         <div className="container">
           {/* Sección de imagen y botón */}
-          <div className="row align-items-center mb-5">
-            <div className="col-lg-6 mb-4 mb-lg-0">
+          <div className="row justify-content-center mb-5">
+            <div className="ancho mb-4 mb-lg-0">
               {/*               <div className="rounded shadow overflow-hidden">
                 <img
                   src={img}
@@ -72,13 +97,15 @@ function HomePage() {
                   }}
                 />
               </div> */}
+              {/* <div className="ancho"> */}
               <CarruselReact
                 imagenes={imagenes}
-                intervalo={2500}
+                intervalo={3000}
                 mostrarIndicadores={true}
               />
+              {/* </div> */}
             </div>
-            <div className="col-lg-6 text-center text-lg-start">
+            {/*             <div className="col-lg-6 text-center text-lg-start">
               <h2 className="fw-bold mb-4">Bienvenido al Sistema</h2>
               <p className="lead mb-4">
                 Nuestra plataforma simplifica la administración académica,
@@ -97,7 +124,7 @@ function HomePage() {
                   Acceder al Sistema
                 </Link>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Tarjetas de características */}

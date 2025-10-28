@@ -36,19 +36,11 @@ const validationSchema = Yup.object({
 function TurnoCreate() {
   const navegation = useNavigate();
 
-
-/*   const onSubmit = (values) => {
-    PostAll(values, "/turnos", navegation);
-    console.log(values);
-  }; */
-
   // Funcion para enviar datos al backend
 
   const onSubmit = async (values, { setErrors }) => {
     try {
-      await PostAll(values, "/turnos", navegation);
-      console.log(values);
-      
+      await PostAll(values, "/turnos", navegation);      
     } catch (error) {
       if (error.response && error.response.data.errors) {
         // Transforma los arrays de Laravel a strings para Formik

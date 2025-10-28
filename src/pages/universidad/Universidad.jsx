@@ -24,7 +24,7 @@ const validationSchema = Yup.object({
 
 export function Universidad() {
   const [universidad, setUniversidad] = useState([]);
-  const navegation = useNavigate();
+  const navegation = useNavigate(); 
   const location = useLocation();
   const [permisos, setPermisos] = useState([]);
   const [loading, setLoading] = useState(true); // Estado de carga
@@ -32,7 +32,7 @@ export function Universidad() {
     rif_univ: "",
     nombre_univ: "",
     abreviado_univ: "",
-    direccion: "",
+    direccion: "", 
   });
 
   // Funcion para enviar datos al backend

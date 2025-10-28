@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import SelectSearch from "../../components/SelectSearch";
 import Spinner from "../../components/Spinner";
 import { TextAreaLabel } from "../../components/TextAreaLabel";
+import { useMemo } from "react";
 
 // Iniciando variables
 const initialValues = {
@@ -133,6 +134,7 @@ function UnidadCurricularEdit() {
         hora_practica: unidadCurricular.hora_practica || "",
         periodo: unidadCurricular.periodo || "",
         trayecto_id: trayectoId,
+        hora_total_est: unidadCurricular.hora_total_est || "",
         trimestre_id: trimestreIdValue,
       };
 
@@ -174,8 +176,6 @@ function UnidadCurricularEdit() {
 
   // Funcion para enviar datos al backend
   const onSubmit = async (values, { setErrors }) => {
-    values.hora_total_est =
-      (parseInt(values.hora_teorica) || 0) + (parseInt(values.hora_practica) || 0);
 
     try {
       await PutAll(
@@ -284,6 +284,15 @@ function UnidadCurricularEdit() {
     formik.setTouched({});
   };
 
+  // Funcion para generar el total de horas
+  const totalHoras = useMemo(() => {
+    // sumar horas teoricas con horas practicas
+    return (
+      parseInt(formik.values.hora_teorica || 0) +
+      parseInt(formik.values.hora_practica || 0)
+    );
+  }, [formik.values.hora_teorica, formik.values.hora_practica]);
+
   if (loading) {
     return <Spinner />;
   }
@@ -330,6 +339,16 @@ function UnidadCurricularEdit() {
                 placeholder="HORA PRACTICA"
                 formik={formik}
               />
+              {/* Input para el total de horas estimadas*/}
+              <InputLabel
+                label={FORM_LABELS.UNIDAD_CURRICULAR.HORA_TOTAL_EST}
+                type="text"
+                name="hora_total_est"
+                placeholder="HORAS TOTALES"
+                formik={formik}
+                disabled={true}
+                value={totalHoras}
+              />
               <SelectSearch
                 name="trayecto_id"
                 options={trayectos || []}
@@ -375,7 +394,7 @@ function UnidadCurricularEdit() {
                 placeholder="UNIDAD CURRICULAR SOBRE ..."
                 formik={formik}
                 rows={3}
-              />  
+              />
             </>
           }
           buttom={

@@ -247,8 +247,8 @@ export function SedeEdit() {
         buttom={
           <>
             <Buttom
-              text="Actualizar"
-              title="Actualizar"
+              text="Editar"
+              title="Editar"
               type="submit"
               style="btn-success"
             />

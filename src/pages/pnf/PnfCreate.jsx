@@ -33,7 +33,7 @@ export function PnfCreate() {
 
   // Funcion para enviar datos al backend
 
-  const onSubmit = async (values, { setErrors }) => {
+  const onSubmit = async (values, { setErrors }) => {  
     try {
       await PostAll(values, "/pnf", navegation);
     } catch (error) {

@@ -20,6 +20,8 @@ const getBackendBaseUrl = () => {
 
 export function Navbar() {
   const { user } = useAuth();
+  // Obtener univeersidad del localStorage
+  // const universidad = JSON.parse(localStorage.getItem("universidad"));
 
   const getAvatarUrl = (user) => {
     if (user.avatar) {
@@ -64,7 +66,9 @@ export function Navbar() {
       <nav className="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
         <div className="container-fluid">
           <nav className="navbar navbar-header-left navbar-expand-lg navbar-form nav-search p-0 d-none d-lg-flex"></nav>
-
+          <div className="with-title d-none d-lg-block">
+            {/* <h4 className="text-center fw-bold mb-0 titleUniversidad">{universidad.nombre_univ}</h4> */}
+          </div>
           <ul className="navbar-nav topbar-nav ms-md-auto align-items-center">
             {/* Select para lapsos */}
             <li>

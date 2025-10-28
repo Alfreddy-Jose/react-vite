@@ -22,6 +22,9 @@ const validationSchema = Yup.object({
   tipo: Yup.string().required("Este campo es obligatorio"),
 });
 
+
+
+
 function DocenteEdit() {
   const { id } = useParams();
   const [docente, setDocente] = useState();
@@ -31,6 +34,12 @@ function DocenteEdit() {
   // Funcion para enviar datos al backend
   const onSubmit = async (values, { setErrors }) => {
     try {
+      //calcular el campo horas de dedicacion si es tiempo completo 18 horas sino 12
+      values.horas_dedicacion = values.dedicacion === "TIEMPO COMPLETO" ? 18 : 12;
+      console.log('Horas de dedicacion: ', values.horas_dedicacion);
+      console.log('Dedicacion: ' + values.dedicacion);
+      
+      
       await PutAll(values, "/docente", navegation, id, "/docentes");
     } catch (error) {
       if (error.response && error.response.data.errors) {

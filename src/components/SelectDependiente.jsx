@@ -15,6 +15,8 @@ export default function SelectControl({
   name,
   disabled = false,
   className = "col-sm-6 col-xl-4",
+  error, 
+  ...props
 }) {
   useEffect(() => {
     if (onValueChange && value) {
@@ -39,7 +41,10 @@ export default function SelectControl({
         placeholder={placeholder}
         classNamePrefix={classNamePrefix}
         isClearable={isClearable}
+         className={error ? "is-invalid" : ""}
+        {...props}
       />
+      {error && <div className="invalid-feedback d-block">{error}</div>}
     </div>
   );
 }

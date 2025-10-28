@@ -7,7 +7,7 @@ import { InputLabel } from "../../components/InputLabel";
 import { Buttom } from "../../components/Buttom";
 import Api, { PostAll } from "../../services/Api";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import SelectSearch from "../../components/SelectSearch";
 
 // Iniciando variables
@@ -15,11 +15,12 @@ const initialValues = {
   etapa: "",
   nro_aula: "",
   sede_id: "",
+  nombre_aula: "",
 };
 
 // Validaciones para cada campo
 const validationSchema = Yup.object({
- // codigo: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
+  // codigo: Yup.string().required("Este campo es obligatorio"), // Campo obligatorio
   etapa: Yup.string()
     .matches(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "Solo letras permitidas") // Solo letras
     .max(1, "Máximo 1 caracter") // Máximo 1 carácter
@@ -28,6 +29,7 @@ const validationSchema = Yup.object({
     .matches(/^[0-:-9]*$/, "Formato incorrecto") // Solo números
     .required("Este campo es obligatorio"), // Campo obligatorio
   sede_id: Yup.number().required("Este campo es obligatorio"), // Campo obligatorio
+  nombre_aula: Yup.string().required("Este campo es obligatorio"),
 });
 
 export default function AulasCreate() {
@@ -65,6 +67,11 @@ export default function AulasCreate() {
     onSubmit,
   });
 
+  // Funcion para generar el nombre del Aula
+  const nombreAula = useMemo(() => {
+    return `${formik.values.etapa}-${formik.values.nro_aula}`;
+  }, [formik.values.etapa, formik.values.nro_aula]);
+
   return (
     <>
       <form onSubmit={formik.handleSubmit}>
@@ -84,14 +91,6 @@ export default function AulasCreate() {
                 valueKey="id"
                 labelKey="nombre_sede"
               />
-              {/* Input para nombre de aula */}
-{/*               <InputLabel
-                label={FORM_LABELS.AULA.CODIGO}
-                type="text"
-                name="codigo"
-                placeholder="CÓDIGO"
-                formik={formik}
-              /> */}
               {/* Input para email de usuario */}
               <InputLabel
                 label={FORM_LABELS.AULA.ETAPA}
@@ -107,6 +106,16 @@ export default function AulasCreate() {
                 name="nro_aula"
                 placeholder="NÚMERO DE AULA"
                 formik={formik}
+              />
+              {/* Input para nombre de aula */}
+              <InputLabel
+                label={FORM_LABELS.AULA.NAME}
+                type="text"
+                name="nombre_aula"
+                placeholder="NOMBRE"
+                formik={formik}
+                value={nombreAula}
+                disabled={true}
               />
             </>
           }
