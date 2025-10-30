@@ -82,12 +82,18 @@ export function SeccionesEdit() {
         }
         input={
           <>
-            <SelectSearch
+{/*             <SelectSearch
               name="pnf_id"
               label={FORM_LABELS.SECCION.PNF}
               options={data.pnfs || []}
               formik={formik}
               valueKey="id"
+            /> */}
+
+            <InputLabel
+              hidden={true}
+              name="pnf_id"
+              formik={formik}
             />
 
             <SelectSearch

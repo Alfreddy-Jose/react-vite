@@ -27,7 +27,7 @@ export default function Aulas() {
   };
 
   // Campos por los que buscar - definidos directamente aquí
-  const camposBusqueda = ["nombre_aula", "sede.nombre_sede"];
+  const camposBusqueda = ["nombre_aula"];
 
   useEffect(() => {
     // Leer permisos del localStorage

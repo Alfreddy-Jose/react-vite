@@ -6,11 +6,12 @@ import { Link, useLocation } from "react-router-dom";
 import Alerta from "../../components/Alert";
 import { Modal, ButtomModal } from "../../components/Modal";
 import { Tabla } from "../../components/Tabla";
+import Acciones from "../../components/Acciones";
 
 export function Horarios() {
   const [horarios, setHorarios] = useState([]);
   const [loading, setLoading] = useState(true);
-/*   const [permisos, setPermisos] = useState([]); */
+  /*   const [permisos, setPermisos] = useState([]); */
   const location = useLocation();
 
   // Campos por los que buscar - definidos directamente aquí
@@ -18,7 +19,7 @@ export function Horarios() {
 
   useEffect(() => {
     // Leer permisos desde localStorage
-/*     const permisosLS = JSON.parse(localStorage.getItem("permissions")) || [];
+    /*     const permisosLS = JSON.parse(localStorage.getItem("permissions")) || [];
     setPermisos(permisosLS); */
 
     // Cargar horarios
@@ -65,7 +66,7 @@ export function Horarios() {
             <p>
               <b>TRIMESTRE:</b> {row.trimestre?.nombre}
             </p>
-            <p> 
+            <p>
               <b>ESTADO:</b> {row.estado.toUpperCase()}
             </p>
           </Modal>
@@ -73,9 +74,8 @@ export function Horarios() {
       ),
     },
     {
-      name: "VER CLASES",
+      name: "VER UNIDADES CURRICULARES",
       cell: (row) => (
-        
         <Link
           className="btn traslation btn-primary"
           to={`/horarios/${row.id}/clases`}
@@ -83,6 +83,16 @@ export function Horarios() {
         >
           <i className="fas fa-eye"></i>
         </Link>
+      ),
+    },
+    {
+      name: "ACCIONES",
+      cell: (row) => (
+        <Acciones
+          urlDelete={`/horarios/${row.id}`}
+          navegar="/docentes"
+          eliminar="docente.eliminar"
+        />
       ),
     },
   ];
@@ -98,7 +108,13 @@ export function Horarios() {
           //  ) : null
         }
         isLoading={loading}
-        tabla={<Tabla columns={columns} data={horarios} searchFields={camposBusqueda} />}
+        tabla={
+          <Tabla
+            columns={columns}
+            data={horarios}
+            searchFields={camposBusqueda}
+          />
+        }
       />
     </>
   );

@@ -28,7 +28,7 @@ export default function Laboratorios() {
   };
 
   // Campos por los que buscar - definidos directamente aquí
-  const camposBusqueda = ["codigo", "nombre_aula", "sede.nombre_sede"];
+  const camposBusqueda = ["nombre_aula", "etapa"];
 
   useEffect(() => {
     // Leer permisos del localStorage

@@ -5,10 +5,13 @@ import { Create } from "../../components/Link";
 import { FORM_LABELS } from "../../constants/formLabels";
 import * as Yup from "yup";
 import { useEffect, useState } from "react";
-import { PostAll, GetAll } from "../../services/Api";
+import Api, { PostAll, GetAll } from "../../services/Api";
 import SelectSearch from "../../components/SelectSearch";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { InputLabel } from "../../components/InputLabel";
+import Spinner from "../../components/Spinner";
+import Warning from "../../img/icons_warning.png";
 
 const initialValues = {
   pnf_id: "",
@@ -29,6 +32,8 @@ export function SeccionesCreate() {
   const [data, setData] = useState({});
   const navegation = useNavigate();
   const { lapsoActual } = useAuth();
+  const [pnf, setPnf] = useState(null);
+  const [loadingPnf, setLoadingPnf] = useState(true);
 
   // Funcion para enviar datos al backend
   const onSubmit = async (values, { setErrors }) => {
@@ -47,7 +52,11 @@ export function SeccionesCreate() {
   };
 
   const formik = useFormik({
-    initialValues,
+    enableReinitialize: true,
+    initialValues: {
+      ...initialValues,
+      pnf_id: pnf?.id || "",
+    },
     validationSchema,
     onSubmit,
   });
@@ -56,6 +65,44 @@ export function SeccionesCreate() {
     GetAll(setData, setLoading, "/seccion/getDataSelect");
   }, []);
   console.log(loading);
+
+  // Efecto para cargar pnf
+  useEffect(() => {
+    const getPnf = async () => {
+      try {
+        const response = await Api.get("/pnfShow");
+        // Asegúrate de que la respuesta tenga la estructura esperada
+        setPnf(response.data);
+      } catch (error) {
+        console.error("Error fetching pnf data:", error);
+        setPnf(null);
+      } finally {
+        setLoadingPnf(false);
+      }
+    };
+
+    getPnf();
+  }, []);
+
+  if (loading || loadingPnf) {
+    return <Spinner />;
+  }
+  
+  if (!pnf || (Array.isArray(pnf) && pnf.length === 0)) {
+    return (
+      <div className="d-flex flex-column align-items-center justify-content-center text-center p-4">
+        <img src={Warning} alt="imagen de alerta" />
+        <h2 className="h4 text-dark mb-3">¡Configuración requerida!</h2>
+        <p className="text-muted mb-4">
+          No has configurado los datos del PNF. <br />
+          Por favor completa esta información para continuar.
+        </p>
+        <Link to="/pnf" className="btn btn-primary">
+          Configurar PNF
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={formik.handleSubmit}>
@@ -70,12 +117,19 @@ export function SeccionesCreate() {
         }
         input={
           <>
-            <SelectSearch
+            {/*             <SelectSearch
               name="pnf_id"
               label={FORM_LABELS.SECCION.PNF}
               options={data.pnfs || []}
               formik={formik}
               valueKey="id"
+            /> */}
+
+            {/* Input oculto para pnf_id */}
+            <InputLabel
+              hidden={true}
+              name="pnf_id"
+              formik={formik}
             />
 
             <SelectSearch

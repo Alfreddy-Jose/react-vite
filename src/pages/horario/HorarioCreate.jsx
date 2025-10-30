@@ -129,15 +129,15 @@ export function HorarioCreate() {
         // 3. MOSTRAR CONFIRMACIÓN AL USUARIO CON SWEETALERT2
         const confirmResult = await Swal.fire({
           title: "¿Copiar horario anterior?",
-          html:
-            "Se encontró un horario anterior para esta sección. ¿Deseas copiar automáticamente las clases del trimestre anterior y generar las nuevas clases?<br><br>" +
-            "Esto copiará la estructura del horario anterior y creará las clases para las unidades curriculares del nuevo trimestre.",
+          html: "Se ha encontrado un horario correspondiente al trimestre anterior para esta sección. ¿Deseas copiar y  generar automáticamente las unidades curriculares del nuevo trimestre?",
           icon: "question",
           showCancelButton: true,
           confirmButtonText: "Sí, copiar automáticamente",
           cancelButtonText: "No, crear vacío",
           confirmButtonColor: "#3085d6",
           cancelButtonColor: "#d33",
+          allowOutsideClick: true,
+          showCloseButton: true,
         });
 
         if (confirmResult.isConfirmed) {
@@ -184,23 +184,23 @@ export function HorarioCreate() {
               </div>
 
               <div style="background: #e8f5e8; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
-                <h5 style="margin-bottom: 10px;">📈 Estadísticas de Clases</h5>
-                <p><strong>Clases en horario anterior:</strong> ${
+                <h5 style="margin-bottom: 10px;">📈 Estadísticas de Unidades curriculares</h5>
+                <p><strong>Unidades curriculares en horario anterior:</strong> ${
                   reporte.clases_en_horario_anterior
                 }</p>
-                <p><strong>Clases copiadas exitosamente:</strong> ${
+                <p><strong>Unidades curriculares copiadas exitosamente:</strong> ${
                   reporte.clases_copiadas_exitosamente
                 }</p>
-                <p><strong>Clases eliminadas (sin UC en nuevo trimestre):</strong> ${
+                <p><strong>Unidades curriculares eliminadas (NO pertenecen al nuevo trimestre):</strong> ${
                   reporte.clases_eliminadas_sin_uc
                 }</p>
-                <p><strong>Clases finales en nuevo horario:</strong> ${
+                <p><strong>Unidades curriculares finales en nuevo horario:</strong> ${
                   reporte.clases_finales_en_nuevo_horario
                 }</p>
               </div>
 
               <div style="background: #fff3cd; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
-                <p><strong>📋 Total de clases creadas:</strong> ${
+                <p><strong>📋 Total de Unidades curriculares creadas:</strong> ${
                   resultado.clases_creadas
                 }</p>
                 <p><strong>⚡ Conflictos resueltos:</strong> ${
@@ -246,14 +246,6 @@ export function HorarioCreate() {
               allowOutsideClick: false,
               showCloseButton: true,
             });
-            // Redirigir después de que el usuario cierre el alerta
-            navigate(`/horarios/${nuevoHorarioId}/clases`, {
-              state: {
-                message: "Horario creado exitosamente",
-                horarioCreadoAutomaticamente: true,
-              },
-            });
-            return; // Salir de la función para evitar la redirección duplicada
           } else {
             await Swal.fire({
               title: "Atención",
@@ -264,34 +256,50 @@ export function HorarioCreate() {
               confirmButtonText: "Continuar",
             });
           }
+
+          // Redirigir después de la copia automática
+          navigate(`/horarios/${nuevoHorarioId}/clases`, {
+            state: {
+              message: "Horario creado exitosamente",
+              horarioCreadoAutomaticamente: true,
+            },
+          });
+          return; // Salir de la función
+        } else if (confirmResult.dismiss) {
+          // ⚠️ EL USUARIO CERRÓ LA ALERTA (botón cerrar o clic fuera)
+          // NO hacer nada y evitar que continúe el flujo
+          setCargando(false);
+          return; // ⬅️ IMPORTANTE: Salir de la función aquí
         } else {
-          // Si el usuario no confirma, mostrar mensaje y continuar
+          // El usuario hizo clic en "No, crear vacío"
           await Swal.fire({
             title: "Horario Creado",
             text: "Horario creado vacío. Puedes agregar las clases manualmente.",
             icon: "info",
             confirmButtonText: "Continuar al Horario",
           });
+
+          // Redirigir después de confirmar "crear vacío"
+          navigate(`/horarios/${nuevoHorarioId}/clases`, {
+            state: {
+              message: "Horario creado exitosamente",
+              horarioCreadoAutomaticamente: false,
+            },
+          });
+          return; // Salir de la función
         }
-      } else {
-        // No existe horario anterior
-        await Swal.fire({
-          title: "Horario Creado",
-          text: "Horario creado correctamente. No se encontró horario anterior para copiar.",
-          icon: "success",
-          confirmButtonText: "Continuar al Horario",
-        });
       }
 
-      // 6. REDIRIGIR A LA VISTA DE EDICIÓN (solo si no se redirigió antes)
+      // 6. REDIRIGIR SOLO SI NO EXISTE HORARIO ANTERIOR
+      // Esta línea solo se ejecuta si NO existe horario anterior
       navigate(`/horarios/${nuevoHorarioId}/clases`, {
         state: {
           message: "Horario creado exitosamente",
-          horarioCreadoAutomaticamente: existeAnterior,
+          horarioCreadoAutomaticamente: false,
         },
       });
     } catch (error) {
-      Swal.close(); // Asegurarse de cerrar cualquier alerta de carga en caso de error
+      Swal.close();
       AlertaError(
         "Error al crear horario: " +
           (error.response?.data?.message || error.message)

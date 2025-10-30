@@ -10,6 +10,7 @@ import { FORM_LABELS } from "../../constants/formLabels";
 import { CardCheckbox, Checkbox } from "../../components/CardCheckbox";
 import { Buttom } from "../../components/Buttom";
 import React, { useState } from "react";
+import { AlertaError } from "../../components/Alert";
 
 // Iniciando variables
 const initialValues = {
@@ -51,13 +52,9 @@ function RolesCreate() {
     try {
       await PostAll(values, "/roles", navegation);
     } catch (error) {
-      if (error.response && error.response.data.errors) {
-        // Transforma los arrays de Laravel a strings para Formik
-        const formikErrors = {};
-        Object.entries(error.response.data.errors).forEach(([key, value]) => {
-          formikErrors[key] = value[0];
-        });
-        setErrors(error.response.data.errors);
+      // mostrar alerta si el campo permisos es requerido 
+      if (error.response && error.response.data.message) {
+        AlertaError("Debe seleccionar al menos un permiso");
       }
     }
   };
@@ -197,20 +194,6 @@ function RolesCreate() {
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.EDITAR}
                       value="pnf.editar"
-                      formik={formik}
-                      disabled={!isModuleEnabled("pnf")}
-                    />
-                    <Checkbox
-                      name="permisos"
-                      label={FORM_LABELS.ROLES_PERMISOS.ELIMINAR}
-                      value="pnf.eliminar"
-                      formik={formik}
-                      disabled={!isModuleEnabled("pnf")}
-                    />
-                    <Checkbox
-                      name="permisos"
-                      label={FORM_LABELS.ROLES_PERMISOS.PDF}
-                      value="pnf.pdf"
                       formik={formik}
                       disabled={!isModuleEnabled("pnf")}
                     />

@@ -141,12 +141,12 @@ export function LapsoAcademico() {
     },
     {
       name: "FECHA INICIO",
-      selector: (row) => new Date(row.fecha_inicio).toLocaleDateString("es-ES"),
+      selector: (row) => row.fecha_inicio, 
       sortable: true,
     },
     {
       name: "FECHA FIN",
-      selector: (row) => new Date(row.fecha_fin).toLocaleDateString("es-ES"),
+      selector: (row) => row.fecha_fin, 
       sortable: true,
     },
     {
@@ -187,11 +187,11 @@ export function LapsoAcademico() {
             </p>
             <p>
               <b>FECHA DE INICIO: </b>{" "}
-              {new Date(row.fecha_inicio).toLocaleDateString("es-ES")}
+              {row.fecha_inicio}
             </p>
             <p>
               <b>FECHA DE FINALIZACIÓN: </b>{" "}
-              {new Date(row.fecha_fin).toLocaleDateString("es-ES")}
+              {row.fecha_fin}
             </p>
             <p>
               <b>ESTADO: </b> {row.status == true ? "ACTIVO" : "INACTIVO"}

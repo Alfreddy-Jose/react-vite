@@ -22,9 +22,6 @@ const validationSchema = Yup.object({
   tipo: Yup.string().required("Este campo es obligatorio"),
 });
 
-
-
-
 function DocenteEdit() {
   const { id } = useParams();
   const [docente, setDocente] = useState();
@@ -35,11 +32,11 @@ function DocenteEdit() {
   const onSubmit = async (values, { setErrors }) => {
     try {
       //calcular el campo horas de dedicacion si es tiempo completo 18 horas sino 12
-      values.horas_dedicacion = values.dedicacion === "TIEMPO COMPLETO" ? 18 : 12;
-      console.log('Horas de dedicacion: ', values.horas_dedicacion);
-      console.log('Dedicacion: ' + values.dedicacion);
-      
-      
+      values.horas_dedicacion =
+        values.dedicacion === "TIEMPO COMPLETO" ? 18 : 12;
+      console.log("Horas de dedicacion: ", values.horas_dedicacion);
+      console.log("Dedicacion: " + values.dedicacion);
+
       await PutAll(values, "/docente", navegation, id, "/docentes");
     } catch (error) {
       if (error.response && error.response.data.errors) {
@@ -102,6 +99,13 @@ function DocenteEdit() {
         }
         input={
           <>
+            {/* Input oculto para pnf_id */}
+            <InputLabel 
+              hidden={true} 
+              name="pnf_id" 
+              formik={formik}
+            />
+
             <SelectSearch
               label={FORM_LABELS.DOCENTE.BUSCAR}
               name="persona_id"
@@ -113,7 +117,7 @@ function DocenteEdit() {
             />
 
             {/* Input para PNF de DOCENTE */}
-            <SelectSearch
+            {/*             <SelectSearch
               label={FORM_LABELS.DOCENTE.PNF}
               name="pnf_id"
               options={dataSelect.pnf}
@@ -121,7 +125,7 @@ function DocenteEdit() {
               valueKey="id"
               labelKey="nombre"
               placeholder="SELECCIONE UNA OPCIÓN"
-            />
+            /> */}
             {/* Input para CATEGORIA del DOCENTE */}
             <SelectSearch
               label="CATEGORÍA"

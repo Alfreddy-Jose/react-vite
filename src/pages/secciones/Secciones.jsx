@@ -159,7 +159,7 @@ export function SeccionParametros({ buscarSecciones, permisos }) {
   const initialValues = {
     lapso: lapsoActual?.id,
     sede: "",
-    pnf: "",
+    // pnf: "",
     trayecto: "",
     matricula: "",
   };
@@ -241,12 +241,12 @@ export function SeccionParametros({ buscarSecciones, permisos }) {
               formik={formik}
             />
             {/* Input para PNF abreviado */}
-            <SelectSearch
+{/*             <SelectSearch
               label={FORM_LABELS.SECCION.PNF}
               name="pnf"
               options={opciones.pnfs || []}
               formik={formik}
-            />
+            /> */}
             {/* Input para PNF abreviado coodinacion */}
             <SelectSearch
               label={FORM_LABELS.SECCION.TRAYECTO}

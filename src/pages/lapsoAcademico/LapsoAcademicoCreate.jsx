@@ -33,9 +33,29 @@ const validationSchema = Yup.object({
     })
     .required("Este campo es obligatorio"),
   tipo_lapso_id: Yup.string().required("Este campo es obligatorio"),
-  fecha_inicio: Yup.date().required("Este campo es obligatorio"),
-  fecha_fin: Yup.date().required("Este campo es obligatorio"),
-
+  // validar que fecha inicio sea menor a la fecha fin y que la fecha fin no sea mayor a un año despues de la fecha inicio
+  fecha_inicio: Yup.date()
+    .required("Este campo es obligatorio")
+    .typeError("Fecha no válida"),
+  fecha_fin: Yup.date()
+    .required("Este campo es obligatorio")
+    .typeError("Fecha no válida")
+    .when(
+      "fecha_inicio",
+      (fecha_inicio, schema) =>
+        fecha_inicio &&
+        schema.min(
+          fecha_inicio,
+          "La fecha de fin debe ser posterior a la fecha de inicio"
+        ).max(
+          new Date(
+            new Date(fecha_inicio).setFullYear(
+              new Date(fecha_inicio).getFullYear() + 1
+            )
+          ),
+          "La fecha de fin no puede ser mayor a un año después de la fecha de inicio"
+        )
+    ),
 });
 
 export function LapsoAcademicoCreate() {

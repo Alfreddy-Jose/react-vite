@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 const validationSchema = Yup.object({
   nombre: Yup.string()
     .required("Este campo es obligatorio") // Campo obligatorio
+    .max(1, "Máximo 1 caracter") // Máximo 1 carácter
     .matches(/^[0-9]*$/, "Solo letras permitidas"), // Solo letras
 });
 
