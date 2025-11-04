@@ -16,7 +16,7 @@ function UnidadCurricular() {
   const location = useLocation();
 
   // Campos por los que buscar - definidos directamente aquí
-  const camposBusqueda = ["codigo", "nombre", "abreviado", "abreviado_coord"];
+  const camposBusqueda = ["nombre", "trimestres[0]?.trayecto"];
 
   useEffect(() => {
     // Leer permisos del localStorage
@@ -34,6 +34,8 @@ function UnidadCurricular() {
     // Limpiar el estado de navegacion para no mostrar el mensaje nuevamente
     window.history.replaceState({}, "");
   }, [location.state]);
+  console.log(unidad);
+  
 
   // Descargar PDF de unidades curriculares
   const descargarPDF = async () => {
@@ -60,6 +62,11 @@ function UnidadCurricular() {
     {
       name: "ID",
       selector: (row, index) => index + 1, // Muestra el contador incremental
+      sortable: true,
+    },
+    {
+      name: "TRAYECTO",
+      selector: (row) => row.trimestres[0]?.trayecto,
       sortable: true,
     },
     {
@@ -92,6 +99,15 @@ function UnidadCurricular() {
             <p>
               <b>PERÍODO: </b>
               {row.periodo}
+            </p>
+            {/* mostrar trayecto */}
+            {row.trayecto && (
+              <p>
+                <b>TRAYECTO: </b> {row.trayecto.nombre}
+              </p>
+            )}
+            <p>
+              <b>TRAYECTO: </b> {row.trimestres[0]?.trayecto}
             </p>
             {/* mostrar trimestres si es uno o mas */}
             {row.trimestres && (
@@ -138,14 +154,15 @@ function UnidadCurricular() {
         title="UNIDADES CURRICULARES"
         // Boton para descargar PDF
         button_pdf={
-          permisos.includes("unidad Curricular.pdf") ?
-          (<Buttom
-            type="button"
-            style="btn btn-danger mb-3"
-            onClick={descargarPDF}
-            title="Generar PDF"
-            text="Generar PDF"
-          />) : null
+          permisos.includes("unidad Curricular.pdf") ? (
+            <Buttom
+              type="button"
+              style="btn btn-danger mb-3"
+              onClick={descargarPDF}
+              title="Generar PDF"
+              text="Generar PDF"
+            />
+          ) : null
         }
         // Boton para crear nuevos registros
         link={
@@ -155,11 +172,12 @@ function UnidadCurricular() {
         }
         // Tabla
         tabla={
-        <Tabla 
-          columns={columns} 
-          data={unidad}
-          searchFields={camposBusqueda}
-          />}
+          <Tabla
+            columns={columns}
+            data={unidad}
+            searchFields={camposBusqueda}
+          />
+        }
         isLoading={loading}
       />
     </>

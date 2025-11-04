@@ -1090,6 +1090,12 @@ export default function Calendar(horarioId) {
       ]);
       setEventoRecienAgregado(eventoDesdeBackend.toString());
     } catch (error) {
+      // si estaus code 422 mostrar el mensaje en el AlertaWarning
+      if (error.response && error.response.status === 422) {
+
+        AlertaWarning(error.response?.data?.message || error.message);
+        return;
+      }
       AlertaError(
         "Error al guardar la clase" +
           " " +

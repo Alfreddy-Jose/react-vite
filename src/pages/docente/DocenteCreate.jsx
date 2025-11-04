@@ -38,8 +38,6 @@ const validationSchema = Yup.object({
 function DocenteCreate() {
   const navegation = useNavigate();
   const [dataSelect, setDataSelect] = useState([]);
-  const [pnf, setPnf] = useState(null);
-  const [loadingPnf, setLoadingPnf] = useState(true);
 
   // Funcion para enviar datos al backend
   const onSubmit = async (values, { setErrors }) => {
@@ -61,11 +59,7 @@ function DocenteCreate() {
   };
 
   const formik = useFormik({
-    enableReinitialize: true,
-    initialValues: {
-      ...initialValues,
-      pnf_id: pnf?.id || "",
-    },
+    initialValues,
     validationSchema,
     onSubmit,
   });
@@ -81,44 +75,6 @@ function DocenteCreate() {
     getDataSelect();
   }, []);
 
-  // Efecto para cargar pnf
-  useEffect(() => {
-    const getPnf = async () => {
-      try {
-        const response = await Api.get("/pnfShow");
-        // Asegúrate de que la respuesta tenga la estructura esperada
-        setPnf(response.data);
-      } catch (error) {
-        console.error("Error fetching pnf data:", error);
-        setPnf(null);
-      } finally {
-        setLoadingPnf(false);
-      }
-    };
-
-    getPnf();
-  }, []);
-
-  if (loadingPnf) {
-    return <Spinner />;
-  }
-
-  if (!pnf || (Array.isArray(pnf) && pnf.length === 0)) {
-    return (
-      <div className="d-flex flex-column align-items-center justify-content-center text-center p-4">
-        <img src={Warning} alt="imagen de alerta" />
-        <h2 className="h4 text-dark mb-3">¡Configuración requerida!</h2>
-        <p className="text-muted mb-4">
-          No has configurado los datos del PNF. <br />
-          Por favor completa esta información para continuar.
-        </p>
-        <Link to="/pnf" className="btn btn-primary">
-          Configurar PNF
-        </Link>
-      </div>
-    );
-  }
-
   return (
     <form onSubmit={formik.handleSubmit}>
       <ContainerIput
@@ -132,13 +88,6 @@ function DocenteCreate() {
         }
         input={
           <>
-            {/* Input oculto para pnf_id */}
-            <InputLabel 
-              hidden={true} 
-              name="pnf_id" 
-              formik={formik}
-            />
-            
             <SelectSearch
               label={FORM_LABELS.DOCENTE.BUSCAR}
               name="persona_id"
@@ -150,7 +99,7 @@ function DocenteCreate() {
             />
 
             {/* Input para PNF de DOCENTE */}
-            {/*             <SelectSearch
+            <SelectSearch
               label={FORM_LABELS.DOCENTE.PNF}
               name="pnf_id"
               options={dataSelect.pnf}
@@ -158,7 +107,8 @@ function DocenteCreate() {
               valueKey="id"
               labelKey="nombre"
               placeholder="SELECCIONE UNA OPCIÓN"
-            /> */}
+            />
+            
             {/* Input para CATEGORIA del DOCENTE */}
             <SelectSearch
               label="CATEGORÍA"

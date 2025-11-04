@@ -56,7 +56,6 @@ import Voceros from "../pages/vocero/Vocero";
 import VoceroCreate from "../pages/vocero/VoceroCreate";
 import VoceroEdit from "../pages/vocero/VoceroEdit";
 import Unauthorized from "../pages/Unauthorized";
-import PnfCrear from "../pages/pnf/PnfCrear";
 
 export function AppRoutes() {
   return (
@@ -118,12 +117,12 @@ export function AppRoutes() {
           element={
             <ProtectedRoute requiredPermission="pnf.ver">
               <Layout>
-                <PnfCrear />
+                <Pnf />
               </Layout>
             </ProtectedRoute>
           }
         />
-{/*         <Route
+        <Route
           path="/pnf/create"
           element={
             <ProtectedRoute requiredPermission="pnf.crear">
@@ -142,7 +141,7 @@ export function AppRoutes() {
               </Layout>
             </ProtectedRoute>
           }
-        /> */}
+        />
 
         {/* Rutas de Sede */}
         <Route

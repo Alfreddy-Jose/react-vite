@@ -9,6 +9,8 @@ import { ContainerIput } from "../../components/ContainerInput";
 import { Create } from "../../components/Link";
 import { Buttom } from "../../components/Buttom";
 import SelectSearch from "../../components/SelectSearch";
+import { AlertaError } from "../../components/Alert";
+import Spinner from "../../components/Spinner";
 
 // Validando campos
 const validationSchema = Yup.object({
@@ -27,6 +29,7 @@ function DocenteEdit() {
   const [docente, setDocente] = useState();
   const navegation = useNavigate();
   const [dataSelect, setDataSelect] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // Funcion para enviar datos al backend
   const onSubmit = async (values, { setErrors }) => {
@@ -70,21 +73,33 @@ function DocenteEdit() {
 
   useEffect(() => {
     // Trayendo los datos del registro
+    try {
+      const getDocente = async () => {
+        const response = await Api.get(`/docente/${id}`);
+        setDocente(response.data);
+        setLoading(false);
+      };
+
+      getDocente();
+    } catch (error) {
+      console.log(error);
+      AlertaError("Error al cargar los datos");
+    }
+  }, [id]);
+
+  useEffect(() => {
+    // Trayendo los datos del registro
     const getDataSelect = async () => {
       const response = await Api.get(`/docente/getDataSelect`);
       setDataSelect(response.data);
     };
 
-    // Trayendo los datos del registro
-    const getDocente = async () => {
-      const response = await Api.get(`/docente/${id}`);
-      setDocente(response.data);
-    };
-
-    getDocente();
-
     getDataSelect();
-  }, [id]);
+  }, []);
+
+  if (loading) {
+    return <Spinner />;
+  }
 
   return (
     <form onSubmit={formik.handleSubmit}>
@@ -100,11 +115,7 @@ function DocenteEdit() {
         input={
           <>
             {/* Input oculto para pnf_id */}
-            <InputLabel 
-              hidden={true} 
-              name="pnf_id" 
-              formik={formik}
-            />
+            <InputLabel hidden={true} name="pnf_id" formik={formik} />
 
             <SelectSearch
               label={FORM_LABELS.DOCENTE.BUSCAR}
@@ -117,7 +128,7 @@ function DocenteEdit() {
             />
 
             {/* Input para PNF de DOCENTE */}
-            {/*             <SelectSearch
+            <SelectSearch
               label={FORM_LABELS.DOCENTE.PNF}
               name="pnf_id"
               options={dataSelect.pnf}
@@ -125,7 +136,8 @@ function DocenteEdit() {
               valueKey="id"
               labelKey="nombre"
               placeholder="SELECCIONE UNA OPCIÓN"
-            /> */}
+            />
+
             {/* Input para CATEGORIA del DOCENTE */}
             <SelectSearch
               label="CATEGORÍA"

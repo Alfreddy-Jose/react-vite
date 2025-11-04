@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import Api, { GetAll, PutAll } from "../../services/Api";
 import SelectSearch from "../../components/SelectSearch";
 import { useNavigate, useParams } from "react-router-dom";
+import Spinner from "../../components/Spinner";
 
 const validationSchema = Yup.object({
   matricula_id: Yup.number().required("Este campo es obligatorio"),
@@ -66,8 +67,10 @@ export function SeccionesEdit() {
     };
     getSeccion();
   }, [id]);
-  console.log(loading);
-  console.log(seccion);
+
+  if (loading) {
+    return <Spinner />;
+  }
 
   return (
     <form onSubmit={formik.handleSubmit}>
@@ -82,19 +85,14 @@ export function SeccionesEdit() {
         }
         input={
           <>
-{/*             <SelectSearch
+            <SelectSearch
               name="pnf_id"
               label={FORM_LABELS.SECCION.PNF}
               options={data.pnfs || []}
               formik={formik}
               valueKey="id"
-            /> */}
-
-            <InputLabel
-              hidden={true}
-              name="pnf_id"
-              formik={formik}
-            />
+              disabled={true}
+            /> 
 
             <SelectSearch
               name="matricula_id"

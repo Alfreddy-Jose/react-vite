@@ -23,12 +23,8 @@ export function Secciones() {
   const camposBusqueda = [
     "nombre",
     "pnf.nombre",
-    "matricula.nombre",
-    "sede.nombre_sede",
     "trayecto.nombre",
-    "sede.nombre_sede",
     "lapso.ano",
-    "numero_seccion",
   ];
 
   // Nueva función para buscar secciones
@@ -75,6 +71,11 @@ export function Secciones() {
       selector: (row) => row.nombre,
       sortable: true,
     },
+    {
+      name: "LAPSO",
+      selector: (row) => row.lapso.ano,
+      sortable: true,
+    },  
     {
       name: "+INFO",
       cell: (row) => (
@@ -241,12 +242,12 @@ export function SeccionParametros({ buscarSecciones, permisos }) {
               formik={formik}
             />
             {/* Input para PNF abreviado */}
-{/*             <SelectSearch
+            <SelectSearch
               label={FORM_LABELS.SECCION.PNF}
               name="pnf"
               options={opciones.pnfs || []}
               formik={formik}
-            /> */}
+            />
             {/* Input para PNF abreviado coodinacion */}
             <SelectSearch
               label={FORM_LABELS.SECCION.TRAYECTO}
