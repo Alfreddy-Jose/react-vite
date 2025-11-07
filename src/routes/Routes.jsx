@@ -103,7 +103,10 @@ export function AppRoutes() {
         <Route
           path="/usuario/:id/edit"
           element={
-            <ProtectedRoute requiredPermission="usuario.editar">
+            <ProtectedRoute
+              requiredPermission="usuario.editar"
+              allowSelfEdit={true}
+            >
               <Layout>
                 <UsuarioEdit />
               </Layout>

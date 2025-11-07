@@ -37,6 +37,8 @@ export function SedeEdit() {
   const [estados, setEstados] = useState([]);
   const [municipios, setMunicipios] = useState([]);
   const [loadingMunicipios, setLoadingMunicipios] = useState(false);
+  const [pnf, setPnf] = useState([]);
+  const [loadingPnf, setLoadingPnf] = useState(true);
 
   // Función para cargar municipios basados en el estado seleccionado
   const cargarMunicipios = async (estadoId) => {
@@ -81,9 +83,10 @@ export function SedeEdit() {
       direccion: sede?.direccion || "",
       estado_id: sede?.municipio.estado.id_estado || "",
       municipio_id: sede?.municipio.id_municipio || "",
-      universidad_id: sede?.universidad_id || ""
+      universidad_id: sede?.universidad_id || "",
+      pnf_id: sede?.pnfs ? sede.pnfs.map((item) => item.pnf_id) : [],
     },
-    validationSchema, 
+    validationSchema,
     onSubmit,
   });
 
@@ -108,7 +111,7 @@ export function SedeEdit() {
       try {
         const response = await Api.get(`/sede/${id}`);
         setSede(response.data);
-        
+
         // Si la sede tiene estado_id, cargar sus municipios
         if (response.data.estado_id) {
           cargarMunicipios(response.data.estado_id);
@@ -123,6 +126,24 @@ export function SedeEdit() {
 
     getSede();
   }, [id]);
+  console.log(sede);
+
+  // Efecto para cargar pnf
+  useEffect(() => {
+    const getPnf = async () => {
+      try {
+        const response = await Api.get("/sede/getPnf");
+        setPnf(response.data);
+      } catch (error) {
+        console.error("Error fetching pnf data:", error);
+        setPnf(null);
+      } finally {
+        setLoadingPnf(false);
+      }
+    };
+
+    getPnf();
+  }, []);
 
   // Efecto para cargar municipios cuando cambia el estado seleccionado
   useEffect(() => {
@@ -135,7 +156,7 @@ export function SedeEdit() {
   }, [formik.values.estado_id]);
 
   // Mostrar Spinner mientras se cargan los datos
-  if (loading) {
+  if (loading && loadingPnf) {
     return <Spinner />;
   }
 
@@ -146,11 +167,7 @@ export function SedeEdit() {
         <p className="text-muted mb-4">
           La sede que intentas editar no existe o no se pudo cargar.
         </p>
-        <Create 
-          path="/sede" 
-          text="Volver a la lista" 
-          style="btn btn-primary" 
-        />
+        <Create path="/sede" text="Volver a la lista" style="btn btn-primary" />
       </div>
     );
   }
@@ -165,11 +182,7 @@ export function SedeEdit() {
         input={
           <>
             {/* Input oculto para universidad_id */}
-            <InputLabel
-              hidden={true}
-              name="universidad_id"
-              formik={formik}
-            />
+            <InputLabel hidden={true} name="universidad_id" formik={formik} />
 
             {/* Input para numero de SEDE */}
             <InputLabel
@@ -230,7 +243,20 @@ export function SedeEdit() {
               valueKey="id_municipio"
               value={formik.values.municipio_id}
               formik={formik}
-              disabled={!formik.values.estado_id || loadingMunicipios || municipios.length === 0}
+              disabled={
+                !formik.values.estado_id ||
+                loadingMunicipios ||
+                municipios.length === 0
+              }
+            />
+
+            <SelectSearch
+              label={FORM_LABELS.SEDE.PNF}
+              name="pnf_id"
+              options={pnf}
+              isMulti={true}
+              formik={formik}
+              placeholder="SELECCIONE UNA O +OPCIONES"
             />
 
             {/* Input para dirección de SEDE */}

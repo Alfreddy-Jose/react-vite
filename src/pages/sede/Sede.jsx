@@ -85,11 +85,11 @@ export function Sede() {
               <b>ABREVIADO: </b> {row.nombre_abreviado}
             </p>
             <p>
-              <b>DIRECCIÓN: </b> {row.direccion}
+              {/* Mostrar municipio en mayúsculas */}
+              <b>MUNICIPIO: </b> {row.municipio.municipio}
             </p>
             <p>
-              {/* Mostrar municipio en mayúsculas */}
-              <b>MUNICIPIO: </b> {row.municipio.municipio.toUpperCase()}
+              <b>DIRECCIÓN: </b> {row.direccion}
             </p>
           </Modal>
         </div>

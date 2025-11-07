@@ -289,7 +289,7 @@ function UnidadCurricularCreate() {
                     : "SELECCIONE UN TRIMESTRE"
                 }
               />
-              {/* Campo de descripcion  */}
+              {/* Campo de descripcion  */} 
               <TextAreaLabel
                 label={FORM_LABELS.UNIDAD_CURRICULAR.DESCRIPCION}
                 name="descripcion"

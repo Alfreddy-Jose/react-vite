@@ -9,8 +9,6 @@ import { ContainerIput } from "../../components/ContainerInput";
 import { Create } from "../../components/Link";
 import { Buttom } from "../../components/Buttom";
 import SelectSearch from "../../components/SelectSearch";
-import Spinner from "../../components/Spinner";
-import Warning from "../../img/icons_warning.png";
 
 const initialValues = {
   persona_id: "",
@@ -33,6 +31,7 @@ const validationSchema = Yup.object({
   fecha_fin: Yup.date().required("Este campo es obligatorio"),
   dedicacion: Yup.string().required("Este campo es obligatorio"),
   tipo: Yup.string().required("Este campo es obligatorio"),
+  unidad_curricular_id: Yup.array().required("Este campo es obligatorio"),
 });
 
 function DocenteCreate() {

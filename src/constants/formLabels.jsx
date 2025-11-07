@@ -11,7 +11,6 @@ export const FORM_LABELS = {
     AVATAR: "AVATAR",
   },
   PNF: {
-    SEDE: "SEDE DE PNF",
     CODIGO: "CÓDIGO",
     NAME_ABRE: "NOMBRE ABREVIADO",
     ABREVIADO: "ABREVIADO",
@@ -22,6 +21,7 @@ export const FORM_LABELS = {
     ESTADO: "ESTADO",
     MUNICIPIO: "MUNICIPIO",
     SEDE_NUMBER: "NÚMERO SEDE",
+    PNF: "PNF",
   },
   LAPSO_ACADEMICO: {
     NAME: "NOMBRE LAPSO",

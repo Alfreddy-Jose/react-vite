@@ -51,8 +51,8 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                 <h4 className="text-section">Opciones</h4>
               </li>
               <li className="nav-item">
-                {permisos.includes("aula.ver") ||
-                permisos.includes("laboratorio.ver") ? (
+                {permisos.includes("usuario.ver") ||
+                permisos.includes("rol.ver") ? (
                   <a data-bs-toggle="collapse" href="#usuarios">
                     <i className="fas fa-user-shield"></i>
                     <p>Control de Usuarios</p>
@@ -72,41 +72,20 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                         </Link>
                       </li>
                     ) : null}
-                    <li
-                      className={`nav-item ${
-                        isActive("/usuarios") ? "active" : ""
-                      }`}
-                    >
-                      {permisos.includes("usuario.ver") ? (
+                    {permisos.includes("usuario.ver") ? (
+                      <li
+                        className={`nav-item ${
+                          isActive("/usuarios") ? "active" : ""
+                        }`}
+                      >
                         <Link to="/usuarios">
                           <span className="sub-item">Usuarios</span>
                         </Link>
-                      ) : null}
-                    </li>
+                      </li>
+                    ) : null}
                   </ul>
                 </div>
               </li>
-{/* 
-              <li
-                className={`nav-item ${isActive("/usuarios") ? "active" : ""}`}
-              >
-                {permisos.includes("usuario.ver") ? (
-                  <Link to="/usuarios">
-                    <i className="fas fa-users"></i>
-                    <p>Usuarios</p>
-                  </Link>
-                ) : null}
-              </li>
-
-              <li className={`nav-item ${isActive("/roles") ? "active" : ""}`}>
-                {permisos.includes("rol.ver") ? (
-                  <Link to="/roles">
-                    <i className="fas fa-user-shield"></i>
-                    <p>Roles y Permisos</p>
-                  </Link>
-                ) : null}
-              </li> */}
-
               <li className={`nav-item ${isActive("/lapsos") ? "active" : ""}`}>
                 {permisos.includes("lapso.ver") ? (
                   <Link to="/lapsos">
@@ -115,42 +94,6 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                   </Link>
                 ) : null}
               </li>
-              {/* 
-              <li
-                className={`nav-item ${isActive("/trayectos") ? "active" : ""}`}
-              >
-                {permisos.includes("trayecto.ver") ? (
-                  <Link to="/trayectos">
-                    <i className="fas fa-hourglass"></i>
-                    <p>Trayectos</p>
-                  </Link>
-                ) : null}
-              </li>
-
-              <li
-                className={`nav-item ${
-                  isActive("/unidad_curricular") ? "active" : ""
-                }`}
-              >
-                {permisos.includes("unidad Curricular.ver") ? (
-                  <Link to="/unidad_curricular">
-                    <i className="fas fa-book"></i>
-                    <p>Unidad Curricular</p>
-                  </Link>
-                ) : null}
-              </li> */}
-              {/* 
-              <li
-                className={`nav-item ${isActive("/matricula") ? "active" : ""}`}
-              >
-                {permisos.includes("Tipo Matricula.ver") ? (
-                  <Link to="/matricula">
-                    <i className="fas fa-clipboard-list"></i>
-                    <p>Tipo Matrícula</p>
-                  </Link>
-                ) : null}
-              </li> */}
-
               <li className={`nav-item ${isActive("/sede") ? "active" : ""}`}>
                 {permisos.includes("sede.ver") ? (
                   <Link to="/sede">
@@ -159,7 +102,6 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                   </Link>
                 ) : null}
               </li>
-
               <li className="nav-item">
                 {permisos.includes("aula.ver") ||
                 permisos.includes("laboratorio.ver") ? (
@@ -182,21 +124,20 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                         </Link>
                       </li>
                     ) : null}
-                    <li
-                      className={`nav-item ${
-                        isActive("/laboratorio") ? "active" : ""
-                      }`}
-                    >
-                      {permisos.includes("laboratorio.ver") ? (
+                    {permisos.includes("laboratorio.ver") ? (
+                      <li
+                        className={`nav-item ${
+                          isActive("/laboratorio") ? "active" : ""
+                        }`}
+                      >
                         <Link to="/laboratorio">
                           <span className="sub-item">Laboratorios</span>
                         </Link>
-                      ) : null}
-                    </li>
+                      </li>
+                    ) : null}
                   </ul>
                 </div>
               </li>
-
               <li
                 className={`nav-item ${isActive("/secciones") ? "active" : ""}`}
               >
@@ -207,15 +148,6 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                   </Link>
                 ) : null}
               </li>
-              
-{/*               <li className={`nav-item ${isActive("/turnos") ? "active" : ""}`}>
-                {permisos.includes("turno.ver") ? (
-                  <Link to="/turnos">
-                    <i className="fas fa-history"></i>
-                    <p>Turnos</p>
-                  </Link>
-                ) : null}
-              </li> */}
               <li className="nav-item">
                 {permisos.includes("persona.ver") ||
                 permisos.includes("vocero.ver") ||
@@ -240,57 +172,56 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                         </Link>
                       </li>
                     ) : null}
-                    <li>
-                      {permisos.includes("vocero.ver") ||
-                      permisos.includes("coordinador.ver") ||
-                      permisos.includes("docente.ver") ? (
+                    {permisos.includes("vocero.ver") ||
+                    permisos.includes("coordinador.ver") ||
+                    permisos.includes("docente.ver") ? (
+                      <li>
                         <a data-bs-toggle="collapse" href="#tipos">
                           <span className="sub-item">Tipos</span>
                           <span className="caret"></span>
                         </a>
-                      ) : null}
-                      <div className="collapse" id="tipos">
-                        <ul className="nav nav-collapse subnav">
-                          {permisos.includes("coordinador.ver") ? (
-                            <li
-                              className={`nav-item ${
-                                isActive("/coordinador") ? "active" : ""
-                              }`}
-                            >
-                              <Link to="/coordinador">
-                                <span className="sub-item">Coodinador</span>
-                              </Link>
-                            </li>
-                          ) : null}
-                          {permisos.includes("docente.ver") ? (
-                            <li
-                              className={`nav-item ${
-                                isActive("/docentes") ? "active" : ""
-                              }`}
-                            >
-                              <Link to="/docentes">
-                                <span className="sub-item">Docente</span>
-                              </Link>
-                            </li>
-                          ) : null}
-                          {permisos.includes("vocero.ver") ? (
-                            <li
-                              className={`nav-item ${
-                                isActive("/voceros") ? "active" : ""
-                              }`}
-                            >
-                              <Link to="/voceros">
-                                <span className="sub-item">Vocero</span>
-                              </Link>
-                            </li>
-                          ) : null}
-                        </ul>
-                      </div>
-                    </li>
+                        <div className="collapse" id="tipos">
+                          <ul className="nav nav-collapse subnav">
+                            {permisos.includes("coordinador.ver") ? (
+                              <li
+                                className={`nav-item ${
+                                  isActive("/coordinador") ? "active" : ""
+                                }`}
+                              >
+                                <Link to="/coordinador">
+                                  <span className="sub-item">Coodinador</span>
+                                </Link>
+                              </li>
+                            ) : null}
+                            {permisos.includes("docente.ver") ? (
+                              <li
+                                className={`nav-item ${
+                                  isActive("/docentes") ? "active" : ""
+                                }`}
+                              >
+                                <Link to="/docentes">
+                                  <span className="sub-item">Docente</span>
+                                </Link>
+                              </li>
+                            ) : null}
+                            {permisos.includes("vocero.ver") ? (
+                              <li
+                                className={`nav-item ${
+                                  isActive("/voceros") ? "active" : ""
+                                }`}
+                              >
+                                <Link to="/voceros">
+                                  <span className="sub-item">Vocero</span>
+                                </Link>
+                              </li>
+                            ) : null}
+                          </ul>
+                        </div>
+                      </li>
+                    ) : null}
                   </ul>
                 </div>
               </li>
-
               {permisos.includes("asistente.ver") ? (
                 <li className="nav-item">
                   <a href="#">
@@ -299,18 +230,8 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                   </a>
                 </li>
               ) : null}
-
-              {/*               {permisos.includes("vocero.ver") ? (
-                <li className="nav-item">
-                  <a href="#">
-                    <i className="fas fa-bullhorn"></i>
-                    <p>Voceros</p>
-                  </a>
-                </li>
-              ) : null} */}
-
-              <li className="nav-item">
-                {permisos.includes("ver estadisticas") ? (
+              {/* <li className="nav-item">
+                {permisos.includes("ver estadisticas") && (permisos.includes("ver instrucciones") || permisos.includes("ver general")) ? (
                   <a data-bs-toggle="collapse" href="#estadisticas">
                     <i className="fas fa-person"></i>
                     <p>Estadísticas</p>
@@ -322,9 +243,7 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                     {permisos.includes("ver instrucciones") ? (
                       <li>
                         <Link to="/estadistica_instruccion">
-                          <span className="sub-item">
-                            Estadísticas de Instrucción
-                          </span>
+                          <span className="sub-item">Estadísticas de Instrucción</span>
                         </Link>
                       </li>
                     ) : null}
@@ -337,111 +256,123 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                     ) : null}
                   </ul>
                 </div>
-              </li>
-
-              <li className="nav-item">
-                <a data-bs-toggle="collapse" href="#confg">
-                  <i className="fas fa-gear"></i>
-                  <p>Configuración</p>
-                  <span className="caret"></span>
-                </a>
-                <div className="collapse" id="confg">
-                  <ul className="nav nav-collapse">
-                    {/* PNF */}
-                    <li
-                      className={`nav-item ${isActive("/pnf") ? "active" : ""}`}
-                    >
+              </li> */}
+              {permisos.includes("pnf.ver") ||
+              permisos.includes("Tipo Matricula.ver") ||
+              permisos.includes("trayecto.ver") ||
+              permisos.includes("unidad Curricular.ver") ||
+              permisos.includes("turno.ver") ||
+              permisos.includes("universidad.ver") ? (
+                <li className="nav-item">
+                  <a data-bs-toggle="collapse" href="#confg">
+                    <i className="fas fa-gear"></i>
+                    <p>Configuración</p>
+                    <span className="caret"></span>
+                  </a>
+                  <div className="collapse" id="confg">
+                    <ul className="nav nav-collapse">
                       {permisos.includes("pnf.ver") ? (
-                        <Link to="/pnf">
-                          <span className="sub-item">PNF</span>
-                        </Link>
+                        <li
+                          className={`nav-item ${
+                            isActive("/pnf") ? "active" : ""
+                          }`}
+                        >
+                          <Link to="/pnf">
+                            <span className="sub-item">PNF</span>
+                          </Link>
+                        </li>
                       ) : null}
-                    </li>
-                    {/* Tipo Matricula */}
-                    <li
-                      className={`nav-item ${
-                        isActive("/matricula") ? "active" : ""
-                      }`}
-                    >
                       {permisos.includes("Tipo Matricula.ver") ? (
-                        <Link to="/matricula">
-                          <span className="sub-item">Tipo Matricula</span>
-                        </Link>
+                        <li
+                          className={`nav-item ${
+                            isActive("/matricula") ? "active" : ""
+                          }`}
+                        >
+                          <Link to="/matricula">
+                            <span className="sub-item">Tipo Matricula</span>
+                          </Link>
+                        </li>
                       ) : null}
-                    </li>
-                    {/* Trayectos */}
-                    <li
-                      className={`nav-item ${
-                        isActive("/trayectos") ? "active" : ""
-                      }`}
-                    >
                       {permisos.includes("trayecto.ver") ? (
-                        <Link to="/trayectos">
-                          <span className="sub-item">Trayectos</span>
-                        </Link>
+                        <li
+                          className={`nav-item ${
+                            isActive("/trayectos") ? "active" : ""
+                          }`}
+                        >
+                          <Link to="/trayectos">
+                            <span className="sub-item">Trayectos</span>
+                          </Link>
+                        </li>
                       ) : null}
-                    </li>
-                    {/* Unidad Curricular */}
-                    <li
-                      className={`nav-item ${
-                        isActive("/unidad_curricular") ? "active" : ""
-                      }`}
-                    >
                       {permisos.includes("unidad Curricular.ver") ? (
-                        <Link to="/unidad_curricular">
-                          <span className="sub-item">Unidad Curricular</span>
-                        </Link>
+                        <li
+                          className={`nav-item ${
+                            isActive("/unidad_curricular") ? "active" : ""
+                          }`}
+                        >
+                          <Link to="/unidad_curricular">
+                            <span className="sub-item">Unidad Curricular</span>
+                          </Link>
+                        </li>
                       ) : null}
-                    </li>
-                    {/* Turnos */}
-                    <li
-                      className={`nav-item ${
-                        isActive("/turnos") ? "active" : ""
-                      }`}
-                    >
                       {permisos.includes("turno.ver") ? (
-                        <Link to="/turnos">
-                          <span className="sub-item">Turnos</span>
-                        </Link>
+                        <li
+                          className={`nav-item ${
+                            isActive("/turnos") ? "active" : ""
+                          }`}
+                        >
+                          <Link to="/turnos">
+                            <span className="sub-item">Turnos</span>
+                          </Link>
+                        </li>
                       ) : null}
-                    </li>
-                    {/* Universidad */}
-                    <li
-                      className={`nav-item ${
-                        isActive("/universidad") ? "active" : ""
-                      }`}
-                    >
                       {permisos.includes("universidad.ver") ? (
-                        <Link to="/universidad">
-                          <span className="sub-item">Universidad</span>
-                        </Link>
+                        <li
+                          className={`nav-item ${
+                            isActive("/universidad") ? "active" : ""
+                          }`}
+                        >
+                          <Link to="/universidad">
+                            <span className="sub-item">Universidad</span>
+                          </Link>
+                        </li>
                       ) : null}
-                    </li>
-                  </ul>
-                </div>
-              </li>
-
-              <li className="nav-item">
-                <a data-bs-toggle="collapse" href="#horarios">
-                  <i className="fa-solid fa-calendar"></i>
-                  <p>Horarios</p>
-                  <span className="caret"></span>
-                </a>
-                <div className="collapse" id="horarios">
-                  <ul className="nav nav-collapse">
-                    <li>
-                      <Link to="/horarios">
-                        <span className="sub-item">Horarios por Sección</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="/horarios/docente">
-                        <span className="sub-item">Horarios por Docente</span>
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-              </li>
+                    </ul>
+                  </div>
+                </li>
+              ) : null}
+              {permisos.includes("horario.ver") ||
+              permisos.includes("horario_docente.ver") ? (
+                <li className="nav-item">
+                  <a data-bs-toggle="collapse" href="#horarios">
+                    <i className="fa-solid fa-calendar"></i>
+                    <p>Horarios</p>
+                    <span className="caret"></span>
+                  </a>
+                  <div className="collapse" id="horarios">
+                    <ul className="nav nav-collapse">
+                      {permisos.includes("horario.ver") ? (
+                        <li>
+                          <Link to="/horarios">
+                            <span className="sub-item">
+                              Horarios por Sección
+                            </span>
+                          </Link>
+                        </li>
+                      ) : null}
+                      {permisos.includes("horario_docente.ver") ? (
+                        <li>
+                          <Link to="/horarios/docente">
+                            <span className="sub-item">
+                              Horarios por Docente
+                            </span>
+                          </Link>
+                        </li>
+                      ) : null}
+                    </ul>
+                  </div>
+                </li>
+              ) : null}
             </ul>
           </div>
         </div>

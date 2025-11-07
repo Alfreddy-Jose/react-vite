@@ -11,6 +11,7 @@ import { FORM_LABELS } from "../../constants/formLabels";
 import SelectSearch from "../../components/SelectSearch";
 import InputImage from "../../components/InputImage";
 import { useAuth } from "../../context/AuthContext";
+import Spinner from "../../components/Spinner";
 
 // Utilidad para obtener la baseURL del backend (sin /api al final)
 const getBackendBaseUrl = () => {
@@ -33,7 +34,8 @@ const validationSchema = Yup.object({
     .email("Ingrese un email válido")
     .required("Este campo es obligatorio"),
   rol: Yup.string().required("Debes seleccionar una opción"),
-  avatar: Yup.mixed().nullable()
+  avatar: Yup.mixed()
+    .nullable()
     .test("fileSize", "La imagen es muy pesada (máx. 2MB)", (value) => {
       if (!value || typeof value === "string") return true; // No validar si es null o string (URL existente)
       return value && value.size <= 2048 * 1024;
@@ -57,6 +59,7 @@ function UsuarioEdit() {
   const [roles, setRoles] = useState([]);
   const [avatarPreview, setAvatarPreview] = useState(null);
   const { updateUser, user: authUser } = useAuth();
+  const [permisos, setPermisos] = useState([]);
 
   // Función para enviar datos al backend
   const onSubmit = async (values, { setErrors }) => {
@@ -82,7 +85,7 @@ function UsuarioEdit() {
         `/usuarios/${id}`,
         navegation,
         null,
-        "/usuarios"
+        !permisos.includes("usuario.ver") ? -1 : "/usuarios"
       );
 
       // Si el usuario editado es el mismo que el autenticado, actualizar el contexto
@@ -144,6 +147,10 @@ function UsuarioEdit() {
   });
 
   useEffect(() => {
+    // Leer permisos cada vez que el componente se monta o el localStorage cambia
+    const permisosLS = JSON.parse(localStorage.getItem("permissions")) || [];
+    setPermisos(permisosLS);
+
     // Trayendo los datos del registro
     const getUsuarios = async () => {
       const response = await Api.get(`/usuario/${id}`);
@@ -170,17 +177,22 @@ function UsuarioEdit() {
     }
   }, [usuarios]);
 
+  // Mostrar spinner mientras carga
+  if (loading) {
+    <Spinner />;
+  }
+
   return (
     <>
       <form onSubmit={formik.handleSubmit}>
         <ContainerIput
           title="EDITAR USUARIO"
           link={
-            <Create
-              path="/usuarios"
-              text="Volver"
-              style="btn btn-secondary mb-4"
-            />
+            !permisos.includes("usuario.ver") ? (
+              <Create path={-1} text="Volver" style="btn btn-secondary mb-4" />
+            ) : (
+              <Create path="/usuarios" text="Volver" style="btn btn-secondary mb-4" />
+            )
           }
           input={
             <>
@@ -272,11 +284,17 @@ export function FormPassword() {
 
   const { id } = useParams();
   const navegation = useNavigate();
+  const [permisos, setPermisos] = useState([]);
+
+  useEffect(() => {
+    const permisosLS = JSON.parse(localStorage.getItem("permissions")) || [];
+    setPermisos(permisosLS);
+  }, []);
 
   // Función para enviar datos al backend
   const onSubmit = async (values, { setErrors }) => {
     try {
-      await PutAll(values, "/password", navegation, id, "/usuarios");
+      await PutAll(values, "/password", navegation, id, !permisos.includes("usuario.ver") ? -1 : "/usuarios");
     } catch (error) {
       if (error.response && error.response.data.errors) {
         const formikErrors = {};

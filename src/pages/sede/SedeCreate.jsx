@@ -21,8 +21,8 @@ const initialValues = {
   municipio_id: "",
   estado_id: "", // Añadido este campo que faltaba
   universidad_id: "",
-  pnf_id: "",
-};
+  pnf_id: [],
+}; 
 
 // Validando campos
 const validationSchema = Yup.object({
@@ -39,12 +39,15 @@ const validationSchema = Yup.object({
   direccion: Yup.string().required("Este campo es obligatorio"),
   estado_id: Yup.string().required("Este campo es obligatorio"),
   municipio_id: Yup.string().required("Este campo es obligatorio"),
+  pnf_id: Yup.array()
+    .min(1, "Seleccione al menos un PNF")
+    .required("Este campo es obligatorio"),
 });
 
 export function SedeCreate() {
   const navegation = useNavigate();
   const [universidad, setUniversidad] = useState(null);
-  const [pnf, setPnf] = useState(null);
+  const [pnf, setPnf] = useState([]);
   const [loadingPnf, setLoadingPnf] = useState(true);
   const [loading, setLoading] = useState(true);
   const [estados, setEstados] = useState([]);
@@ -89,7 +92,6 @@ export function SedeCreate() {
     initialValues: {
       ...initialValues,
       universidad_id: universidad?.id || "",
-      pnf_id: pnf?.id || "",
     },
     validationSchema,
     onSubmit,
@@ -133,8 +135,7 @@ export function SedeCreate() {
   useEffect(() => {
     const getPnf = async () => {
       try {
-        const response = await Api.get("/pnfShow");
-        // Asegúrate de que la respuesta tenga la estructura esperada
+        const response = await Api.get("/sede/getPnf");
         setPnf(response.data);
       } catch (error) {
         console.error("Error fetching pnf data:", error);
@@ -158,7 +159,7 @@ export function SedeCreate() {
   }, [formik.values.estado_id]);
 
   // Mostrar Spinner mientras carga
-  if (loading || loadingPnf) {
+  if (loading && loadingPnf) {
     return <Spinner />;
   }
 
@@ -182,22 +183,6 @@ export function SedeCreate() {
     );
   }
 
-  if (!pnf || (Array.isArray(pnf) && pnf.length === 0)) {
-    return (
-      <div className="d-flex flex-column align-items-center justify-content-center text-center p-4">
-        <img src={Warning} alt="imagen de alerta" />
-        <h2 className="h4 text-dark mb-3">¡Configuración requerida!</h2>
-        <p className="text-muted mb-4">
-          No has configurado los datos del PNF. <br />
-          Por favor completa esta información para continuar.
-        </p>
-        <Link to="/pnf" className="btn btn-primary">
-          Configurar PNF
-        </Link>
-      </div>
-    );
-  }
-
   // Renderizar el formulario
   return (
     <form onSubmit={formik.handleSubmit}>
@@ -213,14 +198,6 @@ export function SedeCreate() {
               hidden={true}
               name="universidad_id"
               value={universidad.id}
-              formik={formik}
-            />
-
-            {/* Input oculto para pnf_id */}
-            <InputLabel
-              hidden={true}
-              name="pnf_id"
-              value={pnf.id}
               formik={formik}
             />
 
@@ -293,6 +270,16 @@ export function SedeCreate() {
                 municipios.length === 0
               }
             />
+
+            <SelectSearch
+              label={FORM_LABELS.SEDE.PNF}
+              name="pnf_id"
+              options={pnf}
+              isMulti={true}
+              formik={formik}
+              placeholder="SELECCIONE UNA O +OPCIONES"
+            />
+
             {/* Input para direccion de SEDE */}
             <TextAreaLabel
               name="direccion"

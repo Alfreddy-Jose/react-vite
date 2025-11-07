@@ -96,7 +96,8 @@ function DocenteEdit() {
 
     getDataSelect();
   }, []);
-
+  console.log(dataSelect);
+  
   if (loading) {
     return <Spinner />;
   }

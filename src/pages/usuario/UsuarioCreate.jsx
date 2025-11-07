@@ -37,6 +37,7 @@ const validationSchema = Yup.object({
     .oneOf([Yup.ref("password"), undefined], "Las contraseñas no coinciden")
     .required("Este campo es obligatorio"),
   avatar: Yup.mixed()
+    .nullable()
     .test("fileSize", "La imagen es muy pesada (máx. 2MB)", (value) => {
       if (!value) return true; // Opcional
       return value && value.size <= 2048 * 1024;
@@ -44,7 +45,7 @@ const validationSchema = Yup.object({
     .test("fileType", "Formato no soportado (JPEG, PNG, GIF)", (value) => {
       if (!value) return true; // Opcional
       return (
-        value &&
+        value && 
         ["image/jpeg", "image/png", "image/jpg", "image/gif"].includes(
           value.type
         )
