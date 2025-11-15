@@ -3,7 +3,7 @@ import { ContainerTable } from "../../components/ContainerTable";
 import { Tabla } from "../../components/Tabla";
 import { Buttom } from "../../components/Buttom";
 import Api from "../../services/Api";
-import Alerta, { AlertaError } from "../../components/Alert";
+import { AlertaError } from "../../components/Alert";
 
 export function HorariosDocentes() {
   const [docentes, setDocentes] = useState([]);
@@ -27,15 +27,22 @@ export function HorariosDocentes() {
     cargarDocentes();
   }, []);
 
-  const descargarHorario = async (docenteId) => {
+  const descargarHorario = async (docenteId, trimestreId, nombre_completo, nombre_trimestre) => {
+    
+    // Funcion para reemplazar espacios por "_" en nombre_completo
+    nombre_completo = nombre_completo.replace(/\s/g, "_");
+
     try {
-      const response = await Api.get(`/docentes/${docenteId}/horario/pdf`, {
+      const url_descargar = trimestreId 
+        ? `/generar_pdf_docente/${docenteId}/${trimestreId}`
+        : `/generar_pdf_docente/${docenteId}`;
+      const response = await Api.get(url_descargar, {
         responseType: "blob",
       });
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", `horario_docente_${docenteId}.pdf`);
+      link.setAttribute("download", `${nombre_completo}_trimestre_${nombre_trimestre}.pdf`);
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -52,13 +59,15 @@ export function HorariosDocentes() {
     },
     {
       name: "DOCENTE",
-      selector: (row) =>
-        `${row.persona?.nombre || ""} ${row.persona?.apellido || ""}`,
+      selector: (row) => row.nombre_completo,
       sortable: true,
-      grow: 3,
     },
     {
-      name: "CLASES ASIGNADAS",
+      name: "TRIMESTRE",
+      selector: (row) => row.trimestre_nombre,
+    },
+    {
+      name: "CLASES",
       selector: (row) => row.clases_count,
     },
     {
@@ -67,7 +76,7 @@ export function HorariosDocentes() {
         <Buttom
           type="button"
           style="btn btn-primary"
-          onClick={() => descargarHorario(row.id)}
+          onClick={() => descargarHorario(row.docente_id, row.trimestre_id, row.nombre_completo, row.trimestre_nombre)}
           title="Descargar"
           text="Descargar PDF"
         />

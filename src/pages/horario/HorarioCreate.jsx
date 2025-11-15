@@ -3,10 +3,9 @@ import { useNavigate } from "react-router-dom";
 import Api from "../../services/Api";
 import { ContainerIput } from "../../components/ContainerInput";
 import SelectControl from "../../components/SelectDependiente";
-import Alerta, {
+import {
   AlertaError,
   AlertaWarning,
-  AlertaSuccess,
 } from "../../components/Alert";
 import { Buttom } from "../../components/Buttom";
 import { useAuth } from "../../context/AuthContext";

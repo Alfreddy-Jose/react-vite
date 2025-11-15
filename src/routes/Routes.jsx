@@ -56,6 +56,7 @@ import Voceros from "../pages/vocero/Vocero";
 import VoceroCreate from "../pages/vocero/VoceroCreate";
 import VoceroEdit from "../pages/vocero/VoceroEdit";
 import Unauthorized from "../pages/Unauthorized";
+import CoordinadorCreate from "../pages/Coordinador/CoordinadorCreate";
 
 export function AppRoutes() {
   return (
@@ -504,6 +505,16 @@ export function AppRoutes() {
             <ProtectedRoute requiredPermission="coordinador.ver">
               <Layout>
                 <Coordinador />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/coordinador/create"
+          element={
+            <ProtectedRoute requiredPermission="coordinador.crear">
+              <Layout>
+                <CoordinadorCreate />
               </Layout>
             </ProtectedRoute>
           }

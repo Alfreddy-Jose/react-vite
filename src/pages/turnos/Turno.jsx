@@ -64,10 +64,8 @@ function Turno() {
             name: "ACCIONES",
             cell: (row) => (
               <Acciones
-                url={`/turno/${row.id}/edit`}
                 urlDelete={`/turno/${row.id}`}
                 navegar="/turnos"
-                editar="turno.editar"
                 eliminar="turno.eliminar"
               />
             ),

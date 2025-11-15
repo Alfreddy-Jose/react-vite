@@ -116,5 +116,8 @@ export const FORM_LABELS = {
   VOCERO: {
     SECCION: "SECCIÓN",
     VOCERO: "BUSCAR VOCERO"
+  },
+  COORDINADOR: {
+    COORDINADOR: "BUSCAR COORDINADOR"
   }
 };

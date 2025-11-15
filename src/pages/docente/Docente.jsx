@@ -41,6 +41,7 @@ function Docente() {
     window.history.replaceState({}, "");
   }, [location.state]);
 
+  
   const descargarPDF = async () => {
     try {
       const response = await Api.get("/docente/pdf", {

@@ -854,6 +854,54 @@ function RolesCreate() {
                   </>
                 }
               />
+
+              <CardCheckbox
+                title="HORARIO"
+                checkbox={
+                  <>
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.VER}
+                      value="horario.ver"
+                      formik={formik}
+                      disabled={false}
+                      onChange={(e) => {
+                        handleModuleToggle("horario")(e);
+                        formik.handleChange(e);
+                      }}
+                      checked={formik.values.permisos.includes("horario.ver")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.CREAR}
+                      value="horario.crear"
+                      formik={formik}
+                      disabled={!isModuleEnabled("horario")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.EDITAR}
+                      value="horario.editar"
+                      formik={formik}
+                      disabled={!isModuleEnabled("horario")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.ELIMINAR}
+                      value="horario.eliminar"
+                      formik={formik}
+                      disabled={!isModuleEnabled("horario")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.PDF}
+                      value="horario.pdf"
+                      formik={formik}
+                      disabled={!isModuleEnabled("horario")}
+                    />
+                  </>
+                }
+              />
             </div>
           </>
         }

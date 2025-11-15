@@ -11,7 +11,7 @@ import Acciones from "../../components/Acciones";
 export function Horarios() {
   const [horarios, setHorarios] = useState([]);
   const [loading, setLoading] = useState(true);
-  /*   const [permisos, setPermisos] = useState([]); */
+  const [permisos, setPermisos] = useState([]);
   const location = useLocation();
 
   // Campos por los que buscar - definidos directamente aquí
@@ -19,8 +19,8 @@ export function Horarios() {
 
   useEffect(() => {
     // Leer permisos desde localStorage
-    /*     const permisosLS = JSON.parse(localStorage.getItem("permissions")) || [];
-    setPermisos(permisosLS); */
+    const permisosLS = JSON.parse(localStorage.getItem("permissions")) || [];
+    setPermisos(permisosLS);
 
     // Cargar horarios
     GetAll(setHorarios, setLoading, "/horarios");
@@ -46,7 +46,7 @@ export function Horarios() {
     },
     {
       name: "TRIMESTRE",
-      selector: (row) => row.trimestre?.nombre || "—",
+      selector: (row) => row.trimestre?.nombre_relativo || "—",
       sortable: true,
     },
     {
@@ -74,7 +74,7 @@ export function Horarios() {
       ),
     },
     {
-      name: "VER UNIDADES CURRICULARES",
+      name: "VER CLASES",
       cell: (row) => (
         <Link
           className="btn traslation btn-primary"
@@ -85,16 +85,21 @@ export function Horarios() {
         </Link>
       ),
     },
-    {
-      name: "ACCIONES",
-      cell: (row) => (
-        <Acciones
-          urlDelete={`/horarios/${row.id}`}
-          navegar="/docentes"
-          eliminar="docente.eliminar"
-        />
-      ),
-    },
+    // Mostrar columna solo si tiene al menos uno de los permisos
+    ...(permisos.includes("horario.eliminar")
+      ? [
+          {
+            name: "ACCIONES",
+            cell: (row) => (
+              <Acciones
+                urlDelete={`/horarios/${row.id}`}
+                navegar="/docentes"
+                eliminar="horario.eliminar"
+              />
+            ),
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -103,9 +108,9 @@ export function Horarios() {
         title="HORARIOS POR SECCIONES"
         // Boton para crear nuevos registros
         link={
-          // permisos.includes("horarios.crear") ? (
+          permisos.includes("horario.crear") ? (
           <Create path="/horarios/create" />
-          //  ) : null
+          ) : null
         }
         isLoading={loading}
         tabla={
