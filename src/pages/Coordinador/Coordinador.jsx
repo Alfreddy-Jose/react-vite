@@ -103,7 +103,7 @@ function Coordinador() {
       {/* Contenedor para la tablas de Administrador */}
       <ContainerTable
         // Titulo para la tabla PNF
-        title="COODINADORES"
+        title="COORDINADORES"
         // Boton para crear nuevos registros
         link={permisos.includes("coordinador.crear") ? (
         <Create path="/coordinador/create" /> ) : null}

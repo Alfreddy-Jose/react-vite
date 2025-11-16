@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo,
+} from "react";
 import {
   DndContext,
   useDraggable,
@@ -220,40 +226,66 @@ export default function Calendar(horarioId) {
   const [eventos, setEventos] = useState([]);
 
   // cargar todas las clases
-  const todasLasClases = async () => {
+  const todasLasClases = useCallback(async () => {
     try {
-      const response = await Api.get(`/clases`);
+      const trimestreActualId = horarioId?.horario?.trimestre_id;
+      const horarioActualId = horarioId?.horarioId;
+
+      if (!trimestreActualId || !horarioActualId) {
+        console.error("Faltan trimestre_id o horario_id");
+        return;
+      }
+
+      // Usar tu endpoint específico
+      const response = await Api.get(
+        `/clases/trimestre/${trimestreActualId}/horario/${horarioActualId}`
+      );
       const eventoTodos = response.data;
-      // Formatear clases para usar luego
+
       const clasesFormateados = eventoTodos.map((clase) => ({
         id: clase.id.toString(),
         dia: clase.dia,
         bloque: clase.bloque_id,
         duracion: clase.duracion,
-        materias: {
-          value: clase.unidad_curricular_id,
-          label: clase.unidad_curricular.nombre,
-        },
-        aula: { value: clase.espacio_id, label: clase.espacio.nombre_aula },
+        trimestre_id: clase.trimestre_id,
         docente: {
           value: clase.docente_id,
           label:
             clase.docente.persona.nombre + " " + clase.docente.persona.apellido,
+          horas_dedicacion: clase.docente.horas_dedicacion, // Incluir las horas del docente
         },
+        materias: {
+          value: clase.unidad_curricular_id,
+          label: clase.unidad_curricular.nombre,
+          horas: clase.unidad_curricular.hora_total_est,
+        },
+        aula: {
+          value: clase.espacio_id,
+          label: clase.espacio.nombre_aula,
+        },
+        // Mantener todos los campos necesarios
+        sede_id: clase.sede_id,
+        pnf_id: clase.pnf_id,
+        trayecto_id: clase.trayecto_id,
+        horario_id: clase.horario_id,
       }));
+
       setTodosLosEventos(clasesFormateados);
+      console.log(
+        `✅ Cargadas ${clasesFormateados.length} clases del trimestre ${trimestreActualId} y horario ${horarioActualId}`
+      );
     } catch (error) {
-      AlertaError("Error al cargar todas las Clases en general " + " " + error);
-      console.error(error);
+      AlertaError("Error al cargar todas las Clases: " + error);
+      console.error("Error en todasLasClases:", error);
     }
-  };
+  }, [horarioId?.horario?.trimestre_id, horarioId?.horarioId]);
 
   // Al cargar el componente
-  const cargarClases = async () => {
+  const cargarClases = useCallback(async () => {
     try {
       // Cargar todas las clases del horario
       const response = await Api.get(`/horarios/${horarioId.horarioId}/clases`);
-      const evento = response.data;      
+      const evento = response.data;
 
       // Normalizar nombres de días
       const normalizarDia = (dia) => {
@@ -306,7 +338,7 @@ export default function Calendar(horarioId) {
       AlertaError("Error al cargar los eventos" + " " + error);
       console.log(error);
     }
-  };
+  }, [horarioId.horario, horarioId.horarioId]);
 
   useEffect(() => {
     if (horarioId) {
@@ -314,7 +346,7 @@ export default function Calendar(horarioId) {
       cargarClases();
       todasLasClases();
     }
-  }, [horarioId]);
+  }, [horarioId, cargarClases, todasLasClases]); // Agregar las dependencias
 
   const obtenerMaterias = async (infoHorario) => {
     // cargar materias segun el trimestre
@@ -344,9 +376,12 @@ export default function Calendar(horarioId) {
   const exportarPDF = async (horarioId) => {
     try {
       // Enviar solo el ID del horario al backend
-      const response = await Api.get(`/generar_horario_pdf/${horarioId.horarioId}`, {
-        responseType: "blob",
-      });
+      const response = await Api.get(
+        `/generar_horario_pdf/${horarioId.horarioId}`,
+        {
+          responseType: "blob",
+        }
+      );
       const nombrePDF = `Horario_Sección_${horarioId?.horario?.seccion?.nombre}_trimestre_${horarioId?.horario?.trimestre?.nombre_relativo}.pdf`;
       // Crear y descargar el PDF
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -425,64 +460,86 @@ export default function Calendar(horarioId) {
     return prop;
   };
 
-  // Función para actualizar el evento en la base de datos
-  const actualizarEventoEnBD = useCallback(async (eventoActualizado) => {
-    try {
-      if (!eventoActualizado || !eventoActualizado.id) {
-        console.error("Evento inválido para actualizar:", eventoActualizado);
-        return;
-      }
+  const recargarDatosCompletos = useCallback(async () => {
+    await cargarClases();
+    await todasLasClases();
+  }, [cargarClases, todasLasClases]);
 
-      let eventoId = eventoActualizado.id;
-      if (typeof eventoId === "object" && eventoId !== null) {
-        // Si el ID es un objeto, intentar extraer el valor real
-        if (eventoId.value !== undefined) {
-          eventoId = eventoId.value;
-        } else if (eventoId.id !== undefined) {
-          eventoId = eventoId.id;
-        } else {
-          console.error(
-            "ID de evento en formato de objeto no reconocido:",
-            eventoId
-          );
+  // Función para calcular horas usadas por docente en el lapso/trimestre actual
+  const calcularHorasUsadasPorDocente = useCallback(
+    (docenteId) => {
+      return todosLosEventos
+        .filter((evento) => {
+          const idDocenteEvento = evento.docente?.value || evento.docente_id;
+          return idDocenteEvento == docenteId;
+        })
+        .reduce((total, evento) => total + (evento.duracion || 1), 0);
+    },
+    [todosLosEventos]
+  );
+
+  // Función para actualizar el evento en la base de datos
+  const actualizarEventoEnBD = useCallback(
+    async (eventoActualizado) => {
+      try {
+        if (!eventoActualizado || !eventoActualizado.id) {
+          console.error("Evento inválido para actualizar:", eventoActualizado);
           return;
         }
+
+        let eventoId = eventoActualizado.id;
+        if (typeof eventoId === "object" && eventoId !== null) {
+          if (eventoId.value !== undefined) {
+            eventoId = eventoId.value;
+          } else if (eventoId.id !== undefined) {
+            eventoId = eventoId.id;
+          } else {
+            console.error(
+              "ID de evento en formato de objeto no reconocido:",
+              eventoId
+            );
+            return;
+          }
+        }
+
+        eventoId = eventoId.toString();
+
+        const bloqueValue = obtenerValor(eventoActualizado.bloque);
+        const bloqueId =
+          typeof bloqueValue === "object"
+            ? parseInt(obtenerValor(bloqueValue))
+            : parseInt(bloqueValue);
+
+        const payload = {
+          dia: eventoActualizado.dia,
+          bloque_id: bloqueId,
+          duracion: eventoActualizado.duracion,
+        };
+
+        await Api.put(`/clase/${eventoId}`, payload);
+
+        // Recargar todos los datos después de actualizar
+        await recargarDatosCompletos();
+      } catch (error) {
+        if (error.response) {
+          console.error(
+            "Error del servidor:",
+            error.response.status,
+            error.response.data
+          );
+          AlertaError(
+            `Error ${error.response.status}: ${
+              error.response.data.message || "Error al actualizar el evento"
+            }`
+          );
+        } else {
+          console.error("Error al actualizar evento:", error.message);
+          AlertaError("Error al actualizar el evento: " + error.message);
+        }
       }
-
-      eventoId = eventoId.toString();
-
-      // Asegurarse de extraer correctamente los valores numéricos
-      const bloqueValue = obtenerValor(eventoActualizado.bloque);
-      const bloqueId =
-        typeof bloqueValue === "object"
-          ? parseInt(obtenerValor(bloqueValue))
-          : parseInt(bloqueValue);
-
-      const payload = {
-        dia: eventoActualizado.dia,
-        bloque_id: bloqueId,
-        duracion: eventoActualizado.duracion,
-      };
-
-      await Api.put(`/clase/${eventoId}`, payload);
-    } catch (error) {
-      if (error.response) {
-        console.error(
-          "Error del servidor:",
-          error.response.status,
-          error.response.data
-        );
-        AlertaError(
-          `Error ${error.response.status}: ${
-            error.response.data.message || "Error al actualizar el evento"
-          }`
-        );
-      } else {
-        console.error("Error al actualizar evento:", error.message);
-        AlertaError("Error al actualizar el evento: " + error.message);
-      }
-    }
-  }, []);
+    },
+    [recargarDatosCompletos]
+  ); // Agregar recargarDatosCompletos como dependencia
 
   // Nuevo evento con valores compatibles con react-select
   const [nuevoEvento, setNuevoEvento] = useState({
@@ -498,55 +555,349 @@ export default function Calendar(horarioId) {
     duracion: 1,
   });
 
+  // Función para calcular horas usadas por materia
+  const calcularHorasUsadasPorMateria = useCallback(
+    (materiaId) => {
+      return eventos
+        .filter((evento) => {
+          const idMateriaEvento =
+            evento.materias?.value || evento.materia || evento.materia_id;
+          return idMateriaEvento == materiaId;
+        })
+        .reduce((total, evento) => total + (evento.duracion || 1), 0);
+    },
+    [eventos]
+  );
+
   // Bloques disponibles: solo los que no están ocupados por el docente ni el aula en ese día y permiten la duración seleccionada
-  const getBloquesDisponibles = () => {
+  const getBloquesConDisponibilidad = () => {
     if (!nuevoEvento.dia || !nuevoEvento.docente || !nuevoEvento.aula)
-      return bloques;
+      return bloques.map((b) => ({
+        ...b,
+        disponible: true,
+        razones: [],
+      }));
+
     const dia = nuevoEvento.dia.value;
     const docenteId = nuevoEvento.docente.value;
     const aulaId = nuevoEvento.aula.value;
     const duracion = parseInt(nuevoEvento.duracion) || 1;
 
-    // Filtrar usando todosLosEventos (de todos los horarios)
-    const ocupados = new Set();
-    todosLosEventos.forEach((e) => {
-      if (
-        e.dia === dia &&
-        (e.docente?.value === docenteId || e.aula?.value === aulaId)
-      ) {
-        for (let i = 0; i < e.duracion; i++) {
-          ocupados.add(e.bloque + i);
+    // Obtener ocupaciones para docente y aula
+    const ocupacionesDocente = new Set();
+    const ocupacionesAula = new Set();
+    const ocupacionesHorarioActual = new Set();
+
+    // Ocupaciones en todos los horarios (docente y aula)
+    todosLosEventos.forEach((evento) => {
+      if (evento.dia === dia) {
+        for (let i = 0; i < evento.duracion; i++) {
+          if (evento.docente?.value === docenteId) {
+            ocupacionesDocente.add(evento.bloque + i);
+          }
+          if (evento.aula?.value === aulaId) {
+            ocupacionesAula.add(evento.bloque + i);
+          }
         }
       }
     });
 
-    // Solo mostrar bloques donde haya espacio suficiente para la duración
-    return bloques.filter((bloque) => {
-      for (let i = 0; i < duracion; i++) {
-        if (ocupados.has(bloque.id + i)) return false;
+    // Ocupaciones en el horario actual (para evitar solapamiento)
+    eventos.forEach((evento) => {
+      if (evento.dia === dia) {
+        for (let i = 0; i < evento.duracion; i++) {
+          ocupacionesHorarioActual.add(evento.bloque + i);
+        }
       }
-      return true;
+    });
+
+    return bloques.map((bloque) => {
+      const razones = [];
+      let disponible = true;
+
+      // Verificar si hay espacio suficiente para la duración
+      for (let i = 0; i < duracion; i++) {
+        const bloqueActual = bloque.id + i;
+
+        // Verificar ocupación en horario actual
+        if (ocupacionesHorarioActual.has(bloqueActual)) {
+          razones.push("Ocupado en este horario");
+          disponible = false;
+          break;
+        }
+
+        // Verificar ocupación del docente
+        if (ocupacionesDocente.has(bloqueActual)) {
+          razones.push("Docente ocupado");
+          disponible = false;
+          break;
+        }
+
+        // Verificar ocupación del aula
+        if (ocupacionesAula.has(bloqueActual)) {
+          razones.push("Aula ocupada");
+          disponible = false;
+          break;
+        }
+      }
+
+      return {
+        value: bloque.id,
+        label: bloque.rango,
+        disponible,
+        razones: [...new Set(razones)], // Eliminar duplicados
+        // Propiedades para estilos
+        colorFondo: disponible ? "#ffffff" : "#f8f9fa",
+        colorTexto: disponible ? "#333333" : "#6c757d",
+        estado: disponible ? "normal" : "no-disponible",
+        isDisabled: !disponible,
+      };
     });
   };
 
-  const bloqueOptionsDisponibles = getBloquesDisponibles().map((b) => ({
-    value: b.id,
-    label: `${b.rango}`,
-  }));
+  const bloqueOptionsConDisponibilidad = getBloquesConDisponibilidad();
+
+  const CustomOption = ({ innerProps, label, data, isDisabled }) => {
+    if (isDisabled || data?.isDisabled) {
+      return (
+        <div
+          {...innerProps}
+          style={{
+            padding: "8px 12px",
+            backgroundColor: "#f8f9fa",
+            color: "#6c757d",
+            cursor: "not-allowed",
+            borderLeft: "3px solid #dc3545",
+            position: "relative",
+          }}
+          title={data?.razones?.join(", ") || "No disponible"}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <span>{label}</span>
+            <span style={{ fontSize: "12px", color: "#dc3545" }}>
+              ⚠ No disponible
+            </span>
+          </div>
+          {data?.razones && data.razones.length > 0 && (
+            <div
+              style={{ fontSize: "11px", marginTop: "4px", color: "#6c757d" }}
+            >
+              {data.razones.join(", ")}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <div
+        {...innerProps}
+        style={{
+          padding: "8px 12px",
+          cursor: "pointer",
+          borderLeft: "3px solid #28a745",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <span>{label}</span>
+          <span style={{ fontSize: "12px", color: "#28a745" }}>
+            ✓ Disponible
+          </span>
+        </div>
+      </div>
+    );
+  };
+
+  // Función para obtener estilos condicionales
+  const getSelectStyles = (selectedOption) => {
+    const estado = selectedOption?.estado;
+
+    return {
+      option: (provided, state) => {
+        const optionData = state.data;
+        let backgroundColor = provided.backgroundColor;
+        let color = provided.color;
+        let cursor = "default";
+        let fontWeight = "normal";
+
+        if (state.isDisabled || optionData?.isDisabled) {
+          backgroundColor = "#f8f9fa";
+          color = "#6c757d";
+          cursor = "not-allowed";
+        } else if (optionData?.estado === "critico") {
+          backgroundColor = state.isSelected ? "#dc3545" : "#dc3545";
+          color = "#ffffff";
+          fontWeight = "bold";
+        } else if (optionData?.estado === "advertencia") {
+          backgroundColor = state.isSelected ? "#ffc107" : "#ffc107";
+          color = "#212529";
+        } else if (optionData?.estado === "no-disponible") {
+          backgroundColor = "#f8f9fa";
+          color = "#6c757d";
+          cursor = "not-allowed";
+        } else if (state.isSelected) {
+          backgroundColor = "#2684FF";
+          color = "#ffffff";
+        } else if (state.isFocused) {
+          backgroundColor = "#f8f9fa";
+        }
+
+        return {
+          ...provided,
+          backgroundColor,
+          color,
+          cursor,
+          fontWeight,
+          position: "relative",
+          ":hover": {
+            backgroundColor:
+              state.isDisabled || optionData?.isDisabled
+                ? "#f8f9fa"
+                : state.isSelected
+                ? "#2684FF"
+                : "#f8f9fa",
+            color:
+              state.isDisabled || optionData?.isDisabled
+                ? "#6c757d"
+                : state.isSelected
+                ? "#ffffff"
+                : "#333333",
+          },
+        };
+      },
+      singleValue: (provided, state) => ({
+        ...provided,
+        backgroundColor: selectedOption?.colorFondo || provided.backgroundColor,
+        color: selectedOption?.colorTexto || provided.color,
+        fontWeight: selectedOption?.estado === "critico" ? "bold" : "normal",
+        padding: "2px 6px",
+        borderRadius: "4px",
+      }),
+      control: (provided, state) => ({
+        ...provided,
+        borderColor:
+          estado === "critico"
+            ? "#dc3545"
+            : estado === "advertencia"
+            ? "#ffc107"
+            : estado === "no-disponible"
+            ? "#6c757d"
+            : provided.borderColor,
+        boxShadow:
+          estado === "critico"
+            ? "0 0 0 1px #dc3545"
+            : estado === "advertencia"
+            ? "0 0 0 1px #ffc107"
+            : estado === "no-disponible"
+            ? "0 0 0 1px #6c757d"
+            : provided.boxShadow,
+        "&:hover": {
+          borderColor:
+            estado === "critico"
+              ? "#c82333"
+              : estado === "advertencia"
+              ? "#e0a800"
+              : estado === "no-disponible"
+              ? "#6c757d"
+              : provided.borderColor,
+        },
+      }),
+      menu: (provided) => ({
+        ...provided,
+        zIndex: 9999,
+      }),
+    };
+  };
 
   // Adaptar datos para react-select
-  const docentesOptions = docentes.map((d) => ({
-    value: d.value || d.id,
-    label: d.label || d.persona.nombre_completo,
-    horas: d.horas_dedicacion,
-  }));
+  const docentesOptions = useMemo(() => {
+    return docentes.map((d) => {
+      const horasUsadas = calcularHorasUsadasPorDocente(d.id);
+      const horasDisponibles = d.horas_dedicacion - horasUsadas;
+
+      // Determinar colores según las horas disponibles
+      let colorFondo = "#ffffff";
+      let colorTexto = "#333333";
+      let estado = "normal";
+
+      if (horasDisponibles <= 1) {
+        colorFondo = "#dc3545"; // Rojo
+        colorTexto = "#ffffff";
+        estado = "critico";
+      } else if (horasDisponibles <= 4) {
+        colorFondo = "#ffc107"; // Amarillo
+        colorTexto = "#212529";
+        estado = "advertencia";
+      }
+
+      return {
+        value: d.id,
+        label: d.persona?.nombre_completo || d.label || "Docente",
+        labelConHoras: `${
+          d.persona?.nombre_completo || d.label || "Docente"
+        } (${horasDisponibles}/${d.horas_dedicacion} hrs)`,
+        horasDisponibles: horasDisponibles,
+        horasBase: d.horas_dedicacion,
+        colorFondo,
+        colorTexto,
+        estado,
+        isDisabled: horasDisponibles <= 0,
+      };
+    });
+  }, [docentes, calcularHorasUsadasPorDocente]); // Se recalcula cuando cambian docentes o eventos
+
   const aulaOptions = aulas.map((a) => ({ value: a.id, label: a.nombre_aula }));
   const diaOptions = dias.map((d) => ({ value: d, label: d }));
 
-  const materiasOptions = materias.map((m) => ({
-    value: m.id,
-    label: m.text,
-  }));
+  const materiasOptions = useMemo(() => {
+    return materias
+      .map((m) => {
+        const horasUsadas = calcularHorasUsadasPorMateria(m.id);
+        const horasDisponibles = m.horas - horasUsadas;
+
+        // Colores para materias
+        let colorFondo = "#ffffff";
+        let colorTexto = "#333333";
+        let estado = "normal";
+
+        if (horasDisponibles <= 1) {
+          colorFondo = "#dc3545";
+          colorTexto = "#ffffff";
+          estado = "critico";
+        } else if (horasDisponibles <= 4) {
+          colorFondo = "#ffc107";
+          colorTexto = "#212529";
+          estado = "advertencia";
+        }
+
+        return {
+          value: m.id,
+          label: m.text,
+          labelConHoras:
+            horasDisponibles > 1
+              ? `${m.text} (${horasDisponibles} hrs disponibles)`
+              : `${m.text} (SIN HORAS DISPONIBLES)`,
+          horasDisponibles: horasDisponibles,
+          isDisabled: horasDisponibles <= 1,
+          colorFondo,
+          colorTexto,
+          estado,
+        };
+      })
+      .filter((materia) => materia.horasDisponibles > 1);
+  }, [materias, calcularHorasUsadasPorMateria]);
 
   const resizeData = useRef({
     initialY: null,
@@ -595,8 +946,8 @@ export default function Calendar(horarioId) {
         const eventoActivo = prevEventos.find((e) => e.id === active.id);
         if (!eventoActivo) return prevEventos;
 
-        // Validación robusta de solapamiento
-        const haySolapamiento = prevEventos.some(
+        // 1. Validación de solapamiento en el horario actual
+        const haySolapamientoHorarioActual = prevEventos.some(
           (e) =>
             e.id !== active.id &&
             e.dia === newDia &&
@@ -604,31 +955,69 @@ export default function Calendar(horarioId) {
             bloqueNum + duracionEvento > e.bloque
         );
 
-        if (!haySolapamiento) {
-          const nuevosEventos = prevEventos.map((e) =>
-            e.id === active.id ? { ...e, dia: newDia, bloque: bloqueNum } : e
+        if (haySolapamientoHorarioActual) {
+          AlertaWarning(
+            "¡Ya existe un evento en ese rango de bloques en este horario!"
           );
-
-          // Actualizar en la base de datos
-          const eventoActualizado = nuevosEventos.find(
-            (e) => e.id === active.id
-          );
-
-          if (eventoActualizado) {
-            setTimeout(() => {
-              actualizarEventoEnBD(eventoActualizado);
-            }, 0);
-          }
-
-          return nuevosEventos;
+          return prevEventos;
         }
-        AlertaWarning("¡Ya existe un evento en ese rango de bloques!");
-        return prevEventos;
+
+        // 2. Validación de solapamiento del docente en todos los horarios
+        const docenteId = activeEvent.docente?.value || activeEvent.docente_id;
+        const haySolapamientoDocente = todosLosEventos.some(
+          (e) =>
+            e.id !== active.id && // Excluir el evento actual
+            (e.docente?.value === docenteId || e.docente_id === docenteId) &&
+            e.dia === newDia &&
+            bloqueNum < e.bloque + e.duracion &&
+            bloqueNum + duracionEvento > e.bloque
+        );
+
+        if (haySolapamientoDocente) {
+          AlertaWarning(
+            "¡El docente ya tiene una clase en ese rango de bloques en otro horario!"
+          );
+          return prevEventos;
+        }
+
+        // 3. Validación de solapamiento del aula en todos los horarios
+        const aulaId = activeEvent.aula?.value || activeEvent.espacio_id;
+        const haySolapamientoAula = todosLosEventos.some(
+          (e) =>
+            e.id !== active.id && // Excluir el evento actual
+            (e.aula?.value === aulaId || e.espacio_id === aulaId) &&
+            e.dia === newDia &&
+            bloqueNum < e.bloque + e.duracion &&
+            bloqueNum + duracionEvento > e.bloque
+        );
+
+        if (haySolapamientoAula) {
+          AlertaWarning(
+            "¡El aula ya tiene una clase en ese rango de bloques en otro horario!"
+          );
+          return prevEventos;
+        }
+
+        // Si pasa todas las validaciones, actualizar
+        const nuevosEventos = prevEventos.map((e) =>
+          e.id === active.id ? { ...e, dia: newDia, bloque: bloqueNum } : e
+        );
+
+        // Actualizar en la base de datos
+        const eventoActualizado = nuevosEventos.find((e) => e.id === active.id);
+
+        if (eventoActualizado) {
+          setTimeout(() => {
+            actualizarEventoEnBD(eventoActualizado);
+          }, 0);
+        }
+
+        return nuevosEventos;
       });
 
       setActiveEvent(null);
     },
-    [activeEvent, actualizarEventoEnBD]
+    [activeEvent, actualizarEventoEnBD, todosLosEventos] // Agregar todosLosEventos como dependencia
   );
 
   useEffect(() => {
@@ -705,20 +1094,37 @@ export default function Calendar(horarioId) {
         const horasMateria = response.data.hora_total_est || 0;
 
         const horasUsadasMateria = eventos
-          .filter(
-            (e) =>
-              e.id !== resizingEventId &&
-              ((e.materias && e.materias.value === materiaId) ||
-                e.materia === materiaId ||
-                e.materia_id === materiaId)
-          )
-          .reduce((acc, e) => acc + (e.duracion || 1), 0);
-        console.log("Horas usadas de la materia " + horasUsadasMateria);
+          .filter((e) => {
+            const esMismaMateria =
+              e.materias?.value === materiaId ||
+              e.materia === materiaId ||
+              e.materia_id === materiaId;
+            return esMismaMateria;
+          })
+          .reduce((acc, e) => {
+            // Si es el evento que se está redimensionando, usa la duración original
+            if (e.id === resizingEventId) {
+              return acc + duracionOriginal;
+            }
+            // Para otros eventos, usa la duración actual
+            return acc + (e.duracion || 1);
+          }, 0);
 
-        if (horasUsadasMateria + duracionNueva > horasMateria) {
-          AlertaWarning(
-            "¡Las horas semanales de la unidad curricular se agotaron!"
-          );
+        // Ahora comparamos con la NUEVA duración que se quiere aplicar
+        const horasTotalesConNuevaDuracion =
+          horasUsadasMateria - duracionOriginal + duracionNueva;
+
+        if (horasTotalesConNuevaDuracion > horasMateria) {
+          AlertaWarning(`
+            <strong>¡Atención! Se ha excedido el límite de horas semanales para esta Unidad Curricular.</strong><br><br>
+            Horas permitidas: ${horasMateria}<br>
+            Horas usadas actualmente: ${horasUsadasMateria}<br>
+            Horas que se quieren agregar: ${
+              duracionNueva - duracionOriginal
+            }<br>
+            Horas totales con la nueva duración: ${horasTotalesConNuevaDuracion}<br><br>
+            Por favor, revisa el horario para ajustarlo dentro del límite establecido.
+          `);
           setEventos((prev) =>
             prev.map((ev) =>
               ev.id === resizingEventId && ev.duracion !== duracionOriginal
@@ -738,44 +1144,46 @@ export default function Calendar(horarioId) {
 
         // Crear una copia con la duración actualizada
         if (eventoOriginal) {
-          const diferencia = duracionNueva - duracionOriginal;
+          // Validación de horas del docente
           const docenteId =
             eventoOriginal.docente?.value || eventoOriginal.docente_id;
-          const respuesta = await Api.get(`/docente/${docenteId}`);
-          const horasActuales = respuesta.data.horas_dedicacion;
-          const horasRestantes = horasActuales - diferencia;
+          const horasUsadasDocente = calcularHorasUsadasPorDocente(docenteId);
+          const horasBaseDocente =
+            docentes.find((d) => d.id === docenteId)?.horas_dedicacion || 0;
 
-          // Si las horas quedan en 0 o menos, preguntar antes de continuar
-          if (diferencia > 0 && horasRestantes <= 0) {
-            const confirmacion = await AlertaConfirm(
-              "La cantidad de horas dedicadas del docente se ha excedido",
-              "¿Deseas continuar?",
-              "Continuar"
+          if (
+            horasUsadasDocente - duracionOriginal + duracionNueva >
+            horasBaseDocente
+          ) {
+            AlertaWarning(`
+              <strong>¡Atención! El docente ha excedido su dedicación horaria en este período.</strong><br><br>
+              Dedicación base: ${horasBaseDocente} hrs<br>
+              Horas usadas en el lapso/trimestre: ${horasUsadasDocente} hrs<br>
+              Horas que intenta agregar: ${
+                duracionNueva - duracionOriginal
+              } hrs<br>
+              Horas disponibles: ${
+                horasBaseDocente - horasUsadasDocente
+              } hrs<br><br>
+              <em>Nota: Incluye todas las clases de este docente en todos los horarios del mismo lapso académico y trimestre.</em>
+          `);
+
+            // Restaurar el tamaño original
+            setEventos((prev) =>
+              prev.map((ev) =>
+                ev.id === resizingEventId && ev.duracion !== duracionOriginal
+                  ? { ...ev, duracion: duracionOriginal }
+                  : ev
+              )
             );
-            if (!confirmacion.isConfirmed) {
-              // Restaurar tamaño anterior SOLO si el valor en el estado ya cambió
-              setEventos((prev) =>
-                prev.map((ev) =>
-                  ev.id === resizingEventId && ev.duracion !== duracionOriginal
-                    ? { ...ev, duracion: duracionOriginal }
-                    : ev
-                )
-              );
-              if (resizeData.current.elemento) {
-                resizeData.current.elemento.style.height = `${
-                  duracionOriginal * 60 - 4
-                }px`;
-              }
-              setIsResizing(false);
-              setResizingEventId(null);
-              return;
+            if (resizeData.current.elemento) {
+              resizeData.current.elemento.style.height = `${
+                duracionOriginal * 60 - 4
+              }px`;
             }
-          }
-
-          if (diferencia !== 0 && docenteId) {
-            await Api.put(
-              `/docente_horas/${docenteId}?horas_dedicacion=${-diferencia}`
-            );
+            setIsResizing(false);
+            setResizingEventId(null);
+            return;
           }
 
           const eventoConDuracionActualizada = {
@@ -793,6 +1201,7 @@ export default function Calendar(horarioId) {
             ev.id === resizingEventId ? { ...ev, duracion: duracionNueva } : ev
           )
         );
+        await recargarDatosCompletos();
       }
 
       // Limpiamos después de la actualización
@@ -829,6 +1238,9 @@ export default function Calendar(horarioId) {
     eventos,
     actualizarEventoEnBD,
     materiaSeleccionada,
+    calcularHorasUsadasPorDocente,
+    recargarDatosCompletos,
+    docentes,
   ]);
 
   const handleResizeStart = useCallback(
@@ -913,41 +1325,7 @@ export default function Calendar(horarioId) {
       return;
     }
 
-    console.log("Docente seleccionado " + docenteSeleccionado.id);
-    console.log("Materia seleccionada " + nuevoEvento.materia);
-    console.log(
-      "Horas de la materia seleccionada " + materiaSeleccionada?.horas
-    );
-    console.log("Duracion " + duracionNum);
-    console.log("Docente seleccionado " + nuevoEvento?.docente.value);
-
-    console.log(materiaSeleccionada?.horas);
-    const hyCoincidencia = eventos.some(
-      (e) => e.materias?.value === nuevoEvento.materia.value
-    );
-    console.log(hyCoincidencia);
-
-    console.log(nuevoEvento.materia.value);
-
-    // Calcular la suma de horas ya usadas para la materia
-    console.log("Filtrando eventos...");
-    console.log(
-      "Valor de nuevoEvento.materia.value:",
-      nuevoEvento.materia.value
-    );
-    console.log("Valores de e.materias?.value en eventos:");
-    eventos.forEach((e) => {
-      console.log(e.materias?.value);
-    });
-    console.log("Valores de e.duracion en eventos:");
-    eventos.forEach((e) => {
-      console.log(e.duracion);
-    });
-    console.log(
-      "valor de materiaSeleccionada?.horas:",
-      materiaSeleccionada?.horas
-    );
-
+    // Evitar exceder el horario de la materia
     const horasUsadasMateria = eventos
       .filter((e) => {
         e.materias?.value &&
@@ -957,46 +1335,42 @@ export default function Calendar(horarioId) {
       })
       .reduce((acc, e) => acc + (e.duracion || 1), 0);
     const horasMateria = materiaSeleccionada?.horas || 0;
-    console.log(
-      `Horas usadas de la materia: ${nuevoEvento.materia.label} => ${horasUsadasMateria}`
-    );
-    console.log(
-      `Horas usadas con el nuevo evento: ${
-        horasUsadasMateria + duracionNum
-      } de ${horasMateria} horas semanales de la materia`
-    );
+
     if (horasUsadasMateria + duracionNum > horasMateria) {
-      AlertaWarning(
-        "¡Se excedieron las horas semanales de la Unidad Curricular!"
-      );
+      AlertaWarning(`
+        <strong>¡Atención! Se ha excedido el límite de horas semanales para esta Unidad Curricular.</strong><br><br>
+        Horas permitidas: ${horasMateria}<br>
+        Horas usadas actualmente: ${horasUsadasMateria}<br>
+        Horas totales con la nueva clase: ${
+          horasUsadasMateria + duracionNum
+        }<br><br>
+        Por favor, revisa el horario para ajustarlo dentro del límite establecido.
+      `);
       return;
     }
-    console.log(
-      "Las horas dedicadas del docente son " +
-        docenteSeleccionado.horas_dedicacion
-    );
-    console.log(
-      "Horas del docente antes de agregar el evento " +
-        docenteSeleccionado.horas_dedicacion
-    );
 
-    if (docenteSeleccionado.horas_dedicacion - duracionNum < 0) {
-      const respuesta = AlertaConfirm(
-        "La cantidad de horas dedicadas del docente se ha excedido",
-        "¿Deseas continuar?",
-        "Continuar"
-      );
-      if (!(await respuesta).isConfirmed) {
-        return;
-      }
+    // Calcular la suma de horas ya usadas para el docente
+    const horasUsadasDocente = calcularHorasUsadasPorDocente(
+      nuevoEvento.docente.value
+    );
+    const horasBaseDocente =
+      docentes.find((d) => d.id === nuevoEvento.docente.value)
+        ?.horas_dedicacion || 0;
+
+    if (horasUsadasDocente + duracionNum > horasBaseDocente) {
+      AlertaWarning(`
+    <strong>¡Atención! El docente ha excedido su dedicación horaria en este período.</strong><br><br>
+    Dedicación base: ${horasBaseDocente} hrs<br>
+    Horas usadas en el lapso/trimestre: ${horasUsadasDocente} hrs<br>
+    Horas que intenta agregar: ${duracionNum} hrs<br>
+    Horas disponibles: ${horasBaseDocente - horasUsadasDocente} hrs<br><br>
+    <em>Nota: Incluye todas las clases de este docente en todos los horarios del mismo lapso académico y trimestre.</em>
+  `);
+      return;
     }
 
     // Calcular la cantidad de bloques
     const cantidadDeBloques = bloques.length;
-    console.log(
-      "Horas de la materia seleccionada:" + materiaSeleccionada?.horas
-    );
-
     if (materiaSeleccionada?.horas < duracionNum) {
       AlertaWarning("¡Las horas semanales de la materia se agotaron!");
       return;
@@ -1024,9 +1398,6 @@ export default function Calendar(horarioId) {
     try {
       // Enviar datos al backend
       const response = await Api.post(`/clases`, payload);
-      await Api.put(
-        `/docente_horas/${payload.docente_id}?horas_dedicacion=${-duracionNum}`
-      );
 
       if (response) {
         Alerta(response.data.message);
@@ -1102,6 +1473,7 @@ export default function Calendar(horarioId) {
       materia: null,
       duracion: 1,
     });
+    await recargarDatosCompletos();
   };
 
   const handleEditarEvento = (evento) => {
@@ -1142,18 +1514,37 @@ export default function Calendar(horarioId) {
                 name="materias"
                 value={nuevoEvento.materia}
                 options={materiasOptions}
+                getOptionLabel={(option) =>
+                  option.labelConHoras || option.label
+                }
+                getOptionValue={(option) => option.value}
                 onChange={(option) => {
-                  setMateriaSeleccionada(
-                    materias.find(
-                      (m) => String(m.id) === String(option?.value)
-                    ) || null
-                  );
-                  setNuevoEvento((prev) => ({
-                    ...prev,
-                    materia: option,
-                    docente: null,
-                    duracion: 2,
-                  }));
+                  if (option) {
+                    setMateriaSeleccionada(
+                      materias.find(
+                        (m) => String(m.id) === String(option.value)
+                      ) || null
+                    );
+                    setNuevoEvento((prev) => ({
+                      ...prev,
+                      materia: {
+                        value: option.value,
+                        label: option.label,
+                        // Pasamos los datos de estilo para el select
+                        colorFondo: option.colorFondo,
+                        colorTexto: option.colorTexto,
+                        estado: option.estado,
+                      },
+                      docente: null,
+                      duracion: 2,
+                    }));
+                  } else {
+                    setNuevoEvento((prev) => ({
+                      ...prev,
+                      materia: null,
+                      docente: null,
+                    }));
+                  }
                 }}
                 onValueChange={async (option) => {
                   if (option) {
@@ -1164,44 +1555,49 @@ export default function Calendar(horarioId) {
                       setDocentes(response.data);
                       setDocenteSeleccionado(response.data[0]);
                     } catch (error) {
-                      AlertaError("Error al cargar las materias");
+                      AlertaError("Error al cargar los docentes");
                       console.log(error);
                     }
                   }
                 }}
+                styles={getSelectStyles(nuevoEvento.materia)}
               />
               <SelectControl
                 label="DOCENTE"
                 name="docente"
                 value={nuevoEvento.docente}
                 options={docentesOptions}
+                getOptionLabel={(option) =>
+                  option.labelConHoras || option.label
+                }
+                getOptionValue={(option) => option.value}
                 onChange={(option) => {
-                  setDocenteSeleccionado(
-                    docentes.find(
-                      (e) => String(e.id) === String(option?.value)
-                    ) || null
-                  );
-                  setNuevoEvento((prev) => ({
-                    ...prev,
-                    docente: option,
-                    duracion: 2,
-                  }));
+                  if (option) {
+                    setDocenteSeleccionado(
+                      docentes.find(
+                        (d) => String(d.id) === String(option.value)
+                      ) || null
+                    );
+                    setNuevoEvento((prev) => ({
+                      ...prev,
+                      docente: {
+                        value: option.value,
+                        label: option.label,
+                        // Pasamos los datos de estilo para el select
+                        colorFondo: option.colorFondo,
+                        colorTexto: option.colorTexto,
+                        estado: option.estado,
+                      },
+                      duracion: 2,
+                    }));
+                  } else {
+                    setNuevoEvento((prev) => ({
+                      ...prev,
+                      docente: null,
+                    }));
+                  }
                 }}
-                styles={{
-                  option: (provided, state) => ({
-                    ...provided,
-                    color:
-                      state.data.horas !== undefined && state.data.horas < 3
-                        ? "#fff"
-                        : "#333",
-                    backgroundColor:
-                      state.data.horas !== undefined && state.data.horas < 3
-                        ? "#dc3545"
-                        : state.isSelected
-                        ? "#2684FF"
-                        : "#fff",
-                  }),
-                }}
+                styles={getSelectStyles(nuevoEvento.docente)}
               />
               <SelectControl
                 label="AULA"
@@ -1233,10 +1629,26 @@ export default function Calendar(horarioId) {
                 label="BLOQUE"
                 name="bloque"
                 value={nuevoEvento.bloque}
-                options={bloqueOptionsDisponibles}
-                onChange={(option) =>
-                  setNuevoEvento((prev) => ({ ...prev, bloque: option }))
-                }
+                options={bloqueOptionsConDisponibilidad}
+                getOptionLabel={(option) => {
+                  if (option.isDisabled) {
+                    return `${
+                      option.label
+                    } (No disponible - ${option.razones?.join(", ")})`;
+                  }
+                  return option.label;
+                }}
+                getOptionValue={(option) => option.value}
+                onChange={(option) => {
+                  if (option && !option.isDisabled) {
+                    setNuevoEvento((prev) => ({ ...prev, bloque: option }));
+                  }
+                }}
+                styles={getSelectStyles(nuevoEvento.bloque)}
+                isOptionDisabled={(option) => option.isDisabled}
+                components={{
+                  Option: CustomOption,
+                }}
               />
               <div className="col-sm-5 col-xl-3">
                 <label htmlFor="duracion" className="mt-4">
@@ -1345,20 +1757,12 @@ export default function Calendar(horarioId) {
                         const response = await Api.delete(
                           `/clase/${evento.id}`
                         );
-                        console.log("Respuesta de eliminación:", response.data);
-                        Alerta(response.data.message);
 
-                        // Sumar la duración a las horas del docente
-                        const docenteId =
-                          evento.docente?.value || evento.docente_id;
-                        if (docenteId) {
-                          await Api.put(
-                            `/docente_horas/${docenteId}?horas_dedicacion=${evento.duracion}`
-                          );
-                        }
+                        Alerta(response.data.message);
                         setEventos((prev) =>
                           prev.filter((e) => e.id !== evento.id)
                         );
+                        await recargarDatosCompletos();
                       } catch (error) {
                         AlertaError("Error al eliminar evento" + " " + error);
                       }
@@ -1418,8 +1822,6 @@ export default function Calendar(horarioId) {
                   const aulaEdit = aulas.find(
                     (a) => String(a.id) === String(eventoEditando.aula?.value)
                   );
-                  console.log("AulaEdit: " + aulaEdit);
-                  console.log("DocenteEdit: " + docenteEdit);
                   const diaEdit = eventoEditando.dia?.value;
                   if (!docenteEdit || !materiaEdit || !aulaEdit) {
                     AlertaWarning("Completa los campos vacíos");
@@ -1487,32 +1889,44 @@ export default function Calendar(horarioId) {
                     return;
                   }
                   // Validar horas del docente
-                  let horasDedicacionDocente = docenteEdit.horas_dedicacion;
-                  // Si cambió el docente, sumar las horas al anterior y restar al nuevo
-                  if (eventoAnterior.docente?.value !== docenteEdit.id) {
-                    // Sumar al anterior
-                    if (eventoAnterior.docente?.value) {
-                      await Api.put(
-                        `/docente_horas/${eventoAnterior.docente.value}?horas_dedicacion=${duracionNum}`
+                  const horasUsadasDocente = calcularHorasUsadasPorDocente(
+                    eventoEditando.docente.value
+                  );
+                  const horasBaseDocente =
+                    docentes.find((d) => d.id === eventoEditando.docente.value)
+                      ?.horas_dedicacion || 0;
+
+                  if (horasUsadasDocente + duracionNum > horasBaseDocente) {
+                    // Excluir el evento actual del cálculo si estamos editando el mismo docente
+                    const horasUsadasSinEventoActual = todosLosEventos
+                      .filter((e) => {
+                        const idDocenteEvento =
+                          e.docente?.value || e.docente_id;
+                        return (
+                          idDocenteEvento == eventoEditando.docente.value &&
+                          e.id !== eventoEditando.id
+                        );
+                      })
+                      .reduce(
+                        (total, evento) => total + (evento.duracion || 1),
+                        0
                       );
-                    }
-                    // Restar al nuevo
-                    await Api.put(
-                      `/docente_horas/${
-                        docenteEdit.id
-                      }?horas_dedicacion=${-duracionNum}`
-                    );
-                  } else {
-                    // Si no cambió, solo validar si tiene suficientes horas
-                    if (horasDedicacionDocente - duracionNum < 0) {
-                      const respuesta = await AlertaConfirm(
-                        "La cantidad de horas dedicadas del docente se ha excedido",
-                        "¿Deseas continuar?",
-                        "Continuar"
-                      );
-                      if (!respuesta.isConfirmed) {
-                        return;
-                      }
+
+                    const horasTotalesConEventoEditado =
+                      horasUsadasSinEventoActual + duracionNum;
+
+                    if (horasTotalesConEventoEditado > horasBaseDocente) {
+                      AlertaWarning(`
+                        <strong>¡Atención! El docente ha excedido su dedicación horaria en este período.</strong><br><br>
+                        Dedicación base: ${horasBaseDocente} hrs<br>
+                        Horas usadas en el lapso/trimestre: ${horasUsadasSinEventoActual} hrs<br>
+                        Horas que intenta asignar: ${duracionNum} hrs<br>
+                        Horas disponibles: ${
+                          horasBaseDocente - horasUsadasSinEventoActual
+                        } hrs<br><br>
+                        <em>Nota: Incluye todas las clases de este docente en todos los horarios del mismo lapso académico y trimestre.</em>
+                      `);
+                      return;
                     }
                   }
                   // Actualizar en backend
@@ -1563,6 +1977,7 @@ export default function Calendar(horarioId) {
                   );
                   setEventoRecienAgregado(eventoEditando.id); // Resalta el evento editado
                   setMostrarModal(false);
+                  await recargarDatosCompletos();
                 }}
               >
                 <div className="modal-header">
@@ -1582,17 +1997,35 @@ export default function Calendar(horarioId) {
                         className="col-sm-12 col-xs-12 col-xl-10"
                         value={eventoEditando.materias}
                         options={materiasOptions}
+                        getOptionLabel={(option) =>
+                          option.labelConHoras || option.label
+                        }
+                        getOptionValue={(option) => option.value}
                         onChange={(option) => {
-                          setMateriaSeleccionada(
-                            materias.find(
-                              (m) => String(m.id) === String(option?.value)
-                            ) || null
-                          );
-                          setEventoEditando({
-                            ...eventoEditando,
-                            materias: option,
-                            docente: null,
-                          });
+                          if (option) {
+                            setMateriaSeleccionada(
+                              materias.find(
+                                (m) => String(m.id) === String(option.value)
+                              ) || null
+                            );
+                            setEventoEditando({
+                              ...eventoEditando,
+                              materias: {
+                                value: option.value,
+                                label: option.label,
+                                colorFondo: option.colorFondo,
+                                colorTexto: option.colorTexto,
+                                estado: option.estado,
+                              },
+                              docente: null,
+                            });
+                          } else {
+                            setEventoEditando({
+                              ...eventoEditando,
+                              materias: null,
+                              docente: null,
+                            });
+                          }
                         }}
                         onValueChange={async (option) => {
                           if (option) {
@@ -1603,11 +2036,12 @@ export default function Calendar(horarioId) {
                               setDocentes(response.data);
                               setDocenteSeleccionado(response.data[0]);
                             } catch (error) {
-                              AlertaError("Error al cargar las docentes");
+                              AlertaError("Error al cargar los docentes");
                               console.log(error);
                             }
                           }
                         }}
+                        styles={getSelectStyles(eventoEditando.materias)}
                       />
                     </div>
                     <div className="d-flex justify-content-center">
@@ -1617,18 +2051,35 @@ export default function Calendar(horarioId) {
                         className="col-sm-12 col-xs-12 col-xl-10"
                         value={eventoEditando.docente}
                         options={docentesOptions}
+                        getOptionLabel={(option) =>
+                          option.labelConHoras || option.label
+                        }
+                        getOptionValue={(option) => option.value}
                         onChange={(option) => {
-                          setDocenteSeleccionado(
-                            docentes.find(
-                              (e) => String(e.id) === String(option?.value)
-                            ) || null
-                          );
-                          setEventoEditando({
-                            ...eventoEditando,
-                            docente: option,
-                          });
-                          console.log("Aula editando: " + eventoEditando?.aula);
+                          if (option) {
+                            setDocenteSeleccionado(
+                              docentes.find(
+                                (d) => String(d.id) === String(option.value)
+                              ) || null
+                            );
+                            setEventoEditando({
+                              ...eventoEditando,
+                              docente: {
+                                value: option.value,
+                                label: option.label,
+                                colorFondo: option.colorFondo,
+                                colorTexto: option.colorTexto,
+                                estado: option.estado,
+                              },
+                            });
+                          } else {
+                            setEventoEditando({
+                              ...eventoEditando,
+                              docente: null,
+                            });
+                          }
                         }}
+                        styles={getSelectStyles(eventoEditando.docente)}
                       />
                     </div>
                     <div className="d-flex justify-content-center">

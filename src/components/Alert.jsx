@@ -116,7 +116,7 @@ export function AlertaWarning(mensaje, title = "Advertencia") {
   return Swal.fire({
     icon: "warning",
     title: title,
-    text: mensaje,
+    html: mensaje,
     confirmButtonText: "Entendido",
     customClass: {
       confirmButton: "btn btn-warning",
