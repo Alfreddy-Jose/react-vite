@@ -57,6 +57,7 @@ import VoceroCreate from "../pages/vocero/VoceroCreate";
 import VoceroEdit from "../pages/vocero/VoceroEdit";
 import Unauthorized from "../pages/Unauthorized";
 import CoordinadorCreate from "../pages/Coordinador/CoordinadorCreate";
+import { Bitacora } from "../pages/Bitacora";
 
 export function AppRoutes() {
   return (
@@ -621,6 +622,17 @@ export function AppRoutes() {
             <ProtectedRoute>
               <Layout>
                 <HorariosDocentes />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/bitacora"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Bitacora />
               </Layout>
             </ProtectedRoute>
           }

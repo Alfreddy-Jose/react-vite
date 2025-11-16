@@ -12,3 +12,23 @@ export function useTogglePassword() {
     togglePasswordVisibility
   };
 }
+
+export function formatFecha(dateString) {
+  if (!dateString) return "";
+  const fecha = new Date(dateString);
+  return fecha.toLocaleDateString("es-VE", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+}
+
+export function formatHora(dateString) {
+  if (!dateString) return "";
+  const fecha = new Date(dateString);
+  return fecha.toLocaleTimeString("es-VE", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  });
+}

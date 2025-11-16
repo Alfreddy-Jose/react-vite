@@ -373,6 +373,19 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                   </div>
                 </li>
               ) : null}
+              {/* Bitacora */}
+              {/* {permisos.includes("bitacora.ver") ? ( */}
+                <li
+                  className={`nav-item ${
+                    isActive("/bitacora") ? "active" : ""
+                  }`}
+                >
+                  <Link to="/bitacora">
+                    <i className="fas fa-book"></i>
+                    <p>Bitácora del Sistema</p>
+                  </Link>
+                </li>
+              {/* ) : null} */}
             </ul>
           </div>
         </div>

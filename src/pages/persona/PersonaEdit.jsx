@@ -21,7 +21,6 @@ const validationSchema = Yup.object({
     .matches(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "Solo letras permitidas") // solo letras permitidas
     .required("Este campo es obligatorio"), // Campo requerido
   direccion: Yup.string().required("Este campo es obligatorio"), // Campo requerido
-  municipio: Yup.string().required("Este campo es obligatorio"), // Campo requerido
   telefono: Yup.string()
     .matches(/^[0-9]*$/, "Solo números permitidos") // Solo números
     .required("Este campo es obligatorio") // Campo requerido
@@ -68,8 +67,19 @@ function PersonaEdit() {
   };
 
   // Funcion para enviar datos al backend
-  const onSubmit = async (values) => {
-    PutAll(values, "/persona", navegation, id, "/persona");
+  const onSubmit = async (values, { setErrors }) => {
+    try {
+      await PutAll(values, "/persona", navegation, id, "/persona");
+    } catch (error) {
+      if (error.response && error.response.data.errors) {
+        // Transforma los arrays de Laravel a strings para Formik
+        const formikErrors = {};
+        Object.entries(error.response.data.errors).forEach(([key, value]) => {
+          formikErrors[key] = value[0];
+        });
+        setErrors(error.response.data.errors);
+      }
+    }
   };
 
   const formik = useFormik({
@@ -112,8 +122,6 @@ function PersonaEdit() {
       try {
         const response = await Api.get(`persona/${id}`);
         setPersona(response.data);
-        console.log(response.data);
-        
       } catch (error) {
         console.error(
           "Error al cargar los datos:",

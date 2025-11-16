@@ -89,7 +89,6 @@ function Coordinador() {
                 url={`/coordinador/${row.id}/edit`}
                 urlDelete={`/coordinador/${row.id}`}
                 navegar="/coordinador"
-                editar={"coordinador.editar"}
                 eliminar={"coordinador.eliminar"}
               />
             ),
