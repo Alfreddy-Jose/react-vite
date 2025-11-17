@@ -9,9 +9,7 @@ import Api, { PostAll, GetAll } from "../../services/Api";
 import SelectSearch from "../../components/SelectSearch";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { InputLabel } from "../../components/InputLabel";
 import Spinner from "../../components/Spinner";
-import Warning from "../../img/icons_warning.png";
 
 const initialValues = {
   pnf_id: "",
@@ -31,7 +29,29 @@ export function SeccionesCreate() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({});
   const navegation = useNavigate();
+  const [sedes, setSedes] = useState([]);
+  const [pnfs, setPnfs] = useState([]);
+  const [loadingPnfs, setLoadingPnfs] = useState(false);
   const { lapsoActual } = useAuth();
+
+  // Función para cargar Pnfs
+  const cargarPnfs = async (sedeId) => {
+    if (!sedeId) {
+      setPnfs([]);
+      return;
+    }
+
+    setLoadingPnfs(true);
+    try {
+      const response = await Api.get(`/horarios/sedes/${sedeId}/pnfs`);
+      setPnfs(response.data);
+    } catch (error) {
+      console.error("Error al cargar Pnfs:", error);
+      setPnfs([]);
+    } finally {
+      setLoadingPnfs(false);
+    }
+  };
 
   // Funcion para enviar datos al backend
   const onSubmit = async (values, { setErrors }) => {
@@ -60,6 +80,31 @@ export function SeccionesCreate() {
   }, []);
   console.log(loading);
 
+  // Efecto para cargar Sedes
+  useEffect(() => {
+    const getSedes = async () => {
+      try {
+        const response = await Api.get(`/horarios/sedes`);
+        setSedes(response.data);
+      } catch (error) {
+        console.error("Error al cargar Estados:", error);
+        setSedes([]);
+      }
+    };
+
+    getSedes();
+  }, []);
+
+  // Efecto para cargar Pnfs cuando cambia el sede
+  useEffect(() => {
+    if (formik.values.sede_id) {
+      cargarPnfs(formik.values.sede_id);
+    } else {
+      setPnfs([]);
+      formik.setFieldValue("pnf_id", "");
+    }
+  }, [formik.values.sede_id]);
+
   if (loading) {
     return <Spinner />;
   }
@@ -78,10 +123,11 @@ export function SeccionesCreate() {
         input={
           <>
             <SelectSearch
-              name="pnf_id"
-              label={FORM_LABELS.SECCION.PNF}
-              options={data.pnfs || []}
+              name="sede_id"
+              label={FORM_LABELS.SECCION.SEDE}
+              options={sedes}
               formik={formik}
+              labelKey="nombre_sede"
               valueKey="id"
             />
 
@@ -101,13 +147,31 @@ export function SeccionesCreate() {
               valueKey="id"
             />
 
-            <SelectSearch
-              name="sede_id"
-              label={FORM_LABELS.SECCION.SEDE}
-              options={data.sedes}
+            {/*             <SelectSearch
+              name="pnf_id"
+              label={FORM_LABELS.SECCION.PNF}
+              options={data.pnfs || []}
               formik={formik}
-              labelKey="nombre_sede"
               valueKey="id"
+            /> */}
+
+            <SelectSearch
+              label={FORM_LABELS.SECCION.PNF}
+              name="pnf_id"
+              placeholder={
+                !formik.values.sede_id
+                  ? "PRIMERO SELECCIONE UN PNF"
+                  : loadingPnfs
+                  ? "CARGANDO PNF..."
+                  : pnfs.length === 0
+                  ? "NO HAY PNF"
+                  : "SELECCIONE UN PNF"
+              }
+              options={pnfs}
+              valueKey="id"
+              value={formik.values.pnf_id}
+              formik={formik}
+              disabled={!formik.values.sede_id || loadingPnfs || pnfs.length === 0}
             />
           </>
         }

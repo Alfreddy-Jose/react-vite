@@ -95,6 +95,7 @@ export const FORM_LABELS = {
     ELIMINAR: "ELIMINAR",
     PDF: "PDF",
     ESTADO: "CAMBIAR ESTADO",
+    EXCEL: "IMPORTAR EXCEL",
   },
   SECCION: {
     NRO_SECCION: "NÚMERO DE SECCIÓN",

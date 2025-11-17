@@ -374,7 +374,7 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                 </li>
               ) : null}
               {/* Bitacora */}
-              {/* {permisos.includes("bitacora.ver") ? ( */}
+              {permisos.includes("bitacora.ver") ? (
                 <li
                   className={`nav-item ${
                     isActive("/bitacora") ? "active" : ""
@@ -385,7 +385,7 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                     <p>Bitácora del Sistema</p>
                   </Link>
                 </li>
-              {/* ) : null} */}
+              ) : null} 
             </ul>
           </div>
         </div>

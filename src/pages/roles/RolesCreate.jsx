@@ -537,6 +537,13 @@ function RolesCreate() {
                       formik={formik}
                       disabled={!isModuleEnabled("aula")}
                     />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.EXCEL}
+                      value="aula.importar excel"
+                      formik={formik}
+                      disabled={!isModuleEnabled("aula")}
+                    />
                   </>
                 }
               />
@@ -584,6 +591,13 @@ function RolesCreate() {
                       name="permisos"
                       label={FORM_LABELS.ROLES_PERMISOS.PDF}
                       value="laboratorio.pdf"
+                      formik={formik}
+                      disabled={!isModuleEnabled("laboratorio")}
+                    />
+                    <Checkbox
+                      name="permisos"
+                      label={FORM_LABELS.ROLES_PERMISOS.EXCEL}
+                      value="laboratorio.importar excel"
                       formik={formik}
                       disabled={!isModuleEnabled("laboratorio")}
                     />

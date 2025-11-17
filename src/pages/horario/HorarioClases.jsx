@@ -5,7 +5,6 @@ import Alerta, { AlertaError } from "../../components/Alert";
 import Calendar from "../horario/HorarioFull";
 import Spinner from "../../components/Spinner";
 import Stepper from "../../components/Stepper";
-import { LapsoAcademico } from "../lapsoAcademico/LapsoAcademico";
 import { Create } from "../../components/Link";
 
 export function HorarioClases() {
@@ -18,7 +17,7 @@ export function HorarioClases() {
     const fetchHorario = async () => {
       try {
         const res = await Api.get(`/horario/${id}`);
-        setHorario(res.data);
+        setHorario(res.data);        
       } catch (error) {
         AlertaError("Error al cargar horario");
         console.error(error);
@@ -49,7 +48,7 @@ export function HorarioClases() {
           pnf: horario.seccion?.pnf?.nombre || "PNF",
           sede: horario.seccion?.sede?.nombre_sede || "Sede",
           trayecto: horario.seccion?.trayecto?.nombre || "Trayecto",
-          trimestre: horario.trimestre?.nombre || "Trimestre",
+          trimestre: horario.trimestre?.nombre_relativo || "Trimestre",
           seccion: horario.seccion?.nombre || "Sección",
           LapsoAcademico: horario.lapso_academico || "Lapso Academico",
         }}

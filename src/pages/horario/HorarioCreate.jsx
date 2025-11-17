@@ -259,7 +259,7 @@ export function HorarioCreate() {
           // Redirigir después de la copia automática
           navigate(`/horarios/${nuevoHorarioId}/clases`, {
             state: {
-              message: "Horario creado exitosamente",
+              message: "Horario Registrado",
               horarioCreadoAutomaticamente: true,
             },
           });

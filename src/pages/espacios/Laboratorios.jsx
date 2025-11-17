@@ -133,7 +133,7 @@ export default function Laboratorios() {
           />) : null
         }
         button_modal={
-          // permisos.includes("aula.importar") ? (
+          permisos.includes("aula.importar excel") ? (
             <>  
               <Buttom
                 type="button"
@@ -148,7 +148,7 @@ export default function Laboratorios() {
                 onImportSuccess={handleImportSuccess}
               />
             </>
-          // ) : null
+          ) : null
 
         }
         // Boton para crear nuevos registros

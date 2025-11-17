@@ -116,6 +116,7 @@ export function SedeEdit() {
         if (response.data.estado_id) {
           cargarMunicipios(response.data.estado_id);
         }
+
       } catch (error) {
         console.error("Error fetching sede data:", error);
         setSede(null);
@@ -126,7 +127,6 @@ export function SedeEdit() {
 
     getSede();
   }, [id]);
-  console.log(sede);
 
   // Efecto para cargar pnf
   useEffect(() => {
@@ -181,7 +181,7 @@ export function SedeEdit() {
         }
         input={
           <>
-            {/* Input oculto para universidad_id */}
+            {/* Input oculto para universidad_id */} 
             <InputLabel hidden={true} name="universidad_id" formik={formik} />
 
             {/* Input para numero de SEDE */}

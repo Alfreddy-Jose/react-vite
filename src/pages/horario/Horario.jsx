@@ -50,11 +50,6 @@ export function Horarios() {
       sortable: true,
     },
     {
-      name: "ESTADO",
-      selector: (row) => row.estado.toUpperCase(),
-      sortable: true,
-    },
-    {
       name: "+INFO",
       cell: (row) => (
         <div>
@@ -66,9 +61,7 @@ export function Horarios() {
             <p>
               <b>TRIMESTRE:</b> {row.trimestre?.nombre}
             </p>
-            <p>
-              <b>ESTADO:</b> {row.estado.toUpperCase()}
-            </p>
+
           </Modal>
         </div>
       ),

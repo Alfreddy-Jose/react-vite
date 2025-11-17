@@ -1560,7 +1560,6 @@ export default function Calendar(horarioId) {
                     }
                   }
                 }}
-                styles={getSelectStyles(nuevoEvento.materia)}
               />
               <SelectControl
                 label="DOCENTE"
@@ -1597,7 +1596,6 @@ export default function Calendar(horarioId) {
                     }));
                   }
                 }}
-                styles={getSelectStyles(nuevoEvento.docente)}
               />
               <SelectControl
                 label="AULA"
@@ -1634,7 +1632,7 @@ export default function Calendar(horarioId) {
                   if (option.isDisabled) {
                     return `${
                       option.label
-                    } (No disponible - ${option.razones?.join(", ")})`;
+                    }`;
                   }
                   return option.label;
                 }}
@@ -2041,7 +2039,6 @@ export default function Calendar(horarioId) {
                             }
                           }
                         }}
-                        styles={getSelectStyles(eventoEditando.materias)}
                       />
                     </div>
                     <div className="d-flex justify-content-center">
@@ -2079,7 +2076,6 @@ export default function Calendar(horarioId) {
                             });
                           }
                         }}
-                        styles={getSelectStyles(eventoEditando.docente)}
                       />
                     </div>
                     <div className="d-flex justify-content-center">

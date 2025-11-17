@@ -130,7 +130,7 @@ export default function Aulas() {
         }
         // Boton para importar desde Excel
         button_modal={
-          // permisos.includes("aula.importar") ? (
+          permisos.includes("aula.importar excel") ? (
             <>  
               <Buttom
                 type="button"
@@ -145,7 +145,7 @@ export default function Aulas() {
                 onImportSuccess={handleImportSuccess}
               />
             </>
-          // ) : null
+        ) : null
         }
         // Boton para crear nuevos registros
         link={

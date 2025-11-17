@@ -25,7 +25,29 @@ export function SeccionesEdit() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({});
   const [seccion, setSeccion] = useState([]);
+  const [sedes, setSedes] = useState([]);
+  const [pnfs, setPnfs] = useState([]);
+  const [loadingPnfs, setLoadingPnfs] = useState(false);
   const navegation = useNavigate();
+
+  // Función para cargar Pnfs
+  const cargarPnfs = async (sedeId) => {
+    if (!sedeId) {
+      setPnfs([]);
+      return;
+    }
+
+    setLoadingPnfs(true);
+    try {
+      const response = await Api.get(`/horarios/sedes/${sedeId}/pnfs`);
+      setPnfs(response.data);
+    } catch (error) {
+      console.error("Error al cargar Pnfs:", error);
+      setPnfs([]);
+    } finally {
+      setLoadingPnfs(false);
+    }
+  };
 
   // Funcion para enviar datos al backend
   const onSubmit = async (values, { setErrors }) => {
@@ -46,10 +68,10 @@ export function SeccionesEdit() {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
+      sede_id: seccion?.sede_id || "",
       pnf_id: seccion?.pnf_id || "",
       matricula_id: seccion?.matricula_id || "",
       trayecto_id: seccion?.trayecto_id || "",
-      sede_id: seccion?.sede_id || "",
       numero_seccion: seccion?.numero_seccion || "",
       //lapso_id: seccion?.lapso_id || "",
     },
@@ -63,10 +85,40 @@ export function SeccionesEdit() {
     // Trayendo los datos del registro
     const getSeccion = async () => {
       const response = await Api.get(`/seccion/${id}`);
+
+      // Si la sección tiene sede_id, cargar sus pnfs
+        if (response.data.sede_id) {
+          cargarPnfs(response.data.sede_id);
+        }
       setSeccion(response.data);
     };
     getSeccion();
-  }, [id]);
+  }, [id]);  
+
+  // Efecto para cargar Sedes
+  useEffect(() => {
+    const getSedes = async () => {
+      try {
+        const response = await Api.get(`/horarios/sedes`);
+        setSedes(response.data);
+      } catch (error) {
+        console.error("Error al cargar Estados:", error);
+        setSedes([]);
+      }
+    };
+
+    getSedes();
+  }, []);
+
+  // Efecto para cargar Pnfs cuando cambia el sede
+  useEffect(() => {
+    if (formik.values.sede_id) {
+      cargarPnfs(formik.values.sede_id);
+    } else {
+      setPnfs([]);
+      formik.setFieldValue("pnf_id", "");
+    }
+  }, [formik.values.sede_id]);
 
   if (loading) {
     return <Spinner />;
@@ -86,13 +138,13 @@ export function SeccionesEdit() {
         input={
           <>
             <SelectSearch
-              name="pnf_id"
-              label={FORM_LABELS.SECCION.PNF}
-              options={data.pnfs || []}
+              name="sede_id"
+              label={FORM_LABELS.SECCION.SEDE}
+              options={sedes}
               formik={formik}
+              labelKey="nombre_sede"
               valueKey="id"
-              disabled={true}
-            /> 
+            />
 
             <SelectSearch
               name="matricula_id"
@@ -110,15 +162,6 @@ export function SeccionesEdit() {
               valueKey="id"
             />
 
-            <SelectSearch
-              name="sede_id"
-              label={FORM_LABELS.SECCION.SEDE}
-              options={data.sedes}
-              formik={formik}
-              labelKey="nombre_sede"
-              valueKey="id"
-            />
-
             <InputLabel
               name="numero_seccion"
               label={FORM_LABELS.SECCION.NRO_SECCION}
@@ -126,6 +169,27 @@ export function SeccionesEdit() {
               type="text"
               hidden={true}
               placeholder="INGRESE NÚMERO DE SECCIÓN"
+            />
+
+            <SelectSearch
+              label={FORM_LABELS.SECCION.PNF}
+              name="pnf_id"
+              placeholder={
+                !formik.values.sede_id
+                  ? "PRIMERO SELECCIONE UN PNF"
+                  : loadingPnfs
+                  ? "CARGANDO PNF..."
+                  : pnfs.length === 0
+                  ? "NO HAY PNF"
+                  : "SELECCIONE UN PNF"
+              }
+              options={pnfs}
+              valueKey="id"
+              value={formik.values.pnf_id}
+              formik={formik}
+              disabled={
+                !formik.values.sede_id || loadingPnfs || pnfs.length === 0
+              }
             />
           </>
         }
