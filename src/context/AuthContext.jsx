@@ -1,7 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect } from "react";
 import Api from "../services/Api";
-// import { useLocation } from "react-router-dom";
 
 const isLogin = (path) => location.pathname !== path;
 const AuthContext = createContext();
@@ -86,6 +85,7 @@ export function AuthProvider({ children }) {
     // Almcenando token del usuario en el localStorage
     localStorage.setItem("token", userData.token);
     localStorage.setItem("permissions", JSON.stringify(userData.permissions));
+    localStorage.setItem("pnf", userData.pnf);
 
     // Configurar el token en las cabeceras de las peticiones API
     Api.defaults.headers.common["Authorization"] = `Bearer ${userData.token}`;

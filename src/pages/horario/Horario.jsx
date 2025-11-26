@@ -1,29 +1,34 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { ContainerTable } from "../../components/ContainerTable";
 import { Create } from "../../components/Link";
 import { GetAll } from "../../services/Api";
 import { Link, useLocation } from "react-router-dom";
 import Alerta from "../../components/Alert";
-import { Modal, ButtomModal } from "../../components/Modal";
 import { Tabla } from "../../components/Tabla";
 import Acciones from "../../components/Acciones";
+import { useAuth } from "../../context/AuthContext";
 
 export function Horarios() {
   const [horarios, setHorarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [permisos, setPermisos] = useState([]);
+  const [pnf, setPnf] = useState("");
   const location = useLocation();
+  const { lapsoActual, user } = useAuth();
 
   // Campos por los que buscar - definidos directamente aquí
-  const camposBusqueda = ["seccion.nombre", "trimestre.nombre", "estado"];
+  const camposBusqueda = ["seccion.nombre", "trimestre?.nombre_relativo", "estado"];
 
   useEffect(() => {
     // Leer permisos desde localStorage
     const permisosLS = JSON.parse(localStorage.getItem("permissions")) || [];
     setPermisos(permisosLS);
 
+    const pnfLS = localStorage.getItem("pnf") || "";
+    setPnf(pnfLS);
+
     // Cargar horarios
-    GetAll(setHorarios, setLoading, "/horarios");
+    GetAll(setHorarios, setLoading, `/horarios/${lapsoActual?.nombre_lapso}`);
 
     // Mostrar alerta si venimos de crear/editar
     if (location.state?.message) {
@@ -32,7 +37,21 @@ export function Horarios() {
 
     // Limpiar el estado de navegación
     window.history.replaceState({}, "");
-  }, [location.state]);
+  }, [location.state, lapsoActual]);
+
+  // Filtrar horarios por el PNF de la sección
+  const horariosFiltrados = useMemo(() => {
+
+    if (user?.roles[0]?.name === "COORDINADOR" && pnf) {
+      const filtrados = horarios.filter((horario) => {
+        const coincide = horario.seccion?.pnf_id == pnf;
+        return coincide;
+      });
+      return filtrados;
+    }
+
+    return horarios;
+  }, [horarios, pnf, user?.roles]);
 
   const columns = [
     {
@@ -48,23 +67,6 @@ export function Horarios() {
       name: "TRIMESTRE",
       selector: (row) => row.trimestre?.nombre_relativo || "—",
       sortable: true,
-    },
-    {
-      name: "+INFO",
-      cell: (row) => (
-        <div>
-          <ButtomModal id={row.id} />
-          <Modal titleModal={`+INFO Horario ${row.id}`} id={row.id}>
-            <p>
-              <b>SECCIÓN:</b> {row.seccion?.nombre}
-            </p>
-            <p>
-              <b>TRIMESTRE:</b> {row.trimestre?.nombre}
-            </p>
-
-          </Modal>
-        </div>
-      ),
     },
     {
       name: "VER CLASES",
@@ -86,7 +88,7 @@ export function Horarios() {
             cell: (row) => (
               <Acciones
                 urlDelete={`/horarios/${row.id}`}
-                navegar="/docentes"
+                navegar="/horarios"
                 eliminar="horario.eliminar"
               />
             ),
@@ -109,7 +111,7 @@ export function Horarios() {
         tabla={
           <Tabla
             columns={columns}
-            data={horarios}
+            data={horariosFiltrados} // Cambiado aquí
             searchFields={camposBusqueda}
           />
         }

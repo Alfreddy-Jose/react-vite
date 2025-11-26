@@ -228,17 +228,18 @@ export default function Calendar(horarioId) {
   // cargar todas las clases
   const todasLasClases = useCallback(async () => {
     try {
-      const trimestreActualId = horarioId?.horario?.trimestre_id;
-      const horarioActualId = horarioId?.horarioId;
+      const trimestreNumeroRelativo = horarioId?.horario?.trimestre.numero_relativo;
+      const horarioActualId = horarioId?.horarioId;      
+      
 
-      if (!trimestreActualId || !horarioActualId) {
+      if (!trimestreNumeroRelativo || !horarioActualId) {
         console.error("Faltan trimestre_id o horario_id");
         return;
       }
 
       // Usar tu endpoint específico
       const response = await Api.get(
-        `/clases/trimestre/${trimestreActualId}/horario/${horarioActualId}`
+        `/clases/trimestre/${trimestreNumeroRelativo}/horario/${horarioActualId}`
       );
       const eventoTodos = response.data;
 
@@ -272,13 +273,13 @@ export default function Calendar(horarioId) {
 
       setTodosLosEventos(clasesFormateados);
       console.log(
-        `✅ Cargadas ${clasesFormateados.length} clases del trimestre ${trimestreActualId} y horario ${horarioActualId}`
+        `✅ Cargadas ${clasesFormateados.length} clases del trimestre ${trimestreNumeroRelativo} y horario ${horarioActualId}`
       );
     } catch (error) {
       AlertaError("Error al cargar todas las Clases: " + error);
       console.error("Error en todasLasClases:", error);
     }
-  }, [horarioId?.horario?.trimestre_id, horarioId?.horarioId]);
+  }, [horarioId?.horario?.trimestre.numero_relativo, horarioId?.horarioId]);
 
   // Al cargar el componente
   const cargarClases = useCallback(async () => {
@@ -1145,28 +1146,85 @@ export default function Calendar(horarioId) {
         // Crear una copia con la duración actualizada
         if (eventoOriginal) {
           // Validación de horas del docente
+          // Validación de horas del docente - SOLUCIÓN CORREGIDA
           const docenteId =
             eventoOriginal.docente?.value || eventoOriginal.docente_id;
-          const horasUsadasDocente = calcularHorasUsadasPorDocente(docenteId);
-          const horasBaseDocente =
-            docentes.find((d) => d.id === docenteId)?.horas_dedicacion || 0;
 
-          if (
-            horasUsadasDocente - duracionOriginal + duracionNueva >
-            horasBaseDocente
-          ) {
+          // Calcular horas usadas EXCLUYENDO el evento actual
+          const horasUsadasSinEventoActual = todosLosEventos
+            .filter((e) => {
+              const idDocenteEvento = e.docente?.value || e.docente_id;
+              return idDocenteEvento == docenteId && e.id !== resizingEventId;
+            })
+            .reduce((total, evento) => total + (evento.duracion || 1), 0);
+
+          // Obtener las horas de dedicación del docente desde cualquier evento que tenga este docente
+          let horasBaseDocente = 0;
+          const cualquierEventoDelDocente = todosLosEventos.find((e) => {
+            const idDocenteEvento = e.docente?.value || e.docente_id;
+            return idDocenteEvento == docenteId;
+          });
+
+          if (cualquierEventoDelDocente && cualquierEventoDelDocente.docente) {
+            horasBaseDocente =
+              cualquierEventoDelDocente.docente.horas_dedicacion || 0;
+          } else {
+            // Si no encontramos en todosLosEventos, intentar en el estado docentes (por si acaso)
+            const docenteEnEstado = docentes.find((d) => d.id == docenteId);
+            if (docenteEnEstado) {
+              horasBaseDocente = docenteEnEstado.horas_dedicacion || 0;
+            } else {
+              // Si aún no, mostrar error y abortar
+              AlertaError(
+                "No se pudo obtener la información del docente. Intente recargar la página."
+              );
+              // Restaurar el tamaño original
+              setEventos((prev) =>
+                prev.map((ev) =>
+                  ev.id === resizingEventId && ev.duracion !== duracionOriginal
+                    ? { ...ev, duracion: duracionOriginal }
+                    : ev
+                )
+              );
+              if (resizeData.current.elemento) {
+                resizeData.current.elemento.style.height = `${
+                  duracionOriginal * 60 - 4
+                }px`;
+              }
+              setIsResizing(false);
+              setResizingEventId(null);
+              return;
+            }
+          }
+
+          console.log("🔍 Validación docente - ID:", docenteId);
+          console.log("📊 Horas base:", horasBaseDocente);
+          console.log(
+            "⏰ Horas usadas (sin evento actual):",
+            horasUsadasSinEventoActual
+          );
+          console.log(
+            "🔄 Duración original:",
+            duracionOriginal,
+            "→ Nueva:",
+            duracionNueva
+          );
+
+          const horasTotalesConNuevaDuracion =
+            horasUsadasSinEventoActual + duracionNueva;
+
+          if (horasTotalesConNuevaDuracion > horasBaseDocente) {
             AlertaWarning(`
-              <strong>¡Atención! El docente ha excedido su dedicación horaria en este período.</strong><br><br>
+              <strong>¡Atención! El docente ha excedido su dedicación horaria.</strong><br><br>
               Dedicación base: ${horasBaseDocente} hrs<br>
-              Horas usadas en el lapso/trimestre: ${horasUsadasDocente} hrs<br>
-              Horas que intenta agregar: ${
-                duracionNueva - duracionOriginal
-              } hrs<br>
+              Horas usadas (excluyendo esta clase): ${horasUsadasSinEventoActual} hrs<br>
+              Horas que intenta agregar: ${duracionNueva} hrs<br>
+              Horas totales con la nueva duración: ${horasTotalesConNuevaDuracion} hrs<br>
               Horas disponibles: ${
-                horasBaseDocente - horasUsadasDocente
+              horasBaseDocente - horasUsadasSinEventoActual
               } hrs<br><br>
-              <em>Nota: Incluye todas las clases de este docente en todos los horarios del mismo lapso académico y trimestre.</em>
-          `);
+              <em>Nota: Incluye todas las clases de este docente en todos los horarios del mismo período.</em>
+            `);
 
             // Restaurar el tamaño original
             setEventos((prev) =>
@@ -1185,7 +1243,6 @@ export default function Calendar(horarioId) {
             setResizingEventId(null);
             return;
           }
-
           const eventoConDuracionActualizada = {
             ...eventoOriginal,
             duracion: duracionNueva,
@@ -1630,9 +1687,7 @@ export default function Calendar(horarioId) {
                 options={bloqueOptionsConDisponibilidad}
                 getOptionLabel={(option) => {
                   if (option.isDisabled) {
-                    return `${
-                      option.label
-                    }`;
+                    return `${option.label}`;
                   }
                   return option.label;
                 }}

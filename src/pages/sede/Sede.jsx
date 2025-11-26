@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { ContainerTable } from "../../components/ContainerTable";
 import { Create } from "../../components/Link";
 import { Tabla } from "../../components/Tabla";
@@ -8,12 +8,15 @@ import Acciones from "../../components/Acciones";
 import Modal, { ButtomModal } from "../../components/Modal";
 import { Buttom } from "../../components/Buttom";
 import { useLocation } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 export function Sede() {
   const [sedes, setSedes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [permisos, setPermisos] = useState([]);
-    const location = useLocation();
+  const [pnf, setPnf] = useState("");
+  const location = useLocation();
+  const { user } = useAuth();
 
   // Campos por los que buscar - definidos directamente aquí
   const camposBusqueda = [
@@ -26,6 +29,10 @@ export function Sede() {
   useEffect(() => {
     const permisosLS = JSON.parse(localStorage.getItem("permissions")) || [];
     setPermisos(permisosLS);
+
+    const pnfLS = localStorage.getItem("pnf") || "";
+    setPnf(pnfLS);
+
     GetAll(setSedes, setLoading, "/sedes");
 
     if (location.state?.message) {
@@ -34,6 +41,20 @@ export function Sede() {
 
     window.history.replaceState({}, "");
   }, [location.state]);
+
+  // Filtrar sedes por el PNF del coordinador
+  const sedesFiltradas = useMemo(() => {
+    if (user?.roles[0]?.name === "COORDINADOR" && pnf) {
+      const filtradas = sedes.filter((sede) => {
+        // Verificar si la sede tiene el PNF del coordinador
+        const tienePnf = sede.pnfs?.some((pnfObj) => pnfObj.id == pnf);
+        return tienePnf;
+      });
+      return filtradas;
+    }
+
+    return sedes;
+  }, [sedes, pnf, user?.roles]);
 
   const descargarPDF = async () => {
     try {
@@ -91,6 +112,18 @@ export function Sede() {
             <p>
               <b>DIRECCIÓN: </b> {row.direccion}
             </p>
+            {/* Mostrar PNFs asociados si existen */}
+            {row.pnfs && row.pnfs.length > 0 && (
+              <p>
+                <b>PNFs ASOCIADOS: </b>
+                {row.pnfs.map((pnf, index) => (
+                  <span key={pnf.id}>
+                    {pnf.nombre}
+                    {index < row.pnfs.length - 1 ? ", " : ""}
+                  </span>
+                ))}
+              </p>
+            )}
           </Modal>
         </div>
       ),
@@ -136,7 +169,11 @@ export function Sede() {
         }
         isLoading={loading}
         tabla={
-          <Tabla data={sedes} columns={columns} searchFields={camposBusqueda} />
+          <Tabla 
+            data={sedesFiltradas}  // Cambiado aquí - usar sedesFiltradas
+            columns={columns} 
+            searchFields={camposBusqueda} 
+          />
         }
       />
     </>

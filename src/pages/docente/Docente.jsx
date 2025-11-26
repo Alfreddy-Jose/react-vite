@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { ContainerTable } from "../../components/ContainerTable";
 import { Create } from "../../components/Link";
 import { Tabla } from "../../components/Tabla";
@@ -8,12 +8,15 @@ import Alerta, { AlertaError } from "../../components/Alert";
 import Api, { GetAll } from "../../services/Api";
 import Modal, { ButtomModal } from "../../components/Modal";
 import { Buttom } from "../../components/Buttom";
+import { useAuth } from "../../context/AuthContext";
 
 function Docente() {
-  const [docentes, setDocentes] = useState([]);
+  const [docentes, setDocentes] = useState([]); // Todos los docentes originales
   const [loading, setLoading] = useState(true);
   const [permisos, setPermisos] = useState([]);
+  const [pnf, setPnf] = useState("");
   const location = useLocation();
+  const { user } = useAuth();
 
   // Campos por los que buscar - definidos directamente aquí
   const camposBusqueda = [
@@ -29,6 +32,9 @@ function Docente() {
     const permisosLS = JSON.parse(localStorage.getItem("permissions")) || [];
     setPermisos(permisosLS);
 
+    const pnfLS = localStorage.getItem("pnf") || "";
+    setPnf(pnfLS);
+
     // Mostrar la lista de registros
     GetAll(setDocentes, setLoading, "/docentes");
 
@@ -41,7 +47,22 @@ function Docente() {
     window.history.replaceState({}, "");
   }, [location.state]);
 
-  
+  // Usar useMemo para filtrar los docentes sin modificar el estado original
+  const docentesFiltrados = useMemo(() => {
+
+    if (user.roles[0].name === "COORDINADOR" && pnf) {
+      const filtrados = docentes.filter(
+        (docente) => {
+          const coincide = docente.pnf_id == pnf;
+          return coincide;
+        }
+      );
+      return filtrados;
+    }
+    
+    return docentes;
+  }, [docentes, pnf, user.roles]);
+
   const descargarPDF = async () => {
     try {
       const response = await Api.get("/docente/pdf", {
@@ -182,8 +203,14 @@ function Docente() {
           ) : null
         }
         isLoading={loading}
-        // Tabla
-        tabla={<Tabla columns={columns} data={docentes} searchFields={camposBusqueda} />}
+        // Tabla - Usar docentesFiltrados en lugar de docentes
+        tabla={
+          <Tabla
+            columns={columns}
+            data={docentesFiltrados} // Cambiado aquí
+            searchFields={camposBusqueda}
+          />
+        }
       />
     </>
   );

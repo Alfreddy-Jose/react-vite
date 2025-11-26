@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { ContainerTable } from "../../components/ContainerTable";
 import { Create } from "../../components/Link";
 import { Tabla } from "../../components/Tabla";
@@ -17,7 +17,9 @@ export function Secciones() {
   const [secciones, setSecciones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [permisos, setPermisos] = useState([]);
+  const [pnf, setPnf] = useState("");
   const location = useLocation();
+  const { user } = useAuth();
 
   // Campos por los que buscar - definidos directamente aquí
   const camposBusqueda = [
@@ -47,6 +49,9 @@ export function Secciones() {
     const permisosLS = JSON.parse(localStorage.getItem("permissions")) || [];
     setPermisos(permisosLS);
 
+    const pnfLS = localStorage.getItem("pnf") || "";
+    setPnf(pnfLS);
+
     // Mostrar la lista de Secciones
     GetAll(setSecciones, setLoading, "/secciones");
 
@@ -59,6 +64,20 @@ export function Secciones() {
     window.history.replaceState({}, "");
   }, [location.state]);
 
+  // Filtrar secciones por el PNF del coordinador
+  const seccionesFiltradas = useMemo(() => {
+
+    if (user?.roles[0]?.name === "COORDINADOR" && pnf) {
+      const filtradas = secciones.filter((seccion) => {
+        const coincide = seccion.pnf_id == pnf;
+        return coincide;
+      });
+      return filtradas;
+    }
+
+    return secciones;
+  }, [secciones, pnf, user?.roles]);
+
   // Definir las columnas de la tabla
   const columns = [
     {
@@ -69,6 +88,11 @@ export function Secciones() {
     {
       name: "NOMBRE",
       selector: (row) => row.nombre,
+      sortable: true,
+    },
+    {
+      name: "PNF",
+      selector: (row) => row.pnf.nombre,
       sortable: true,
     },
     {
@@ -144,8 +168,8 @@ export function Secciones() {
             <Create path="/seccion/create" />
           ) : null
         }
-        // Tabla
-        tabla={<Tabla data={secciones} columns={columns} searchFields={camposBusqueda} />}
+        // Tabla - Cambiado aquí para usar seccionesFiltradas
+        tabla={<Tabla data={seccionesFiltradas} columns={columns} searchFields={camposBusqueda} />}
         // Indicador de carga
         isLoading={loading}
       />
@@ -155,12 +179,18 @@ export function Secciones() {
 
 export function SeccionParametros({ buscarSecciones, permisos }) {
   const [opciones, setOpciones] = useState({});
-  const { lapsoActual } = useAuth();
+  const [pnf, setPnf] = useState("");
+  const { lapsoActual, user } = useAuth();
+
+  useEffect(() => {
+    const pnfLS = localStorage.getItem("pnf") || "";
+    setPnf(pnfLS);
+  }, []);
 
   const initialValues = {
     lapso: lapsoActual?.id,
     sede: "",
-    // pnf: "",
+    pnf: user?.roles[0]?.name === "COORDINADOR" ? pnf : "", // Auto-seleccionar PNF para coordinadores
     trayecto: "",
     matricula: "",
   };
@@ -170,6 +200,7 @@ export function SeccionParametros({ buscarSecciones, permisos }) {
     initialValues,
     onSubmit: () => {},
   });
+
   // Función para generar y descargar el PDF
   const handleGenerarPDF = async () => {
     const params = new URLSearchParams(
@@ -241,12 +272,13 @@ export function SeccionParametros({ buscarSecciones, permisos }) {
               labelKey="nombre_sede"
               formik={formik}
             />
-            {/* Input para PNF abreviado */}
+            {/* Input para PNF - Deshabilitado para coordinadores */}
             <SelectSearch
               label={FORM_LABELS.SECCION.PNF}
               name="pnf"
               options={opciones.pnfs || []}
               formik={formik}
+              disabled={user?.roles[0]?.name === "COORDINADOR"} // Deshabilitar para coordinadores
             />
             {/* Input para PNF abreviado coodinacion */}
             <SelectSearch
