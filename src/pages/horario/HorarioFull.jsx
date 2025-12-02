@@ -18,6 +18,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import "./style.css";
 import Alerta, {
+  AlertaConfirm,
   AlertaError,
   AlertaWarning,
 } from "../../components/Alert";
@@ -25,6 +26,7 @@ import Api from "../../services/Api";
 import SelectControl from "../../components/SelectDependiente";
 import { ContainerIput } from "../../components/ContainerInput";
 import { Link } from "react-router-dom";
+import confirmarHorasExtras from "../../components/helpers/ConfirmarHorasExtras";
 
 function Evento({
   id,
@@ -458,8 +460,7 @@ export default function Calendar(horarioId) {
     try {
       const response = await Api.get("/bloques");
       setBloques(response.data);
-      console.log('bloques de horas', response.data);
-      
+      console.log("bloques de horas", response.data);
     } catch (error) {
       AlertaError("Error al cargar los bloques de horas");
       console.error(error);
@@ -790,6 +791,30 @@ export default function Calendar(horarioId) {
     );
   };
 
+  // Función para obtener el nombre del docente por ID
+  const obtenerNombreDocente = useCallback(
+    (docenteId) => {
+      if (!docenteId) return "Docente";
+
+      // Buscar en docentes
+      const docente = docentes.find((d) => d.id == docenteId);
+      if (docente) {
+        return docente.persona?.nombre_completo || docente.label || "Docente";
+      }
+
+      // Buscar en todosLosEventos
+      const eventoConDocente = todosLosEventos.find(
+        (e) => e.docente?.value == docenteId || e.docente_id == docenteId
+      );
+      if (eventoConDocente?.docente?.label) {
+        return eventoConDocente.docente.label;
+      }
+
+      return "Docente";
+    },
+    [docentes, todosLosEventos]
+  );
+
   // Función para obtener estilos condicionales
   const getSelectStyles = (selectedOption) => {
     const estado = selectedOption?.estado;
@@ -895,38 +920,36 @@ export default function Calendar(horarioId) {
   const docentesOptions = useMemo(() => {
     return docentes.map((d) => {
       const horasUsadas = calcularHorasUsadasPorDocente(d.id);
-      const horasDisponibles = d.horas_dedicacion - horasUsadas;
+      const horasBase = d.horas_dedicacion;
+      const horasDisponibles = horasBase - horasUsadas;
 
-      // Determinar colores según las horas disponibles
-      let colorFondo = "#ffffff";
-      let colorTexto = "#333333";
-      let estado = "normal";
+      // Calcular horas extras si las hay
+      const horasExtras = horasUsadas > horasBase ? horasUsadas - horasBase : 0;
 
-      if (horasDisponibles <= 1) {
-        colorFondo = "#dc3545"; // Rojo
-        colorTexto = "#ffffff";
-        estado = "critico";
-      } else if (horasDisponibles <= 4) {
-        colorFondo = "#ffc107"; // Amarillo
-        colorTexto = "#212529";
-        estado = "advertencia";
+      // Determinar si necesita indicador de advertencia
+      let indicador = "";
+      if (horasDisponibles <= 1 && horasDisponibles > 0) {
+        indicador = " ⚠️"; // Advertencia
+      } else if (horasDisponibles <= 0) {
+        indicador = " ❌"; // Sin horas
       }
 
       return {
         value: d.id,
         label: d.persona?.nombre_completo || d.label || "Docente",
+        // Mostrar horas extras si existen
         labelConHoras: `${
           d.persona?.nombre_completo || d.label || "Docente"
-        } (${horasDisponibles}/${d.horas_dedicacion} hrs)`,
-        horasDisponibles: horasDisponibles,
-        horasBase: d.horas_dedicacion,
-        colorFondo,
-        colorTexto,
-        estado,
-        isDisabled: horasDisponibles <= 0,
+        } (${horasUsadas}/${horasBase} hrs${
+          horasExtras > 0 ? ` +${horasExtras} extras` : ""
+        })${indicador}`,
+        horasUsadas,
+        horasBase,
+        horasExtras,
+        isDisabled: false, // Siempre habilitado para permitir horas extras
       };
     });
-  }, [docentes, calcularHorasUsadasPorDocente]); // Se recalcula cuando cambian docentes o eventos
+  }, [docentes, calcularHorasUsadasPorDocente]);
 
   const aulaOptions = aulas.map((a) => ({ value: a.id, label: a.nombre_aula }));
   const diaOptions = dias.map((d) => ({ value: d, label: d }));
@@ -1287,35 +1310,49 @@ export default function Calendar(horarioId) {
             horasUsadasSinEventoActual + duracionNueva;
 
           if (horasTotalesConNuevaDuracion > horasBaseDocente) {
-            AlertaWarning(`
-              <strong>¡Atención! El docente ha excedido su dedicación horaria.</strong><br><br>
-              Dedicación base: ${horasBaseDocente} hrs<br>
-              Horas usadas (excluyendo esta clase): ${horasUsadasSinEventoActual} hrs<br>
-              Horas que intenta agregar: ${duracionNueva} hrs<br>
-              Horas totales con la nueva duración: ${horasTotalesConNuevaDuracion} hrs<br>
-              Horas disponibles: ${
-                horasBaseDocente - horasUsadasSinEventoActual
-              } hrs<br><br>
-              <em>Nota: Incluye todas las clases de este docente en todos los horarios del mismo período.</em>
-            `);
+            const horasExtras = horasTotalesConNuevaDuracion - horasBaseDocente;
 
-            // Restaurar el tamaño original
-            setEventos((prev) =>
-              prev.map((ev) =>
-                ev.id === resizingEventId && ev.duracion !== duracionOriginal
-                  ? { ...ev, duracion: duracionOriginal }
-                  : ev
-              )
+            // Obtener el nombre del docente
+            const docenteNombre = obtenerNombreDocente(docenteId);
+
+            const resultado = await confirmarHorasExtras(
+              {
+                nombre: docenteNombre,
+                horasBase: horasBaseDocente,
+                horasAsignadas: horasUsadasSinEventoActual,
+                duracionNueva: duracionNueva,
+                duracionOriginal: duracionOriginal,
+              },
+              horasExtras,
+              "redimensión"
             );
-            if (resizeData.current.elemento) {
-              resizeData.current.elemento.style.height = `${
-                duracionOriginal * 60 - 4
-              }px`;
+
+            // Si el usuario cancela
+            if (!resultado.isConfirmed) {
+              // Cancelar la redimensión
+              setEventos((prev) =>
+                prev.map((ev) =>
+                  ev.id === resizingEventId && ev.duracion !== duracionOriginal
+                    ? { ...ev, duracion: duracionOriginal }
+                    : ev
+                )
+              );
+              if (resizeData.current.elemento) {
+                resizeData.current.elemento.style.height = `${
+                  duracionOriginal * 60 - 4
+                }px`;
+              }
+              setIsResizing(false);
+              setResizingEventId(null);
+              return;
             }
-            setIsResizing(false);
-            setResizingEventId(null);
-            return;
+
+            // Si el usuario confirma, continuar sin mostrar advertencia
+            console.log(
+              `✅ Horas extras asignadas: ${horasExtras} hr(s) a ${docenteNombre}`
+            );
           }
+
           const eventoConDuracionActualizada = {
             ...eventoOriginal,
             duracion: duracionNueva,
@@ -1488,15 +1525,26 @@ export default function Calendar(horarioId) {
           ?.horas_dedicacion || 0;
 
       if (horasUsadasDocente + duracionNum > horasBaseDocente) {
-        AlertaWarning(`
-        <strong>¡Atención! El docente ha excedido su dedicación horaria en este período.</strong><br><br>
-        Dedicación base: ${horasBaseDocente} hrs<br>
-        Horas usadas en el lapso/trimestre: ${horasUsadasDocente} hrs<br>
-        Horas que intenta agregar: ${duracionNum} hrs<br>
-        Horas disponibles: ${horasBaseDocente - horasUsadasDocente} hrs<br><br>
-        <em>Nota: Incluye todas las clases de este docente en todos los horarios del mismo lapso académico y trimestre.</em>
-      `);
-        return;
+        const horasExtras = horasUsadasDocente + duracionNum - horasBaseDocente;
+
+        const resultado = await confirmarHorasExtras(
+          {
+            nombre: nuevoEvento.docente.label,
+            horasBase: horasBaseDocente,
+            horasAsignadas: horasUsadasDocente,
+            horasNuevas: duracionNum,
+          },
+          horasExtras,
+          "nueva"
+        );
+
+        if (!resultado.isConfirmed) {
+          return; // Cancelar la creación de la clase
+        }
+
+        console.log(
+          `✅ Horas extras asignadas: ${horasExtras} hr(s) a ${nuevoEvento.docente.label}`
+        );
       }
     }
 
@@ -2035,9 +2083,6 @@ export default function Calendar(horarioId) {
 
                   // VALIDACIÓN 3: Horas del docente (solo si hay docente seleccionado)
                   if (docenteEdit) {
-                    const horasUsadasDocente = calcularHorasUsadasPorDocente(
-                      eventoEditando.docente.value
-                    );
                     const horasBaseDocente = docenteEdit?.horas_dedicacion || 0;
 
                     // Excluir el evento actual del cálculo
@@ -2059,20 +2104,29 @@ export default function Calendar(horarioId) {
                       horasUsadasSinEventoActual + duracionActual;
 
                     if (horasTotalesConEventoEditado > horasBaseDocente) {
-                      AlertaWarning(`
-                  <strong>¡Atención! El docente ha excedido su dedicación horaria en este período.</strong><br><br>
-                  Dedicación base: ${horasBaseDocente} hrs<br>
-                  Horas usadas en el lapso/trimestre: ${horasUsadasSinEventoActual} hrs<br>
-                  Horas que intenta asignar: ${duracionActual} hrs<br>
-                  Horas disponibles: ${
-                    horasBaseDocente - horasUsadasSinEventoActual
-                  } hrs<br><br>
-                  <em>Nota: Incluye todas las clases de este docente en todos los horarios del mismo lapso académico y trimestre.</em>
-                `);
-                      return;
+                      const horasExtras =
+                        horasTotalesConEventoEditado - horasBaseDocente;
+
+                      const resultado = await confirmarHorasExtras(
+                        {
+                          nombre: docenteEdit.label || docenteEdit.nombre,
+                          horasBase: horasBaseDocente,
+                          horasAsignadas: horasUsadasSinEventoActual,
+                          horasNuevas: duracionActual,
+                        },
+                        horasExtras,
+                        "edición"
+                      );
+
+                      if (!resultado.isConfirmed) {
+                        return; // Cancelar la edición
+                      }
+
+                      console.log(
+                        `✅ Horas extras asignadas en edición: ${horasExtras} hr(s) a ${docenteEdit.label}`
+                      );
                     }
                   }
-
                   // Actualizar en backend - permitir valores nulos
                   const payload = {
                     unidad_curricular_id: materiaEdit.id,

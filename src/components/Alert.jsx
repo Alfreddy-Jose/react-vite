@@ -1,5 +1,4 @@
 import Swal from "sweetalert2";
-import Api from "../services/Api";
 
 // Configuración global de SweetAlert2
 const swalConfig = {
