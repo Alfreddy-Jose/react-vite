@@ -15,6 +15,7 @@ export const FORM_LABELS = {
     NAME_ABRE: "NOMBRE ABREVIADO",
     ABREVIADO: "ABREVIADO",
     COORDINACION: "ABREVIADO COORDINACIÓN",
+    LOGO: "LOGO DEL PNF",
   },
   SEDE: {
     ADDRE: "DIRECCIÓN",
@@ -59,6 +60,7 @@ export const FORM_LABELS = {
     NAME: "NOMBRE",
     NAME_ABRE: "NOMBRE ABREVIADO",
     ADRRE: "DIRECCIÓN",
+    LOGO: "LOGO",
   },
   PERSONAS: {
     CEDULA: "CÉDULA",

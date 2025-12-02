@@ -33,6 +33,7 @@ export function SeccionesCreate() {
   const [pnfs, setPnfs] = useState([]);
   const [loadingPnfs, setLoadingPnfs] = useState(false);
   const { lapsoActual } = useAuth();
+  const { user } = useAuth();
 
   // Función para cargar Pnfs
   const cargarPnfs = async (sedeId) => {
@@ -43,7 +44,9 @@ export function SeccionesCreate() {
 
     setLoadingPnfs(true);
     try {
-      const response = await Api.get(`/horarios/sedes/${sedeId}/pnfs`);
+      // si usuaio es COORDINADOR, enviar true para filtrar datos sino false
+      const isCoordinador = user?.roles[0]?.name === "COORDINADOR";
+      const response = await Api.get(`/horarios/sedes/${sedeId}/pnfs/${isCoordinador}`);
       setPnfs(response.data);
     } catch (error) {
       console.error("Error al cargar Pnfs:", error);
@@ -52,6 +55,8 @@ export function SeccionesCreate() {
       setLoadingPnfs(false);
     }
   };
+  console.log(pnfs);
+  
 
   // Funcion para enviar datos al backend
   const onSubmit = async (values, { setErrors }) => {
@@ -76,9 +81,8 @@ export function SeccionesCreate() {
   });
 
   useEffect(() => {
-    GetAll(setData, setLoading, "/seccion/getDataSelect");
-  }, []);
-  console.log(loading);
+    GetAll(setData, setLoading, `/seccion/getDataSelect`);
+  }, [user]);
 
   // Efecto para cargar Sedes
   useEffect(() => {
@@ -167,7 +171,7 @@ export function SeccionesCreate() {
                   ? "NO HAY PNF"
                   : "SELECCIONE UN PNF"
               }
-              options={pnfs}
+              options={pnfs.pnfs || pnfs || []}
               valueKey="id"
               value={formik.values.pnf_id}
               formik={formik}

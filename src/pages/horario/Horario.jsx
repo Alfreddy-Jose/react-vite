@@ -16,8 +16,8 @@ export function Horarios() {
   const location = useLocation();
   const { lapsoActual, user } = useAuth();
 
-  // Campos por los que buscar - definidos directamente aquí
-  const camposBusqueda = ["seccion.nombre", "trimestre?.nombre_relativo", "estado"];
+  // Campos por los que buscar
+  const camposBusqueda = ["seccion.nombre", "trimestre.nombre_relativo", "estado"];
 
   useEffect(() => {
     // Leer permisos desde localStorage

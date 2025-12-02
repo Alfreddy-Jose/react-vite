@@ -1,9 +1,9 @@
 import { useAuth } from "../../context/AuthContext";
 import { LogoutButton } from "../Logout";
-import logo from "../../img/PNF.svg";
 import { Link } from "react-router-dom";
 import LapsoSelector from "../LapsoSelect";
 import Api from "../../services/Api";
+import { useUniversityInfo } from "../../context/UniversityInfoContext";
 
 const getBackendBaseUrl = () => {
   let url = Api.defaults.baseURL || "";
@@ -20,8 +20,9 @@ const getBackendBaseUrl = () => {
 
 export function Navbar() {
   const { user } = useAuth();
-  // Obtener univeersidad del localStorage
-  // const universidad = JSON.parse(localStorage.getItem("universidad"));
+  const { nombre_univ, loading, logo, error } = useUniversityInfo();
+  // obeter el logo del pnf del coordinador desde el localStorage
+  const pnfLogo = localStorage.getItem("logoPnf");
 
   const getAvatarUrl = (user) => {
     if (user.avatar) {
@@ -35,6 +36,30 @@ export function Navbar() {
     // Avatar por defecto si no tiene
     return "/default-avatar.png"; // Asegúrate de tener esta imagen en tu public folder
   };
+
+  // Mejor lógica para mostrar el logo: primero PNF, luego universidad, luego por defecto
+  const getLogoUrl = (logo, pnfLogo) => {
+    if (
+      pnfLogo &&
+      pnfLogo !== "null" &&
+      pnfLogo !== "undefined" &&
+      pnfLogo.trim() !== ""
+    ) {
+      if (pnfLogo.startsWith("http")) {
+        return pnfLogo;
+      }
+      return `${getBackendBaseUrl()}/storage/${pnfLogo}`;
+    }
+    if (logo && logo !== "null" && logo !== "undefined" && logo.trim() !== "") {
+      if (logo.startsWith("http")) {
+        return logo;
+      }
+      return `${getBackendBaseUrl()}/storage/${logo}`;
+    }
+    return "/logo_sistema.svg";
+  };
+
+
   return (
     <div className="main-header">
       <div className="main-header-logo">
@@ -42,9 +67,19 @@ export function Navbar() {
         <div className="logo-header" data-background-color="dark">
           <a href="#" className="logo">
             <img
-              src={logo}
+              src={getLogoUrl(logo, pnfLogo)}
               alt="navbar brand"
               className="navbar-brand ml-3 logo_pnfi"
+              style={{
+                objectFit: "contain",
+                background: "#fff",
+                borderRadius: "8px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                border: "1px solid #e3e3e3",
+                padding: "4px",
+                display: "block",
+                margin: "0 auto",
+              }}
             />
           </a>
           <div className="nav-toggle">
@@ -67,7 +102,9 @@ export function Navbar() {
         <div className="container-fluid">
           <nav className="navbar navbar-header-left navbar-expand-lg navbar-form nav-search p-0 d-none d-lg-flex"></nav>
           <div className="with-title d-none d-lg-block">
-            {/* <h4 className="text-center fw-bold mb-0 titleUniversidad">{universidad.nombre_univ}</h4> */}
+            <h4 className="text-center fw-bold mb-0 titleUniversidad">
+              {nombre_univ}
+            </h4>
           </div>
           <ul className="navbar-nav topbar-nav ms-md-auto align-items-center">
             {/* Select para lapsos */}

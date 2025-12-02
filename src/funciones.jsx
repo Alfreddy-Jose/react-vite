@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+// Hook para alternar la visibilidad de la contraseña
 export function useTogglePassword() {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -13,6 +14,7 @@ export function useTogglePassword() {
   };
 }
 
+// Formatear fecha en formato local (DD/MM/YYYY)
 export function formatFecha(dateString) {
   if (!dateString) return "";
   const fecha = new Date(dateString);
@@ -23,6 +25,7 @@ export function formatFecha(dateString) {
   });
 }
 
+// Formatear hora en formato local (HH:MM:SS)
 export function formatHora(dateString) {
   if (!dateString) return "";
   const fecha = new Date(dateString);
@@ -32,3 +35,14 @@ export function formatHora(dateString) {
     second: "2-digit"
   });
 }
+
+// Función para capitalizar la primera letra de cada palabra en una cadena
+export const toCapitalize = (text) => {
+  if (typeof text !== 'string') return '';
+  
+  return text
+    .toLowerCase()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};

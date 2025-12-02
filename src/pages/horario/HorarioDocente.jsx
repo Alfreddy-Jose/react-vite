@@ -13,7 +13,7 @@ export function HorariosDocentes() {
   const { lapsoActual } = useAuth();
 
   // Campos por los que buscar - definidos directamente aquí
-  const camposBusqueda = ["persona.nombre", "persona.apellido"];
+  const camposBusqueda = ["nombre_completo", "trimestre_nombre", "clases_count"];
 
   useEffect(() => {
     const cargarDocentes = async () => {

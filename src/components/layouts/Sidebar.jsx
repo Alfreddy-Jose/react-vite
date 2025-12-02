@@ -1,14 +1,52 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import logo from "../../img/PNF.svg";
+import Api from "../../services/Api";
+import { useUniversityInfo } from "../../context/UniversityInfoContext";
+
+const getBackendBaseUrl = () => {
+  let url = Api.defaults.baseURL || "";
+  // Elimina /api si está al final
+  if (url.endsWith("/api")) {
+    url = url.slice(0, -4);
+  }
+  // Elimina barra final si existe
+  if (url.endsWith("/")) {
+    url = url.slice(0, -1);
+  }
+  return url;
+};
 
 export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
   const location = useLocation(); // Hook para obtener la ruta actual
+  const { logo, loading, error } = useUniversityInfo();
+  // obeter el logo del pnf del coordinador desde el localStorage
+  const pnfLogo = localStorage.getItem("logoPnf");
+
   // Función para verificar si la ruta actual coincide con el enlace
   const isActive = (path) => location.pathname === path;
 
   // Leer permisos del localStorage
   const permisos = JSON.parse(localStorage.getItem("permissions")) || [];
+
+  // Mejor lógica para mostrar el logo: primero PNF, luego universidad, luego por defecto
+  const getLogoUrl = (logo, pnfLogo) => {
+    if (pnfLogo && pnfLogo !== "null" && pnfLogo !== "undefined" && pnfLogo.trim() !== "") {
+      // Si el logo ya es una URL completa
+      if (pnfLogo.startsWith("http")) {
+        return pnfLogo;
+      }
+      // Si es una ruta relativa, construir la URL completa usando la baseURL del backend
+      return `${getBackendBaseUrl()}/storage/${pnfLogo}`;
+    }
+    if (logo && logo !== "null" && logo !== "undefined" && logo.trim() !== "") {
+      if (logo.startsWith("http")) {
+        return logo;
+      }
+      return `${getBackendBaseUrl()}/storage/${logo}`;
+    }
+    // Logo por defecto si no tiene
+    return "/logo_sistema.svg";
+  };
 
   return (
     <>
@@ -17,9 +55,22 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
           <div className="logo-header" data-background-color="dark">
             <a href="#" className="logo">
               <img
-                src={logo}
-                alt="navbar brand"
-                className="navbar-brand logo_pnfi"
+                src={getLogoUrl(logo, pnfLogo)}
+                alt="Logo institucional"
+                className="navbar-brand logo_pnfi mt-3"
+                style={{
+                  width: "140px",
+                  height: "70px",
+                  background: "#fff",
+                  borderRadius: "8px",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                  border: "1px solid #e3e3e3",
+                  padding: "4px",
+                  display: "block",
+                  margin: "0 auto",
+                  objectFit: "contain",
+                }}
+                onError={e => { e.target.src = "/logo_sistema.svg"; }}
               />
             </a>
             <div className="nav-toggle">
@@ -385,7 +436,7 @@ export function Sidebar({ toggleSidebar, isSidebarMinimized }) {
                     <p>Bitácora del Sistema</p>
                   </Link>
                 </li>
-              ) : null} 
+              ) : null}
             </ul>
           </div>
         </div>

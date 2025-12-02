@@ -179,6 +179,7 @@ svg[data-prefix="fas"] {
         width: 100%;
     }
 }
+
 /* ancho del carrusel  */
 .ancho {
     min-width: 60%;
@@ -187,13 +188,13 @@ svg[data-prefix="fas"] {
 }
 
 /* estilo de la barra azul en la paguina home */
-.barra_blue{
+.barra_blue {
     width: 100%;
     height: 20px;
 }
 
 /* estilos para el header del home */
-.header_home{
+.header_home {
     height: 10vh;
     overflow: hidden;
 }

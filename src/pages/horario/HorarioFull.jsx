@@ -18,7 +18,6 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import "./style.css";
 import Alerta, {
-  AlertaConfirm,
   AlertaError,
   AlertaWarning,
 } from "../../components/Alert";
@@ -228,9 +227,9 @@ export default function Calendar(horarioId) {
   // cargar todas las clases
   const todasLasClases = useCallback(async () => {
     try {
-      const trimestreNumeroRelativo = horarioId?.horario?.trimestre.numero_relativo;
-      const horarioActualId = horarioId?.horarioId;      
-      
+      const trimestreNumeroRelativo =
+        horarioId?.horario?.trimestre.numero_relativo;
+      const horarioActualId = horarioId?.horarioId;
 
       if (!trimestreNumeroRelativo || !horarioActualId) {
         console.error("Faltan trimestre_id o horario_id");
@@ -243,33 +242,50 @@ export default function Calendar(horarioId) {
       );
       const eventoTodos = response.data;
 
-      const clasesFormateados = eventoTodos.map((clase) => ({
-        id: clase.id.toString(),
-        dia: clase.dia,
-        bloque: clase.bloque_id,
-        duracion: clase.duracion,
-        trimestre_id: clase.trimestre_id,
-        docente: {
-          value: clase.docente_id,
-          label:
-            clase.docente.persona.nombre + " " + clase.docente.persona.apellido,
-          horas_dedicacion: clase.docente.horas_dedicacion, // Incluir las horas del docente
-        },
-        materias: {
-          value: clase.unidad_curricular_id,
-          label: clase.unidad_curricular.nombre,
-          horas: clase.unidad_curricular.hora_total_est,
-        },
-        aula: {
-          value: clase.espacio_id,
-          label: clase.espacio.nombre_aula,
-        },
-        // Mantener todos los campos necesarios
-        sede_id: clase.sede_id,
-        pnf_id: clase.pnf_id,
-        trayecto_id: clase.trayecto_id,
-        horario_id: clase.horario_id,
-      }));
+      const clasesFormateados = eventoTodos.map((clase) => {
+        // Manejar docente (puede ser null)
+        let docenteLabel = "Sin docente";
+        let docenteHoras = 0;
+
+        if (clase.docente && clase.docente.persona) {
+          docenteLabel =
+            clase.docente.persona.nombre + " " + clase.docente.persona.apellido;
+          docenteHoras = clase.docente.horas_dedicacion || 0;
+        }
+
+        // Manejar aula (puede ser null)
+        let aulaLabel = "Sin aula";
+        if (clase.espacio) {
+          aulaLabel = clase.espacio.nombre_aula;
+        }
+
+        return {
+          id: clase.id.toString(),
+          dia: clase.dia,
+          bloque: clase.bloque_id,
+          duracion: clase.duracion,
+          trimestre_id: clase.trimestre_id,
+          docente: {
+            value: clase.docente_id,
+            label: docenteLabel,
+            horas_dedicacion: docenteHoras,
+          },
+          materias: {
+            value: clase.unidad_curricular_id,
+            label: clase.unidad_curricular.nombre,
+            horas: clase.unidad_curricular.hora_total_est,
+          },
+          aula: {
+            value: clase.espacio_id,
+            label: aulaLabel,
+          },
+          // Mantener todos los campos necesarios
+          sede_id: clase.sede_id,
+          pnf_id: clase.pnf_id,
+          trayecto_id: clase.trayecto_id,
+          horario_id: clase.horario_id,
+        };
+      });
 
       setTodosLosEventos(clasesFormateados);
       console.log(
@@ -303,51 +319,88 @@ export default function Calendar(horarioId) {
 
       // Luego de obtener las clases del horario, cargar las materias y aulas
       obtenerMaterias(horarioId.horario);
-      // Formatear clases para el calendario
-      const eventosFormateados = evento.map((evento) => ({
-        id: evento.id.toString(),
-        dia: normalizarDia(evento.dia),
-        bloque: evento.bloque_id,
-        duracion: evento.duracion,
-        texto: `${evento.unidad_curricular.nombre}\n${
-          evento.docente.persona.nombre + " " + evento.docente.persona.apellido
-        }\n${evento.espacio.nombre_aula}`,
-        color: "#e3f2fd",
-        // Mantener referencias para edición
-        sede: { value: evento.sede_id, label: evento.sede.nombre_sede },
-        pnf: { value: evento.pnf_id, label: evento.pnf.nombre },
-        materias: {
-          value: evento.unidad_curricular_id,
-          label: evento.unidad_curricular.nombre,
-        },
-        aula: { value: evento.espacio_id, label: evento.espacio.nombre_aula },
-        trimestre: {
-          value: evento.trimestre_id,
-          label: evento.trimestre.nombre,
-        },
-        trayecto: { value: evento.trayecto_id, label: evento.trayecto.nombre },
-        docente: {
-          value: evento.docente_id,
-          label:
+
+      // Formatear clases para el calendario - CON MANEJO DE VALORES NULOS
+      const eventosFormateados = evento.map((evento) => {
+        // Manejar docente (puede ser null)
+        let docenteTexto = "Sin docente";
+        let docenteObj = null;
+
+        if (evento.docente && evento.docente.persona) {
+          docenteTexto =
             evento.docente.persona.nombre +
             " " +
-            evento.docente.persona.apellido,
-        },
-      }));
-      setEventos(eventosFormateados);
+            evento.docente.persona.apellido;
+          docenteObj = {
+            value: evento.docente_id,
+            label: docenteTexto,
+          };
+        }
+
+        // Manejar aula (puede ser null)
+        let aulaTexto = "Sin aula";
+        let aulaObj = null;
+
+        if (evento.espacio) {
+          aulaTexto = evento.espacio.nombre_aula;
+          aulaObj = {
+            value: evento.espacio_id,
+            label: aulaTexto,
+          };
+        }
+
+        // Crear texto del evento
+        const textoEvento = `${evento.unidad_curricular.nombre}\n${docenteTexto}\n${aulaTexto}`;
+
+        return {
+          id: evento.id.toString(),
+          dia: normalizarDia(evento.dia),
+          bloque: evento.bloque_id,
+          duracion: evento.duracion,
+          texto: textoEvento,
+          color: "#e3f2fd",
+          // Mantener referencias para edición
+          sede: { value: evento.sede_id, label: evento.sede.nombre_sede },
+          pnf: { value: evento.pnf_id, label: evento.pnf.nombre },
+          materias: {
+            value: evento.unidad_curricular_id,
+            label: evento.unidad_curricular.nombre,
+          },
+          aula: aulaObj, // Puede ser null
+          trimestre: {
+            value: evento.trimestre_id,
+            label: evento.trimestre.nombre,
+          },
+          trayecto: {
+            value: evento.trayecto_id,
+            label: evento.trayecto.nombre,
+          },
+          docente: docenteObj, // Puede ser null
+        };
+      });
+
+      setEventos(eventosFormateados || []);
     } catch (error) {
       AlertaError("Error al cargar los eventos" + " " + error);
       console.log(error);
+      setEventos([]);
     }
   }, [horarioId.horario, horarioId.horarioId]);
 
   useEffect(() => {
     if (horarioId) {
-      obtenerBloques();
-      cargarClases();
-      todasLasClases();
+      try {
+        obtenerBloques();
+        cargarClases();
+        todasLasClases();
+      } catch (error) {
+        console.error("Error en useEffect principal:", error);
+        // Asegurar que los estados sean arrays vacíos en caso de error
+        setEventos([]);
+        setTodosLosEventos([]);
+      }
     }
-  }, [horarioId, cargarClases, todasLasClases]); // Agregar las dependencias
+  }, [horarioId, cargarClases, todasLasClases]);
 
   const obtenerMaterias = async (infoHorario) => {
     // cargar materias segun el trimestre
@@ -405,6 +458,8 @@ export default function Calendar(horarioId) {
     try {
       const response = await Api.get("/bloques");
       setBloques(response.data);
+      console.log('bloques de horas', response.data);
+      
     } catch (error) {
       AlertaError("Error al cargar los bloques de horas");
       console.error(error);
@@ -533,9 +588,11 @@ export default function Calendar(horarioId) {
               error.response.data.message || "Error al actualizar el evento"
             }`
           );
+          await recargarDatosCompletos();
         } else {
           console.error("Error al actualizar evento:", error.message);
           AlertaError("Error al actualizar el evento: " + error.message);
+          await recargarDatosCompletos();
         }
       }
     },
@@ -559,8 +616,19 @@ export default function Calendar(horarioId) {
   // Función para calcular horas usadas por materia
   const calcularHorasUsadasPorMateria = useCallback(
     (materiaId) => {
+      // Asegurarnos de que eventos sea un array válido
+      if (!eventos || !Array.isArray(eventos)) {
+        console.warn(
+          "eventos no es un array válido en calcularHorasUsadasPorMateria"
+        );
+        return 0;
+      }
+
       return eventos
         .filter((evento) => {
+          // Verificar que evento no sea null/undefined
+          if (!evento) return false;
+
           const idMateriaEvento =
             evento.materias?.value || evento.materia || evento.materia_id;
           return idMateriaEvento == materiaId;
@@ -572,7 +640,7 @@ export default function Calendar(horarioId) {
 
   // Bloques disponibles: solo los que no están ocupados por el docente ni el aula en ese día y permiten la duración seleccionada
   const getBloquesConDisponibilidad = () => {
-    if (!nuevoEvento.dia || !nuevoEvento.docente || !nuevoEvento.aula)
+    if (!nuevoEvento.dia)
       return bloques.map((b) => ({
         ...b,
         disponible: true,
@@ -580,11 +648,11 @@ export default function Calendar(horarioId) {
       }));
 
     const dia = nuevoEvento.dia.value;
-    const docenteId = nuevoEvento.docente.value;
-    const aulaId = nuevoEvento.aula.value;
+    const docenteId = nuevoEvento.docente?.value;
+    const aulaId = nuevoEvento.aula?.value;
     const duracion = parseInt(nuevoEvento.duracion) || 1;
 
-    // Obtener ocupaciones para docente y aula
+    // Obtener ocupaciones para docente y aula (solo si están seleccionados)
     const ocupacionesDocente = new Set();
     const ocupacionesAula = new Set();
     const ocupacionesHorarioActual = new Set();
@@ -593,10 +661,12 @@ export default function Calendar(horarioId) {
     todosLosEventos.forEach((evento) => {
       if (evento.dia === dia) {
         for (let i = 0; i < evento.duracion; i++) {
-          if (evento.docente?.value === docenteId) {
+          // Solo verificar docente si hay docente seleccionado
+          if (docenteId && evento.docente?.value === docenteId) {
             ocupacionesDocente.add(evento.bloque + i);
           }
-          if (evento.aula?.value === aulaId) {
+          // Solo verificar aula si hay aula seleccionada
+          if (aulaId && evento.aula?.value === aulaId) {
             ocupacionesAula.add(evento.bloque + i);
           }
         }
@@ -627,15 +697,15 @@ export default function Calendar(horarioId) {
           break;
         }
 
-        // Verificar ocupación del docente
-        if (ocupacionesDocente.has(bloqueActual)) {
+        // Verificar ocupación del docente solo si hay docente seleccionado
+        if (docenteId && ocupacionesDocente.has(bloqueActual)) {
           razones.push("Docente ocupado");
           disponible = false;
           break;
         }
 
-        // Verificar ocupación del aula
-        if (ocupacionesAula.has(bloqueActual)) {
+        // Verificar ocupación del aula solo si hay aula seleccionada
+        if (aulaId && ocupacionesAula.has(bloqueActual)) {
           razones.push("Aula ocupada");
           disponible = false;
           break;
@@ -647,7 +717,6 @@ export default function Calendar(horarioId) {
         label: bloque.rango,
         disponible,
         razones: [...new Set(razones)], // Eliminar duplicados
-        // Propiedades para estilos
         colorFondo: disponible ? "#ffffff" : "#f8f9fa",
         colorTexto: disponible ? "#333333" : "#6c757d",
         estado: disponible ? "normal" : "no-disponible",
@@ -863,25 +932,19 @@ export default function Calendar(horarioId) {
   const diaOptions = dias.map((d) => ({ value: d, label: d }));
 
   const materiasOptions = useMemo(() => {
+    // Asegurarnos de que materias sea un array válido
+    if (!materias || !Array.isArray(materias)) {
+      console.warn("materias no es un array válido");
+      return [];
+    }
+
     return materias
       .map((m) => {
+        // Verificar que m no sea null/undefined
+        if (!m) return null;
+
         const horasUsadas = calcularHorasUsadasPorMateria(m.id);
         const horasDisponibles = m.horas - horasUsadas;
-
-        // Colores para materias
-        let colorFondo = "#ffffff";
-        let colorTexto = "#333333";
-        let estado = "normal";
-
-        if (horasDisponibles <= 1) {
-          colorFondo = "#dc3545";
-          colorTexto = "#ffffff";
-          estado = "critico";
-        } else if (horasDisponibles <= 4) {
-          colorFondo = "#ffc107";
-          colorTexto = "#212529";
-          estado = "advertencia";
-        }
 
         return {
           value: m.id,
@@ -892,12 +955,9 @@ export default function Calendar(horarioId) {
               : `${m.text} (SIN HORAS DISPONIBLES)`,
           horasDisponibles: horasDisponibles,
           isDisabled: horasDisponibles <= 1,
-          colorFondo,
-          colorTexto,
-          estado,
         };
       })
-      .filter((materia) => materia.horasDisponibles > 1);
+      .filter((materia) => materia && materia.horasDisponibles > 1);
   }, [materias, calcularHorasUsadasPorMateria]);
 
   const resizeData = useRef({
@@ -944,8 +1004,17 @@ export default function Calendar(horarioId) {
       const duracionEvento = activeEvent.duracion;
 
       setEventos((prevEventos) => {
+        // Asegurarnos de que prevEventos siempre sea un array
+        if (!prevEventos || !Array.isArray(prevEventos)) {
+          console.error("prevEventos no es un array válido:", prevEventos);
+          return prevEventos || [];
+        }
+
         const eventoActivo = prevEventos.find((e) => e.id === active.id);
-        if (!eventoActivo) return prevEventos;
+        if (!eventoActivo) {
+          console.error("Evento activo no encontrado");
+          return prevEventos;
+        }
 
         // 1. Validación de solapamiento en el horario actual
         const haySolapamientoHorarioActual = prevEventos.some(
@@ -965,38 +1034,42 @@ export default function Calendar(horarioId) {
 
         // 2. Validación de solapamiento del docente en todos los horarios
         const docenteId = activeEvent.docente?.value || activeEvent.docente_id;
-        const haySolapamientoDocente = todosLosEventos.some(
-          (e) =>
-            e.id !== active.id && // Excluir el evento actual
-            (e.docente?.value === docenteId || e.docente_id === docenteId) &&
-            e.dia === newDia &&
-            bloqueNum < e.bloque + e.duracion &&
-            bloqueNum + duracionEvento > e.bloque
-        );
-
-        if (haySolapamientoDocente) {
-          AlertaWarning(
-            "¡El docente ya tiene una clase en ese rango de bloques en otro horario!"
+        if (docenteId) {
+          const haySolapamientoDocente = todosLosEventos.some(
+            (e) =>
+              e.id !== active.id && // Excluir el evento actual
+              (e.docente?.value === docenteId || e.docente_id === docenteId) &&
+              e.dia === newDia &&
+              bloqueNum < e.bloque + e.duracion &&
+              bloqueNum + duracionEvento > e.bloque
           );
-          return prevEventos;
+
+          if (haySolapamientoDocente) {
+            AlertaWarning(
+              "¡El docente ya tiene una clase en ese rango de bloques en otro horario!"
+            );
+            return prevEventos;
+          }
         }
 
         // 3. Validación de solapamiento del aula en todos los horarios
         const aulaId = activeEvent.aula?.value || activeEvent.espacio_id;
-        const haySolapamientoAula = todosLosEventos.some(
-          (e) =>
-            e.id !== active.id && // Excluir el evento actual
-            (e.aula?.value === aulaId || e.espacio_id === aulaId) &&
-            e.dia === newDia &&
-            bloqueNum < e.bloque + e.duracion &&
-            bloqueNum + duracionEvento > e.bloque
-        );
-
-        if (haySolapamientoAula) {
-          AlertaWarning(
-            "¡El aula ya tiene una clase en ese rango de bloques en otro horario!"
+        if (aulaId) {
+          const haySolapamientoAula = todosLosEventos.some(
+            (e) =>
+              e.id !== active.id && // Excluir el evento actual
+              (e.aula?.value === aulaId || e.espacio_id === aulaId) &&
+              e.dia === newDia &&
+              bloqueNum < e.bloque + e.duracion &&
+              bloqueNum + duracionEvento > e.bloque
           );
-          return prevEventos;
+
+          if (haySolapamientoAula) {
+            AlertaWarning(
+              "¡El aula ya tiene una clase en ese rango de bloques en otro horario!"
+            );
+            return prevEventos;
+          }
         }
 
         // Si pasa todas las validaciones, actualizar
@@ -1018,7 +1091,7 @@ export default function Calendar(horarioId) {
 
       setActiveEvent(null);
     },
-    [activeEvent, actualizarEventoEnBD, todosLosEventos] // Agregar todosLosEventos como dependencia
+    [activeEvent, actualizarEventoEnBD, todosLosEventos]
   );
 
   useEffect(() => {
@@ -1221,7 +1294,7 @@ export default function Calendar(horarioId) {
               Horas que intenta agregar: ${duracionNueva} hrs<br>
               Horas totales con la nueva duración: ${horasTotalesConNuevaDuracion} hrs<br>
               Horas disponibles: ${
-              horasBaseDocente - horasUsadasSinEventoActual
+                horasBaseDocente - horasUsadasSinEventoActual
               } hrs<br><br>
               <em>Nota: Incluye todas las clases de este docente en todos los horarios del mismo período.</em>
             `);
@@ -1327,20 +1400,18 @@ export default function Calendar(horarioId) {
   const handleAgregarEvento = async (e) => {
     e.preventDefault();
     if (
-      !docenteSeleccionado ||
       !materiaSeleccionada ||
-      !docenteSeleccionado ||
       !nuevoEvento.dia ||
       nuevoEvento.bloque === null
     ) {
-      AlertaWarning("Completa los campos vacíos");
+      AlertaWarning("Completa los campos obligatorios (Materia, Día y Bloque)");
       return;
     }
 
     const bloqueNum = parseInt(nuevoEvento.bloque.value);
     const duracionNum = parseInt(nuevoEvento.duracion);
 
-    // Evitar solapamientos (validación robusta)
+    // Evitar solapamientos en el horario actual (siempre se valida)
     const haySolapamiento = eventos.some(
       (e) =>
         e.dia === nuevoEvento.dia.value &&
@@ -1352,42 +1423,43 @@ export default function Calendar(horarioId) {
       return;
     }
 
-    // evitar solapamiento de docentes
-    const haySolaplamientoDocente = todosLosEventos.some(
-      (e) =>
-        e.docente.value === nuevoEvento.docente.value &&
-        e.dia === nuevoEvento.dia.value &&
-        bloqueNum < e.bloque + e.duracion &&
-        bloqueNum + duracionNum > e.bloque
-    );
-    if (haySolaplamientoDocente) {
-      AlertaWarning(
-        "¡El docente ya tiene una clase en ese rango de bloques en otro horario!"
+    // Validar solapamiento de docente solo si hay docente seleccionado
+    if (nuevoEvento.docente) {
+      const haySolapamientoDocente = todosLosEventos.some(
+        (e) =>
+          e.docente?.value === nuevoEvento.docente.value &&
+          e.dia === nuevoEvento.dia.value &&
+          bloqueNum < e.bloque + e.duracion &&
+          bloqueNum + duracionNum > e.bloque
       );
-      return;
+      if (haySolapamientoDocente) {
+        AlertaWarning(
+          "¡El docente ya tiene una clase en ese rango de bloques en otro horario!"
+        );
+        return;
+      }
     }
 
-    //evitar solapamiento de aulas
-    const haySolapamientoAula = todosLosEventos.some(
-      (e) =>
-        e.aula.value === nuevoEvento.aula?.value &&
-        e.dia === nuevoEvento.dia.value &&
-        bloqueNum < e.bloque + e.duracion &&
-        bloqueNum + duracionNum > e.bloque
-    );
-    if (haySolapamientoAula) {
-      AlertaWarning(
-        "¡El aula ya tiene una clase en ese rango de bloques en otro horario!"
+    // Validar solapamiento de aula solo si hay aula seleccionada
+    if (nuevoEvento.aula) {
+      const haySolapamientoAula = todosLosEventos.some(
+        (e) =>
+          e.aula?.value === nuevoEvento.aula.value &&
+          e.dia === nuevoEvento.dia.value &&
+          bloqueNum < e.bloque + e.duracion &&
+          bloqueNum + duracionNum > e.bloque
       );
-      return;
+      if (haySolapamientoAula) {
+        AlertaWarning(
+          "¡El aula ya tiene una clase en ese rango de bloques en otro horario!"
+        );
+        return;
+      }
     }
 
     // Evitar exceder el horario de la materia
     const horasUsadasMateria = eventos
       .filter((e) => {
-        e.materias?.value &&
-          nuevoEvento.materia.value &&
-          e.materias?.value === nuevoEvento.materia.value;
         return e.materias?.value === nuevoEvento.materia.value;
       })
       .reduce((acc, e) => acc + (e.duracion || 1), 0);
@@ -1395,35 +1467,37 @@ export default function Calendar(horarioId) {
 
     if (horasUsadasMateria + duracionNum > horasMateria) {
       AlertaWarning(`
-        <strong>¡Atención! Se ha excedido el límite de horas semanales para esta Unidad Curricular.</strong><br><br>
-        Horas permitidas: ${horasMateria}<br>
-        Horas usadas actualmente: ${horasUsadasMateria}<br>
-        Horas totales con la nueva clase: ${
-          horasUsadasMateria + duracionNum
-        }<br><br>
-        Por favor, revisa el horario para ajustarlo dentro del límite establecido.
-      `);
+      <strong>¡Atención! Se ha excedido el límite de horas semanales para esta Unidad Curricular.</strong><br><br>
+      Horas permitidas: ${horasMateria}<br>
+      Horas usadas actualmente: ${horasUsadasMateria}<br>
+      Horas totales con la nueva clase: ${
+        horasUsadasMateria + duracionNum
+      }<br><br>
+      Por favor, revisa el horario para ajustarlo dentro del límite establecido.
+    `);
       return;
     }
 
-    // Calcular la suma de horas ya usadas para el docente
-    const horasUsadasDocente = calcularHorasUsadasPorDocente(
-      nuevoEvento.docente.value
-    );
-    const horasBaseDocente =
-      docentes.find((d) => d.id === nuevoEvento.docente.value)
-        ?.horas_dedicacion || 0;
+    // Calcular horas del docente solo si hay docente seleccionado
+    if (nuevoEvento.docente) {
+      const horasUsadasDocente = calcularHorasUsadasPorDocente(
+        nuevoEvento.docente.value
+      );
+      const horasBaseDocente =
+        docentes.find((d) => d.id === nuevoEvento.docente.value)
+          ?.horas_dedicacion || 0;
 
-    if (horasUsadasDocente + duracionNum > horasBaseDocente) {
-      AlertaWarning(`
-    <strong>¡Atención! El docente ha excedido su dedicación horaria en este período.</strong><br><br>
-    Dedicación base: ${horasBaseDocente} hrs<br>
-    Horas usadas en el lapso/trimestre: ${horasUsadasDocente} hrs<br>
-    Horas que intenta agregar: ${duracionNum} hrs<br>
-    Horas disponibles: ${horasBaseDocente - horasUsadasDocente} hrs<br><br>
-    <em>Nota: Incluye todas las clases de este docente en todos los horarios del mismo lapso académico y trimestre.</em>
-  `);
-      return;
+      if (horasUsadasDocente + duracionNum > horasBaseDocente) {
+        AlertaWarning(`
+        <strong>¡Atención! El docente ha excedido su dedicación horaria en este período.</strong><br><br>
+        Dedicación base: ${horasBaseDocente} hrs<br>
+        Horas usadas en el lapso/trimestre: ${horasUsadasDocente} hrs<br>
+        Horas que intenta agregar: ${duracionNum} hrs<br>
+        Horas disponibles: ${horasBaseDocente - horasUsadasDocente} hrs<br><br>
+        <em>Nota: Incluye todas las clases de este docente en todos los horarios del mismo lapso académico y trimestre.</em>
+      `);
+        return;
+      }
     }
 
     // Calcular la cantidad de bloques
@@ -1443,10 +1517,10 @@ export default function Calendar(horarioId) {
       trayecto_id: parseInt(horarioId?.horario?.seccion?.trayecto_id),
       trimestre_id: parseInt(horarioId?.horario?.trimestre_id),
       unidad_curricular_id: parseInt(nuevoEvento.materia.value),
-      docente_id: parseInt(nuevoEvento.docente.value),
-      espacio_id: nuevoEvento.aula?.value
-        ? parseInt(nuevoEvento.aula?.value)
+      docente_id: nuevoEvento.docente
+        ? parseInt(nuevoEvento.docente.value)
         : null,
+      espacio_id: nuevoEvento.aula ? parseInt(nuevoEvento.aula.value) : null,
       dia: nuevoEvento.dia.value,
       bloque_id: parseInt(nuevoEvento.bloque.value),
       duracion: nuevoEvento.duracion,
@@ -1481,7 +1555,9 @@ export default function Calendar(horarioId) {
           trayecto: horarioId?.horario?.seccion?.trayecto_id,
           docente: nuevoEvento.docente,
           trimestre: horarioId?.horario?.trimestre_id,
-          texto: `${nuevoEvento.materia.label}\n${nuevoEvento.docente.label}\n${nuevoEvento.aula.label}`,
+          texto: `${nuevoEvento.materia.label}\n${
+            nuevoEvento.docente ? nuevoEvento.docente.label : "Sin docente"
+          }\n${nuevoEvento.aula ? nuevoEvento.aula.label : "Sin aula"}`,
           color: "#e3f2fd",
         },
       ]);
@@ -1534,7 +1610,23 @@ export default function Calendar(horarioId) {
   };
 
   const handleEditarEvento = (evento) => {
-    // Preseleccionar aula correctamente para el select
+    // Preseleccionar docente correctamente (puede ser null)
+    let docenteObj = null;
+    if (
+      evento.docente &&
+      typeof evento.docente === "object" &&
+      "value" in evento.docente
+    ) {
+      docenteObj = evento.docente;
+    } else if (evento.docente_id) {
+      // Buscar en docentesOptions
+      const found = docentesOptions.find(
+        (d) => String(d.value) === String(evento.docente_id)
+      );
+      docenteObj = found || null;
+    }
+
+    // Preseleccionar aula correctamente (puede ser null)
     let aulaObj = null;
     if (
       evento.aula &&
@@ -1542,15 +1634,17 @@ export default function Calendar(horarioId) {
       "value" in evento.aula
     ) {
       aulaObj = evento.aula;
-    } else if (evento.aula) {
-      // Buscar en aulasOptions
+    } else if (evento.espacio_id) {
+      // Buscar en aulaOptions
       const found = aulaOptions.find(
-        (a) => String(a.value) === String(evento.aula)
+        (a) => String(a.value) === String(evento.espacio_id)
       );
       aulaObj = found || null;
     }
+
     setEventoEditando({
       ...evento,
+      docente: docenteObj,
       aula: aulaObj,
     });
     setMostrarModal(true);
@@ -1860,97 +1954,93 @@ export default function Calendar(horarioId) {
               <form
                 onSubmit={async (e) => {
                   e.preventDefault();
-                  // Validaciones igual que en agregar evento
-                  const eventoAnterior = eventos.find(
-                    (ev) => ev.id === eventoEditando.id
-                  );
+
+                  // Solo la materia es obligatoria, docente y aula son opcionales
                   const materiaEdit = materias.find(
                     (m) =>
                       String(m.id) === String(eventoEditando.materias?.value)
                   );
-                  const docenteEdit = docentes.find(
-                    (d) =>
-                      String(d.id) === String(eventoEditando.docente?.value)
-                  );
-                  const aulaEdit = aulas.find(
-                    (a) => String(a.id) === String(eventoEditando.aula?.value)
-                  );
-                  const diaEdit = eventoEditando.dia?.value;
-                  if (!docenteEdit || !materiaEdit || !aulaEdit) {
-                    AlertaWarning("Completa los campos vacíos");
-                    return;
-                  }
-                  // Validar solapamiento en el mismo horario
-                  const bloqueNum = eventoAnterior.bloque;
-                  const duracionNum = eventoAnterior.duracion;
-                  const haySolapamiento = eventos.some(
-                    (e) =>
-                      e.id !== eventoEditando.id &&
-                      e.dia === diaEdit &&
-                      bloqueNum < e.bloque + e.duracion &&
-                      bloqueNum + duracionNum > e.bloque
-                  );
-                  if (haySolapamiento) {
-                    AlertaWarning(
-                      "¡Ya existe una clase en ese rango de bloques!"
-                    );
-                    return;
-                  }
-                  // Validar solapamiento docente en todos los horarios
-                  const haySolaplamientoDocente = todosLosEventos.some(
-                    (e) =>
-                      e.id !== eventoEditando.id &&
-                      e.docente.value === docenteEdit.id &&
-                      e.dia === diaEdit &&
-                      bloqueNum < e.bloque + e.duracion &&
-                      bloqueNum + duracionNum > e.bloque
-                  );
-                  if (haySolaplamientoDocente) {
-                    AlertaWarning(
-                      "¡El docente ya tiene una clase en ese rango de bloques en otro horario!"
-                    );
-                    return;
-                  }
-                  // Validar solapamiento aula en todos los horarios
-                  const haySolapamientoAula = todosLosEventos.some(
-                    (e) =>
-                      e.id !== eventoEditando.id &&
-                      e.aula.value === aulaEdit.id &&
-                      e.dia === diaEdit &&
-                      bloqueNum < e.bloque + e.duracion &&
-                      bloqueNum + duracionNum > e.bloque
-                  );
-                  if (haySolapamientoAula) {
-                    AlertaWarning(
-                      "¡El aula ya tiene una clase en ese rango de bloques en otro horario!"
-                    );
-                    return;
-                  }
-                  // Validar horas de la materia
-                  const horasUsadasMateria = eventos
-                    .filter(
-                      (e) =>
-                        e.id !== eventoEditando.id &&
-                        e.materias?.value === eventoEditando.materias?.value
-                    )
-                    .reduce((acc, e) => acc + (e.duracion || 1), 0);
-                  const horasMateria = materiaEdit?.horas || 0;
-                  if (horasUsadasMateria + duracionNum > horasMateria) {
-                    AlertaWarning(
-                      "¡Se excedieron las horas semanales de la Unidad Curricular!"
-                    );
-                    return;
-                  }
-                  // Validar horas del docente
-                  const horasUsadasDocente = calcularHorasUsadasPorDocente(
-                    eventoEditando.docente.value
-                  );
-                  const horasBaseDocente =
-                    docentes.find((d) => d.id === eventoEditando.docente.value)
-                      ?.horas_dedicacion || 0;
 
-                  if (horasUsadasDocente + duracionNum > horasBaseDocente) {
-                    // Excluir el evento actual del cálculo si estamos editando el mismo docente
+                  // Docente y aula son opcionales - pueden ser null
+                  const docenteEdit = eventoEditando.docente
+                    ? docentes.find(
+                        (d) =>
+                          String(d.id) === String(eventoEditando.docente?.value)
+                      )
+                    : null;
+
+                  const aulaEdit = eventoEditando.aula
+                    ? aulas.find(
+                        (a) =>
+                          String(a.id) === String(eventoEditando.aula?.value)
+                      )
+                    : null;
+
+                  // Solo validar materia obligatoria
+                  if (!materiaEdit) {
+                    AlertaWarning("La Unidad Curricular es obligatoria");
+                    return;
+                  }
+
+                  // Obtener información del evento actual para validaciones
+                  const eventoActual = eventos.find(
+                    (e) => e.id === eventoEditando.id
+                  );
+                  if (!eventoActual) {
+                    AlertaError("No se encontró el evento a editar");
+                    return;
+                  }
+
+                  const diaActual = eventoActual.dia;
+                  const bloqueActual = eventoActual.bloque;
+                  const duracionActual = eventoActual.duracion;
+
+                  // VALIDACIÓN 1: Solapamiento de docente (solo si hay docente seleccionado)
+                  if (docenteEdit) {
+                    const haySolapamientoDocente = todosLosEventos.some(
+                      (e) =>
+                        e.id !== eventoEditando.id && // Excluir el evento actual
+                        e.docente?.value === docenteEdit.id && // Mismo docente
+                        e.dia === diaActual && // Mismo día
+                        bloqueActual < e.bloque + e.duracion && // Solapamiento en bloques
+                        bloqueActual + duracionActual > e.bloque
+                    );
+
+                    if (haySolapamientoDocente) {
+                      AlertaWarning(
+                        "¡El docente ya tiene una clase en ese rango de bloques en otro horario!"
+                      );
+                      return;
+                    }
+                  }
+
+                  // VALIDACIÓN 2: Solapamiento de aula (solo si hay aula seleccionada)
+                  if (aulaEdit) {
+                    const haySolapamientoAula = todosLosEventos.some(
+                      (e) =>
+                        e.id !== eventoEditando.id && // Excluir el evento actual
+                        e.aula?.value === aulaEdit.id && // Misma aula
+                        e.dia === diaActual && // Mismo día
+                        bloqueActual < e.bloque + e.duracion && // Solapamiento en bloques
+                        bloqueActual + duracionActual > e.bloque
+                    );
+
+                    if (haySolapamientoAula) {
+                      AlertaWarning(
+                        "¡El aula ya tiene una clase en ese rango de bloques en otro horario!"
+                      );
+                      return;
+                    }
+                  }
+
+                  // VALIDACIÓN 3: Horas del docente (solo si hay docente seleccionado)
+                  if (docenteEdit) {
+                    const horasUsadasDocente = calcularHorasUsadasPorDocente(
+                      eventoEditando.docente.value
+                    );
+                    const horasBaseDocente = docenteEdit?.horas_dedicacion || 0;
+
+                    // Excluir el evento actual del cálculo
                     const horasUsadasSinEventoActual = todosLosEventos
                       .filter((e) => {
                         const idDocenteEvento =
@@ -1966,31 +2056,30 @@ export default function Calendar(horarioId) {
                       );
 
                     const horasTotalesConEventoEditado =
-                      horasUsadasSinEventoActual + duracionNum;
+                      horasUsadasSinEventoActual + duracionActual;
 
                     if (horasTotalesConEventoEditado > horasBaseDocente) {
                       AlertaWarning(`
-                        <strong>¡Atención! El docente ha excedido su dedicación horaria en este período.</strong><br><br>
-                        Dedicación base: ${horasBaseDocente} hrs<br>
-                        Horas usadas en el lapso/trimestre: ${horasUsadasSinEventoActual} hrs<br>
-                        Horas que intenta asignar: ${duracionNum} hrs<br>
-                        Horas disponibles: ${
-                          horasBaseDocente - horasUsadasSinEventoActual
-                        } hrs<br><br>
-                        <em>Nota: Incluye todas las clases de este docente en todos los horarios del mismo lapso académico y trimestre.</em>
-                      `);
+                  <strong>¡Atención! El docente ha excedido su dedicación horaria en este período.</strong><br><br>
+                  Dedicación base: ${horasBaseDocente} hrs<br>
+                  Horas usadas en el lapso/trimestre: ${horasUsadasSinEventoActual} hrs<br>
+                  Horas que intenta asignar: ${duracionActual} hrs<br>
+                  Horas disponibles: ${
+                    horasBaseDocente - horasUsadasSinEventoActual
+                  } hrs<br><br>
+                  <em>Nota: Incluye todas las clases de este docente en todos los horarios del mismo lapso académico y trimestre.</em>
+                `);
                       return;
                     }
                   }
-                  // Actualizar en backend
+
+                  // Actualizar en backend - permitir valores nulos
                   const payload = {
-                    dia: diaEdit,
-                    bloque_id: bloqueNum,
-                    duracion: duracionNum,
                     unidad_curricular_id: materiaEdit.id,
-                    docente_id: docenteEdit.id,
-                    espacio_id: aulaEdit.id,
+                    docente_id: docenteEdit ? docenteEdit.id : null,
+                    espacio_id: aulaEdit ? aulaEdit.id : null,
                   };
+
                   try {
                     const response = await Api.put(
                       `/claseEdit/${eventoEditando.id}`,
@@ -2004,7 +2093,13 @@ export default function Calendar(horarioId) {
                     );
                     return;
                   }
-                  // Actualiza el evento en el array y resalta visualmente
+
+                  // Crear texto actualizado del evento
+                  const textoActualizado = `${eventoEditando.materias.label}\n${
+                    docenteEdit ? eventoEditando.docente.label : "Sin docente"
+                  }\n${aulaEdit ? eventoEditando.aula.label : "Sin aula"}`;
+
+                  // Actualiza el evento en el array
                   setEventos((prev) =>
                     prev.map((ev) =>
                       ev.id === eventoEditando.id
@@ -2014,21 +2109,25 @@ export default function Calendar(horarioId) {
                               value: eventoEditando.materias?.value,
                               label: eventoEditando.materias?.label,
                             },
-                            docente: {
-                              value: eventoEditando.docente?.value,
-                              label: eventoEditando.docente?.label,
-                            },
-                            aula: {
-                              value: eventoEditando.aula?.value,
-                              label: eventoEditando.aula?.label,
-                            },
-                            dia: eventoEditando.dia,
-                            texto: `${eventoEditando.materias.label}\n${eventoEditando.docente.label}\n${eventoEditando.aula.label}`,
+                            docente: docenteEdit
+                              ? {
+                                  value: eventoEditando.docente?.value,
+                                  label: eventoEditando.docente?.label,
+                                }
+                              : null,
+                            aula: aulaEdit
+                              ? {
+                                  value: eventoEditando.aula?.value,
+                                  label: eventoEditando.aula?.label,
+                                }
+                              : null,
+                            texto: textoActualizado,
                           }
                         : ev
                     )
                   );
-                  setEventoRecienAgregado(eventoEditando.id); // Resalta el evento editado
+
+                  setEventoRecienAgregado(eventoEditando.id);
                   setMostrarModal(false);
                   await recargarDatosCompletos();
                 }}
@@ -2070,7 +2169,7 @@ export default function Calendar(horarioId) {
                                 colorTexto: option.colorTexto,
                                 estado: option.estado,
                               },
-                              docente: null,
+                              docente: null, // Reset docente al cambiar materia
                             });
                           } else {
                             setEventoEditando({
@@ -2087,7 +2186,8 @@ export default function Calendar(horarioId) {
                                 `/docentes/unidadesPnfs?pnf_id=${horarioId?.horario?.seccion?.pnf_id}&unidad_curricular_id=${option.value}`
                               );
                               setDocentes(response.data);
-                              setDocenteSeleccionado(response.data[0]);
+                              // No establecer docente seleccionado automáticamente
+                              // Dejar que el usuario elija o deje en null
                             } catch (error) {
                               AlertaError("Error al cargar los docentes");
                               console.log(error);
@@ -2107,6 +2207,7 @@ export default function Calendar(horarioId) {
                           option.labelConHoras || option.label
                         }
                         getOptionValue={(option) => option.value}
+                        isClearable={true}
                         onChange={(option) => {
                           if (option) {
                             setDocenteSeleccionado(
@@ -2125,6 +2226,7 @@ export default function Calendar(horarioId) {
                               },
                             });
                           } else {
+                            // Cuando se limpia el select
                             setEventoEditando({
                               ...eventoEditando,
                               docente: null,
@@ -2140,16 +2242,25 @@ export default function Calendar(horarioId) {
                         className="col-sm-12 col-xs-12 col-xl-10"
                         value={eventoEditando.aula}
                         options={aulaOptions}
+                        isClearable={true}
                         onChange={(option) => {
-                          setAulaSeleccionada(
-                            aulas.find(
-                              (e) => String(e.id) === String(option?.value)
-                            ) || null
-                          );
-                          setEventoEditando({
-                            ...eventoEditando,
-                            aula: option,
-                          });
+                          if (option) {
+                            setAulaSeleccionada(
+                              aulas.find(
+                                (e) => String(e.id) === String(option?.value)
+                              ) || null
+                            );
+                            setEventoEditando({
+                              ...eventoEditando,
+                              aula: option,
+                            });
+                          } else {
+                            // Cuando se limpia el select
+                            setEventoEditando({
+                              ...eventoEditando,
+                              aula: null,
+                            });
+                          }
                         }}
                       />
                     </div>

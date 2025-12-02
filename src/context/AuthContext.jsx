@@ -86,6 +86,7 @@ export function AuthProvider({ children }) {
     localStorage.setItem("token", userData.token);
     localStorage.setItem("permissions", JSON.stringify(userData.permissions));
     localStorage.setItem("pnf", userData.pnf);
+    localStorage.setItem("logoPnf", userData.logoPnf);
 
     // Configurar el token en las cabeceras de las peticiones API
     Api.defaults.headers.common["Authorization"] = `Bearer ${userData.token}`;
@@ -97,6 +98,8 @@ export function AuthProvider({ children }) {
     setUser(null);
     localStorage.removeItem("user");
     localStorage.removeItem("token");
+    localStorage.removeItem("pnf");
+    localStorage.removeItem("logoPnf");
   };
 
   return (

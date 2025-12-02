@@ -4,6 +4,7 @@ import { Navbar } from "./layouts/Navbar";
 import { Sidebar } from "./layouts/Sidebar";
 import { Footer } from "./layouts/Footer";
 import ScrollToTopButton from "./ScrollToTopButton";
+import { UniversityProvider } from "../context/UniversityInfoContext";
 
 export default function Layout({ children }) {
   const location = useLocation();
@@ -15,21 +16,34 @@ export default function Layout({ children }) {
         // Re-inicializa los plugins de Kaiadmin y jQuery
         if (window.$) {
           // Scrollbars
-          window.$(".sidebar .scrollbar").scrollbar && window.$(".sidebar .scrollbar").scrollbar();
-          window.$(".main-panel .content-scroll").scrollbar && window.$(".main-panel .content-scroll").scrollbar();
-          window.$(".messages-scroll").scrollbar && window.$(".messages-scroll").scrollbar();
-          window.$(".tasks-scroll").scrollbar && window.$(".tasks-scroll").scrollbar();
-          window.$(".quick-scroll").scrollbar && window.$(".quick-scroll").scrollbar();
-          window.$(".message-notif-scroll").scrollbar && window.$(".message-notif-scroll").scrollbar();
-          window.$(".notif-scroll").scrollbar && window.$(".notif-scroll").scrollbar();
-          window.$(".quick-actions-scroll").scrollbar && window.$(".quick-actions-scroll").scrollbar();
-          window.$(".dropdown-user-scroll").scrollbar && window.$(".dropdown-user-scroll").scrollbar();
+          window.$(".sidebar .scrollbar").scrollbar &&
+            window.$(".sidebar .scrollbar").scrollbar();
+          window.$(".main-panel .content-scroll").scrollbar &&
+            window.$(".main-panel .content-scroll").scrollbar();
+          window.$(".messages-scroll").scrollbar &&
+            window.$(".messages-scroll").scrollbar();
+          window.$(".tasks-scroll").scrollbar &&
+            window.$(".tasks-scroll").scrollbar();
+          window.$(".quick-scroll").scrollbar &&
+            window.$(".quick-scroll").scrollbar();
+          window.$(".message-notif-scroll").scrollbar &&
+            window.$(".message-notif-scroll").scrollbar();
+          window.$(".notif-scroll").scrollbar &&
+            window.$(".notif-scroll").scrollbar();
+          window.$(".quick-actions-scroll").scrollbar &&
+            window.$(".quick-actions-scroll").scrollbar();
+          window.$(".dropdown-user-scroll").scrollbar &&
+            window.$(".dropdown-user-scroll").scrollbar();
           // Tooltips y popovers de Bootstrap
           if (window.bootstrap) {
-            let tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-            [...tooltips].map(e => new window.bootstrap.Tooltip(e));
-            let popovers = document.querySelectorAll('[data-bs-toggle="popover"]');
-            [...popovers].map(e => new window.bootstrap.Popover(e));
+            let tooltips = document.querySelectorAll(
+              '[data-bs-toggle="tooltip"]'
+            );
+            [...tooltips].map((e) => new window.bootstrap.Tooltip(e));
+            let popovers = document.querySelectorAll(
+              '[data-bs-toggle="popover"]'
+            );
+            [...popovers].map((e) => new window.bootstrap.Popover(e));
           }
         }
       }, 200); // Puedes probar con 200ms o más si tu menú es muy pesado
@@ -39,18 +53,20 @@ export default function Layout({ children }) {
 
   return (
     <>
-      <div className="wrapper">
-        <Sidebar />
-        <div className="main-panel">
-          <Navbar />
-          <div className="container">
-            <div className="page-inner">{children}</div>
-          </div>
-          <Footer />
+      <UniversityProvider>
+        <div className="wrapper">
+          <Sidebar />
+          <div className="main-panel">
+            <Navbar />
+            <div className="container">
+              <div className="page-inner">{children}</div>
+            </div>
+            <Footer />
 
-          <ScrollToTopButton />
+            <ScrollToTopButton />
+          </div>
         </div>
-      </div>
+      </UniversityProvider>
     </>
   );
 }

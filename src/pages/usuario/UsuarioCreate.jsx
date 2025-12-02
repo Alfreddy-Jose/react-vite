@@ -48,7 +48,7 @@ const validationSchema = Yup.object({
         value && 
         ["image/jpeg", "image/png", "image/jpg", "image/gif"].includes(
           value.type
-        )
+        ) 
       );
     }),
 });

@@ -197,9 +197,9 @@ function HomePage() {
       </main>
 
       {/* Pie de página */}
-      <div className="text-dark">
+{/*       <div className="text-dark">
         <Footer />
-      </div>
+      </div> */}
     </div>
   );
 }

@@ -124,7 +124,7 @@ function UsuarioEdit() {
   const handleRemoveAvatar = () => {
     formik.setFieldValue("avatar", null);
     setAvatarPreview(null);
-    // También podrías enviar un campo para eliminar el avatar existente
+    // enviar un campo para eliminar el avatar existente
     formik.setFieldValue("remove_avatar", true);
 
     // Limpiar el input file
